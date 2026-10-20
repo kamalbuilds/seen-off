@@ -1,0 +1,106 @@
+{
+ "summary": {
+  "set": "painted-out",
+  "provider": "openrouter",
+  "model": "amazon/nova-lite-v1",
+  "frames": 10,
+  "errors": 0,
+  "present_absent_accuracy": "100.0% (10/10)",
+  "count_exact_accuracy_on_labelled": "100.0% (10/10)",
+  "median_ms": 1567,
+  "present_absent_painted-out": "100.0% (10/10)",
+  "truth_gone_correct": "100.0% (10/10)"
+ },
+ "rows": [
+  {
+   "id": "p01",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 2404
+  },
+  {
+   "id": "p02",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1455
+  },
+  {
+   "id": "p03",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1414
+  },
+  {
+   "id": "p04",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1979
+  },
+  {
+   "id": "p05",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1514
+  },
+  {
+   "id": "p06",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1622
+  },
+  {
+   "id": "p07",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1241
+  },
+  {
+   "id": "p08",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 3024
+  },
+  {
+   "id": "p09",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1567
+  },
+  {
+   "id": "p10",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1419
+  }
+ ]
+}

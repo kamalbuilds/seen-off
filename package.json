@@ -1,0 +1,13 @@
+{
+  "name": "outbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Outbox: carrier-pickup proof for people who ship from home, built on the Ring Partner API.",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test 'test/*.test.ts'",
+    "spike:porch": "node spikes/porch/run.ts"
+  }
+}
