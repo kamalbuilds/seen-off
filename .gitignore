@@ -1,0 +1,8 @@
+node_modules/
+.venv/
+.env
+.env.*
+spikes/porch/src/
+spikes/porch/_work/
+*.log
+data/

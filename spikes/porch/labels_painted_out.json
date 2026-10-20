@@ -1,0 +1,62 @@
+[
+ {
+  "id": "p01",
+  "source": "front_porch_theft t=0.0s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p02",
+  "source": "front_porch_theft t=0.5s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p03",
+  "source": "front_porch_theft t=1.0s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p04",
+  "source": "front_porch_theft t=1.5s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p05",
+  "source": "front_porch_theft t=2.0s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p06",
+  "source": "dont_tempt t=0.0s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p07",
+  "source": "dont_tempt t=0.5s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p08",
+  "source": "dont_tempt t=1.5s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p09",
+  "source": "dont_tempt t=2.0s, parcel region painted out",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "p10",
+  "source": "dont_tempt t=2.5s, parcel region painted out",
+  "present": false,
+  "count": 0
+ }
+]

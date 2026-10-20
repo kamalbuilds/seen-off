@@ -1,0 +1,568 @@
+[
+ {
+  "id": "f001",
+  "kind": "real",
+  "source": "front_porch_theft t=0.0s",
+  "present": true,
+  "count": null
+ },
+ {
+  "id": "f002",
+  "kind": "real",
+  "source": "front_porch_theft t=0.5s",
+  "present": true,
+  "count": null
+ },
+ {
+  "id": "f003",
+  "kind": "real",
+  "source": "front_porch_theft t=1.0s",
+  "present": true,
+  "count": null
+ },
+ {
+  "id": "f004",
+  "kind": "real",
+  "source": "front_porch_theft t=1.5s",
+  "present": true,
+  "count": null
+ },
+ {
+  "id": "f005",
+  "kind": "real",
+  "source": "front_porch_theft t=2.0s",
+  "present": true,
+  "count": null
+ },
+ {
+  "id": "f006",
+  "kind": "real",
+  "source": "front_porch_theft t=2.5s",
+  "present": true,
+  "count": null
+ },
+ {
+  "id": "f007",
+  "kind": "real",
+  "source": "front_porch_theft t=3.0s",
+  "present": true,
+  "count": null
+ },
+ {
+  "id": "f008",
+  "kind": "real",
+  "source": "dont_tempt t=0.0s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f009",
+  "kind": "real",
+  "source": "dont_tempt t=0.5s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f010",
+  "kind": "real",
+  "source": "dont_tempt t=1.0s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f011",
+  "kind": "real",
+  "source": "dont_tempt t=1.5s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f012",
+  "kind": "real",
+  "source": "dont_tempt t=2.0s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f013",
+  "kind": "real",
+  "source": "dont_tempt t=2.5s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f014",
+  "kind": "real",
+  "source": "dont_tempt t=3.0s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f015",
+  "kind": "real",
+  "source": "dont_tempt t=3.5s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f016",
+  "kind": "real",
+  "source": "dont_tempt t=4.0s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f017",
+  "kind": "real",
+  "source": "dont_tempt t=4.5s",
+  "present": true,
+  "count": 1
+ },
+ {
+  "id": "f018",
+  "kind": "real",
+  "source": "front_porch_theft t=8.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f019",
+  "kind": "real",
+  "source": "front_porch_theft t=8.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f020",
+  "kind": "real",
+  "source": "front_porch_theft t=9.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f021",
+  "kind": "real",
+  "source": "front_porch_theft t=9.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f022",
+  "kind": "real",
+  "source": "front_porch_theft t=10.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f023",
+  "kind": "real",
+  "source": "front_porch_theft t=10.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f024",
+  "kind": "real",
+  "source": "front_porch_theft t=11.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f025",
+  "kind": "real",
+  "source": "front_porch_theft t=11.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f026",
+  "kind": "real",
+  "source": "front_porch_theft t=12.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f027",
+  "kind": "real",
+  "source": "front_porch_theft t=12.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f028",
+  "kind": "real",
+  "source": "front_porch_theft t=13.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f029",
+  "kind": "real",
+  "source": "front_porch_theft t=13.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f030",
+  "kind": "real",
+  "source": "dont_tempt t=22.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f031",
+  "kind": "real",
+  "source": "dont_tempt t=22.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f032",
+  "kind": "real",
+  "source": "dont_tempt t=23.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f033",
+  "kind": "real",
+  "source": "dont_tempt t=23.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f034",
+  "kind": "real",
+  "source": "dont_tempt t=24.0s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f035",
+  "kind": "real",
+  "source": "dont_tempt t=24.5s",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f036",
+  "kind": "composite",
+  "source": "fp empty background + 3 pasted parcel(s)",
+  "present": true,
+  "count": 3,
+  "bboxes": [
+   [
+    312,
+    365,
+    359,
+    405
+   ],
+   [
+    212,
+    479,
+    306,
+    560
+   ],
+   [
+    294,
+    456,
+    401,
+    604
+   ]
+  ]
+ },
+ {
+  "id": "f037",
+  "kind": "composite",
+  "source": "fp empty background + 1 pasted parcel(s)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    143,
+    343,
+    191,
+    409
+   ]
+  ]
+ },
+ {
+  "id": "f038",
+  "kind": "composite",
+  "source": "fp empty background + 1 pasted parcel(s)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    291,
+    475,
+    407,
+    636
+   ]
+  ]
+ },
+ {
+  "id": "f039",
+  "kind": "composite",
+  "source": "fp empty background + 1 pasted parcel(s) (IR-style)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    226,
+    428,
+    319,
+    557
+   ]
+  ]
+ },
+ {
+  "id": "f040",
+  "kind": "composite",
+  "source": "fp empty background + 1 pasted parcel(s)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    166,
+    383,
+    235,
+    478
+   ]
+  ]
+ },
+ {
+  "id": "f041",
+  "kind": "composite",
+  "source": "fp empty background + 1 pasted parcel(s)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    243,
+    352,
+    296,
+    425
+   ]
+  ]
+ },
+ {
+  "id": "f042",
+  "kind": "composite",
+  "source": "fp empty background + 2 pasted parcel(s)",
+  "present": true,
+  "count": 2,
+  "bboxes": [
+   [
+    304,
+    366,
+    351,
+    406
+   ],
+   [
+    131,
+    494,
+    258,
+    670
+   ]
+  ]
+ },
+ {
+  "id": "f043",
+  "kind": "composite",
+  "source": "dt empty background + 1 pasted parcel(s) (IR-style)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    1023,
+    562,
+    1122,
+    648
+   ]
+  ]
+ },
+ {
+  "id": "f044",
+  "kind": "composite",
+  "source": "dt empty background + 1 pasted parcel(s)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    905,
+    552,
+    992,
+    622
+   ]
+  ]
+ },
+ {
+  "id": "f045",
+  "kind": "composite",
+  "source": "dt empty background + 3 pasted parcel(s)",
+  "present": true,
+  "count": 3,
+  "bboxes": [
+   [
+    649,
+    589,
+    768,
+    692
+   ],
+   [
+    1022,
+    579,
+    1128,
+    664
+   ],
+   [
+    608,
+    597,
+    727,
+    693
+   ]
+  ]
+ },
+ {
+  "id": "f046",
+  "kind": "composite",
+  "source": "dt empty background + 2 pasted parcel(s)",
+  "present": true,
+  "count": 2,
+  "bboxes": [
+   [
+    945,
+    582,
+    1059,
+    681
+   ],
+   [
+    974,
+    596,
+    1093,
+    692
+   ]
+  ]
+ },
+ {
+  "id": "f047",
+  "kind": "composite",
+  "source": "dt empty background + 1 pasted parcel(s) (IR-style)",
+  "present": true,
+  "count": 1,
+  "bboxes": [
+   [
+    733,
+    601,
+    855,
+    699
+   ]
+  ]
+ },
+ {
+  "id": "f048",
+  "kind": "composite",
+  "source": "dt empty background + 2 pasted parcel(s)",
+  "present": true,
+  "count": 2,
+  "bboxes": [
+   [
+    772,
+    565,
+    868,
+    642
+   ],
+   [
+    887,
+    542,
+    971,
+    615
+   ]
+  ]
+ },
+ {
+  "id": "f049",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f050",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f051",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f052",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f053",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f054",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f055",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f056",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f057",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f058",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f059",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ },
+ {
+  "id": "f060",
+  "kind": "augmented",
+  "source": "jittered real empty frame (crop, exposure, IR-style)",
+  "present": false,
+  "count": 0
+ }
+]
