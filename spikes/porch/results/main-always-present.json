@@ -1,7 +1,7 @@
 {
  "summary": {
   "set": "main",
-  "provider": "stub-present",
+  "provider": "always-present",
   "model": "always-present",
   "frames": 60,
   "errors": 0,
@@ -22,7 +22,7 @@
    "truthCount": null,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f002",
@@ -58,7 +58,7 @@
    "truthCount": null,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f006",
@@ -67,7 +67,7 @@
    "truthCount": null,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f007",
@@ -85,7 +85,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f009",
@@ -103,7 +103,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f011",
@@ -112,7 +112,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 2
+   "ms": 0
   },
   {
    "id": "f012",
@@ -121,7 +121,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f013",
@@ -130,7 +130,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f014",
@@ -166,7 +166,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f018",
@@ -220,7 +220,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f024",
@@ -229,7 +229,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f025",
@@ -238,7 +238,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f026",
@@ -247,7 +247,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f027",
@@ -265,7 +265,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 2
+   "ms": 0
   },
   {
    "id": "f029",
@@ -283,7 +283,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f031",
@@ -328,7 +328,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f036",
@@ -346,7 +346,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f038",
@@ -364,7 +364,7 @@
    "truthCount": 1,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f040",
@@ -445,7 +445,7 @@
    "truthCount": 2,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f049",
@@ -481,7 +481,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f053",
@@ -499,7 +499,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f055",
@@ -544,7 +544,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   },
   {
    "id": "f060",
@@ -553,7 +553,7 @@
    "truthCount": 0,
    "pred": true,
    "predCount": 1,
-   "ms": 1
+   "ms": 0
   }
  ]
 }

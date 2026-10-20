@@ -2,7 +2,7 @@
 // the days were built with. SIMULATOR: webhooks are signed by simulator/webhook-simulator.ts, frames come from simulator/days.
 //
 //   VISION_PROVIDER=openrouter node metric/run.ts                    headline run
-//   node metric/run.ts --stub-present                                must-fail: vision always says "1 parcel present"
+//   node metric/run.ts --always-present                                must-fail: vision always says "1 parcel present"
 //   ... --tracking shippo                                            read tracking from Shippo test mode (needs SHIPPO_API_KEY)
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -19,7 +19,7 @@ import { deliver, motionEnvelope } from "../simulator/webhook-simulator.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
-const stub = args.includes("--stub-present");
+const alwaysPresentRun = args.includes("--always-present");
 const trackingMode = args.includes("--tracking") ? args[args.indexOf("--tracking") + 1] : "fixture";
 const KEY = "simulator-signing-key-not-a-secret";
 const SETTLE_MS = 30_000;
@@ -59,8 +59,8 @@ if (trackingMode === "shippo") {
   tracking = new ShippoTracking(process.env.SHIPPO_API_KEY);
 }
 
-const alwaysPresent: VisionProvider = { name: "stub-present", model: "always-present", readPorch: async (): Promise<PorchReading> => ({ present: true, count: 1, raw: "stub" }) };
-const vision = stub ? alwaysPresent : visionFromEnv();
+const alwaysPresent: VisionProvider = { name: "always-present", model: "always-present", readPorch: async (): Promise<PorchReading> => ({ present: true, count: 1, raw: "always-present" }) };
+const vision = alwaysPresentRun ? alwaysPresent : visionFromEnv();
 
 let now = 0;
 const alertAt = new Map<string, number>();
@@ -145,5 +145,5 @@ const summary = {
 console.log(JSON.stringify(summary, null, 2));
 for (const r of rows.filter((x) => x.verdict !== x.truth)) console.log("WRONG", r.dayId, "truth", r.truth, "got", r.verdict, `counts ${r.baseline}/${r.close} truth ${r.truthBase}/${r.truthClose}`, r.error ?? "");
 mkdirSync(join(root, "metric/results"), { recursive: true });
-writeFileSync(join(root, "metric/results", stub ? "replay-stub-present.json" : `replay-${vision.name}.json`), JSON.stringify({ summary, rows }, null, 1));
+writeFileSync(join(root, "metric/results", alwaysPresentRun ? "replay-always-present.json" : `replay-${vision.name}.json`), JSON.stringify({ summary, rows }, null, 1));
 void webhooksSent;
