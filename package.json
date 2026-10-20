@@ -5,9 +5,16 @@
   "type": "module",
   "license": "MIT",
   "description": "Outbox: carrier-pickup proof for people who ship from home, built on the Ring Partner API.",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test": "node --test 'test/*.test.ts'",
-    "spike:porch": "node spikes/porch/run.ts"
+    "test:whep": ".venv-rtc/bin/python worker/test_whep_loopback.py",
+    "mutation": "scripts/mutation-check.sh",
+    "spike:porch": "node spikes/porch/run.ts main",
+    "metric": "node metric/run.ts",
+    "serve": "node src/main.ts",
+    "ring:probe": "node scripts/ring-probe.ts"
   }
 }

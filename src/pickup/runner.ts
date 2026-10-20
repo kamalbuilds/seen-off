@@ -66,8 +66,15 @@ export class PickupRunner {
     return count;
   }
 
-  /** Looks at pending webhook events whose settle time has passed. Returns how many were handled. */
-  async drain(): Promise<number> {
+  #draining: Promise<number> | null = null;
+
+  /** Looks at pending webhook events whose settle time has passed. Returns how many were handled. One pass at a time, so a pending event is never observed twice. */
+  drain(): Promise<number> {
+    this.#draining ??= this.#drain().finally(() => { this.#draining = null; });
+    return this.#draining;
+  }
+
+  async #drain(): Promise<number> {
     let n = 0;
     for (const e of this.d.ledger.pendingEvents()) {
       const watches = (e.type === "motion_detected" || e.type === "button_press") && e.deviceId && e.tsMs !== null;
