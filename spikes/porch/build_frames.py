@@ -127,4 +127,5 @@ def main():
     (HERE / "labels_painted_out.json").write_text(json.dumps(po, indent=1))
     print("frames", len(labels), "painted_out", len(po))
 
-main()
+if __name__ == "__main__":
+    main()
