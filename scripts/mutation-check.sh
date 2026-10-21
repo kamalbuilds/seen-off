@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -61,10 +61,12 @@ src/server.ts@@s/rmSync\(join\(o.runner.d.evidenceDir, id\), \{ recursive: true,
 src/store/ledger.ts@@s/for \(const t of \["observations", "jobs", "tracking_readings", "packets"\]\)/for (const t of ["observations"])/@@evidence.test.ts@@delete leaves jobs behind
 metric/score.ts@@s/ \|\| r.truth === "partial"//@@score.test.ts@@false reassurance ignores part-taken days
 src/pickup/packet.ts@@s/unscannedLabels === 0 \? \{ state: "done"/unscannedLabels >= 0 ? { state: "done"/@@packet.test.ts@@carrier track reads unscanned labels as scanned
+src/store/ledger.ts@@s/this.changes.emit\("change", o.dayId\);//@@stream.test.ts@@a stored frame does not reach the page
+src/server.ts@@s/o.ledger.changes.off\("change", onChange\);//@@stream.test.ts@@a closed page leaves its listener
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail

@@ -349,7 +349,6 @@ $("#replayGo").addEventListener("click", async () => {
     const r = await api("/api/replay", { method: "POST", body: JSON.stringify({ dayId: $("#replayDay").value }) });
     state.selected = r.dayId; location.hash = r.dayId; state.packet = null;
     $("#replayNote").textContent = `Replaying as ${r.dayId}. The timeline fills as each step lands.`;
-    fast = 12;
     await refresh();
     if (innerWidth <= 960) $("#detail").scrollIntoView({ behavior: "smooth" });
   } catch (e) { $("#replayNote").textContent = e.errors?.[0] ?? e.message; }
@@ -492,7 +491,6 @@ async function removeDay(id) {
 }
 
 /* ---------- loop ---------- */
-let fast = 0;
 async function select(id) { state.selected = id; location.hash = id; state.packet = null; renderIndex(); renderDetail(); await loadPacket(); }
 async function loadPacket() {
   if (!state.selected) return;
@@ -524,7 +522,15 @@ addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id
 resetForm(); renderIndex(); renderDetail();
 await loadDevices(); await loadReplay(); await refresh();
 $("#newday").open = (state.days?.length ?? 0) === 0;
-(function tick() { setTimeout(async () => { if (!document.hidden) await refresh(); if (fast > 0) fast--; tick(); }, fast > 0 ? 1000 : 2500); })();
+// Live updates: the server pushes a change after every frame, verdict and scan. The slow poll below is only the fallback if the stream drops.
+(function listen() {
+  const es = new EventSource("/api/stream");
+  let t = null;
+  es.addEventListener("change", () => { clearTimeout(t); t = setTimeout(refresh, 60); });
+  es.onerror = () => { $("#banner").hidden = false; $("#banner").textContent = "Live updates paused. Reconnecting."; };
+  es.onopen = () => { if ($("#banner").textContent.startsWith("Live updates")) $("#banner").hidden = true; refresh(); };
+})();
+(function tick() { setTimeout(async () => { await refresh(); tick(); }, 5000); })();
 </script>
 </body>
 </html>

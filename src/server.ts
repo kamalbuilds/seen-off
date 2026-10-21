@@ -89,6 +89,18 @@ export function createApp(o: AppOptions): Server {
           return { dayId: p.dayId, status: p.status, verdict: p.verdict, window: p.window, labels: p.labels.length, baselineCount: p.baselineCount, closeCount: p.closeCount, alert: p.alert?.kind ?? null, provenance: p.provenance.verdict ?? p.provenance.frames };
         }) });
       }
+      if (req.method === "GET" && url.pathname === "/api/stream") {
+        // Server-sent events: one "change" per burst of ledger writes, so an open page redraws as each frame, verdict and scan lands.
+        res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-store", connection: "keep-alive" });
+        res.write("retry: 1500\n: connected\n\n");
+        let pending: Set<string> | null = null;
+        const flush = () => { const ids = [...pending!]; pending = null; res.write(`event: change\ndata: ${JSON.stringify({ dayIds: ids })}\n\n`); };
+        const onChange = (dayId?: string) => { if (pending === null) { pending = new Set(); setTimeout(flush, 80); } pending.add(dayId ?? ""); };
+        const beat = setInterval(() => res.write(": keep-alive\n\n"), 15_000);
+        o.ledger.changes.on("change", onChange);
+        req.on("close", () => { clearInterval(beat); o.ledger.changes.off("change", onChange); });
+        return;
+      }
       if (url.pathname === "/api/replay" && req.method === "GET") return send(200, { days: o.replay?.days() ?? [] });
       if (url.pathname === "/api/replay" && req.method === "POST") {
         if (!o.replay) return send(404, { error: "replay is not available on this server" });

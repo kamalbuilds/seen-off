@@ -1,3 +1,4 @@
+import { EventEmitter } from "node:events";
 import { DatabaseSync } from "node:sqlite";
 import type { IdempotencyStore, RingEvent } from "../ring/webhook.ts";
 import type { DayVerdict, TrackingStatus, WindowVerdict } from "../pickup/verdict.ts";
@@ -105,6 +106,8 @@ const ADDED_COLUMNS: [table: string, column: string, decl: string][] = [
 /** One SQLite file holds idempotency marks, received events, pickup days and evidence. ":memory:" for tests. */
 export class Ledger implements IdempotencyStore {
   readonly db: DatabaseSync;
+  /** Emits "change" with the day id (or undefined for a doorbell event) after every write that a page showing a day would care about. */
+  readonly changes = new EventEmitter();
 
   constructor(path = ":memory:") {
     this.db = new DatabaseSync(path);
@@ -128,6 +131,7 @@ export class Ledger implements IdempotencyStore {
     this.db.prepare(
       "insert or ignore into events (request_id, type, account_id, device_id, ts_ms, sub_type, received_at, provenance) values (?, ?, ?, ?, ?, ?, ?, ?)",
     ).run(e.requestId, e.type, e.accountId, e.deviceId ?? null, e.timestampMs ?? null, e.subType ?? null, Date.now(), eventProvenance(e.accountId));
+    this.changes.emit("change", undefined);
   }
 
   pendingEvents(): { requestId: string; type: string; deviceId: string | null; tsMs: number | null; subType: string | null }[] {
@@ -159,6 +163,7 @@ export class Ledger implements IdempotencyStore {
       this.db.exec("rollback");
       throw e;
     }
+    this.changes.emit("change", d.dayId);
     return { baselineDeferred };
   }
 
@@ -190,6 +195,7 @@ export class Ledger implements IdempotencyStore {
       this.db.prepare("delete from days where day_id = ?").run(dayId);
       this.db.exec("commit");
     } catch (e) { this.db.exec("rollback"); throw e; }
+    this.changes.emit("change", dayId);
   }
 
   close(): void {
@@ -230,6 +236,7 @@ export class Ledger implements IdempotencyStore {
   addObservation(o: Observation): void {
     this.db.prepare("insert into observations (day_id, kind, at_ms, count, frame_sha256, frame_path, error, source, provenance) values (?, ?, ?, ?, ?, ?, ?, ?, ?)")
       .run(o.dayId, o.kind, o.atMs, o.count, o.frameSha256, o.framePath, o.error, o.source, o.provenance);
+    this.changes.emit("change", o.dayId);
   }
 
   observations(dayId: string): Observation[] {
@@ -243,19 +250,23 @@ export class Ledger implements IdempotencyStore {
 
   setBaseline(dayId: string, count: number | null): void {
     this.db.prepare("update days set baseline_count = ? where day_id = ?").run(count, dayId);
+    this.changes.emit("change", dayId);
   }
 
   setWindowResult(dayId: string, closeCount: number | null, verdict: WindowVerdict, handoffMs: number | null): void {
     this.db.prepare("update days set close_count = ?, window_verdict = ?, handoff_ms = ? where day_id = ?").run(closeCount, verdict, handoffMs, dayId);
+    this.changes.emit("change", dayId);
   }
 
   setFinal(dayId: string, verdict: DayVerdict): void {
     this.db.prepare("update days set final_verdict = ? where day_id = ?").run(verdict, dayId);
+    this.changes.emit("change", dayId);
   }
 
   setAlerted(dayId: string, atMs: number, kind: string, text: string, delivery: AlertDelivery | null = null): void {
     this.db.prepare("update days set alerted_at = ?, alert_kind = ?, alert_text = ?, alert_delivery = ? where day_id = ?")
       .run(atMs, kind, text, delivery ? JSON.stringify(delivery) : null, dayId);
+    this.changes.emit("change", dayId);
   }
 
   /** Motion and button events Ring delivered for a device inside [fromMs, toMs]. */
@@ -271,6 +282,7 @@ export class Ledger implements IdempotencyStore {
   addTrackingReading(dayId: string, r: TrackingRow): void {
     this.db.prepare("insert into tracking_readings (day_id, tracking_number, status, read_at, provenance) values (?, ?, ?, ?, ?)")
       .run(dayId, r.trackingNumber, r.status, r.readAtMs, r.provenance);
+    this.changes.emit("change", dayId);
   }
 
   /** Readings from the latest tracking check only, in label order. Empty before the first check. */
