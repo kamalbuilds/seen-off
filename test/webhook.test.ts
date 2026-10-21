@@ -102,3 +102,15 @@ test("webhook: unknown event types are acked, not 4xx'd into an endpoint disable
   const body = JSON.stringify({ meta: { version: "1.1", request_id: "r9", account_id: "a" }, data: { type: "future_event", attributes: {} } });
   assert.equal((await receive(bytes(body), signed(body))).status, 200);
 });
+
+test("webhook: 50 concurrent deliveries of one request_id run the handler once; every caller ends at 200 or a retryable 503", async () => {
+  let handled = 0;
+  const { receive } = setup(async () => { handled++; await new Promise((r) => setTimeout(r, 20)); });
+  const body = motionBody({ requestId: "burst" });
+  const results = await Promise.all(Array.from({ length: 50 }, () => receive(bytes(body), signed(body))));
+  assert.equal(handled, 1);
+  assert.ok(results.every((r) => r.status === 200 || r.status === 503), results.map((r) => r.status).join());
+  assert.equal(results.filter((r) => r.status === 200 && r.body.status === "processed").length, 1);
+  const retry = await receive(bytes(body), signed(body));
+  assert.deepEqual([retry.status, retry.body.status], [200, "already_processed"]);
+});

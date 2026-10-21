@@ -119,3 +119,30 @@ test("a motion event outside every open window is acknowledged and ignored", asy
   assert.equal(r.ledger.observations("d1").filter((o) => o.kind === "motion").length, 0);
   assert.equal(r.ledger.pendingEvents().length, 0);
 });
+
+test("a motion event from another doorbell, even inside the window, triggers no frame and no verdict for the armed day", async () => {
+  const r = rig({ [T0]: 3, [end]: 3 });
+  await r.runner.arm(plan());
+  r.ledger.insertEvent(parseEnvelope(JSON.parse(motionBody({ requestId: "other-door", deviceId: "ava1.ring.device.NEIGHBOUR", timestamp: T0 + 3 * HOUR }))));
+  r.setClock(T0 + 4 * HOUR);
+  assert.equal(await r.runner.drain(), 1, "the event is consumed");
+  assert.equal(r.ledger.observations("d1").filter((o) => o.kind === "motion").length, 0, "but it did not make Outbox look at this porch");
+  assert.equal(r.ledger.getDay("d1").windowVerdict, null);
+  assert.equal(r.alerts.length, 0);
+});
+
+test("frame sources are tried in order: when the snapshot fails, the next source supplies the frame and is named in the evidence", async () => {
+  const ledger = new Ledger(":memory:");
+  const runner = new PickupRunner({
+    ledger, clock: () => T0,
+    frames: [
+      { name: "ring-snapshot", async frameAt() { throw new Error("RECORDING_NOT_READY"); } },
+      { name: "ring-whep", provenance: "live", async frameAt(_d, atMs) { return { jpeg: new TextEncoder().encode("2"), mediaTimestampMs: atMs, origin: "whep-live" }; } },
+    ],
+    vision: { name: "s", model: "s", readPorch: async (j) => ({ present: true, count: Number(new TextDecoder().decode(j)), raw: "" }) },
+    tracking: { statusOf: async () => "TRANSIT" }, alerter: { send: async () => {} },
+  });
+  assert.equal(await runner.arm(plan()), 2);
+  const o = ledger.observations("d1")[0];
+  assert.deepEqual([o.source, o.count, o.error], ["ring-whep", 2, null]);
+});

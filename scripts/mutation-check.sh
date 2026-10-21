@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts runner.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -53,10 +53,11 @@ src/pickup/runner.ts@@s/Math.min\(day.closeCount, day.baselineCount\)/day.closeC
 src/server.ts@@s/const known = o.replay.days\(\).some\(\(d\) => d.dayId === body.dayId\);/const known = true;/@@replay-api.test.ts@@replay accepts an unrecorded day
 src/ring/token-store.ts@@s/refreshToken: saved \?\? auth.refreshToken/refreshToken: auth.refreshToken/@@token-store.test.ts@@restart ignores the saved refresh token
 src/ring/token-store.ts@@s/onRefreshToken: \(t\) => \{ saveRefreshToken\(path, t\); /onRefreshToken: (t) => { /@@token-store.test.ts@@rotated token never saved
+src/store/ledger.ts@@s/where device_id = \? and window_start <= \?/where ? is not null and window_start <= ?/@@runner.test.ts@@another doorbell triggers this porch
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts runner.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail
