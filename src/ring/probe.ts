@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Frame, FrameSource } from "../pickup/runner.ts";
 import type { VisionProvider } from "../vision/types.ts";
-import type { RingClient } from "./client.ts";
+import type { RingApi } from "./client.ts";
 import { RingSnapshotSource } from "./client.ts";
 
 export interface ProbeOptions {
@@ -72,7 +72,7 @@ function describe(f: Frame, outDir: string, name: string, requestedForMs: number
  * download a snapshot (and, if given, a live WHEP frame), and write the frames and a JSON report of what Ring returned.
  * Every step throws on a Ring error. Nothing is filled in when a call fails, and no token is ever written to the report.
  */
-export async function runProbe(client: RingClient, o: ProbeOptions): Promise<ProbeReport> {
+export async function runProbe(client: RingApi, o: ProbeOptions): Promise<ProbeReport> {
   const now = o.now ?? Date.now;
   mkdirSync(o.outDir, { recursive: true });
   const stamp = new Date(now()).toISOString().replace(/[:.]/g, "-");

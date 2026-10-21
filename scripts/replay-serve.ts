@@ -10,6 +10,8 @@ import type { AddressInfo } from "node:net";
 import { Ledger } from "../src/store/ledger.ts";
 import { PickupRunner, type Alerter } from "../src/pickup/runner.ts";
 import { createApp } from "../src/server.ts";
+import { RingSession } from "../src/ring/session.ts";
+import { ringIntegrationFromEnv } from "../src/ring/integration.ts";
 import { visionFromEnv } from "../src/vision/index.ts";
 import { REPLAY_DEVICE, SETTLE_MS, SIM_KEY, fixtureTracking, loadDays, playDay, replayFrameSource } from "../simulator/replay.ts";
 
@@ -30,7 +32,8 @@ let now = 0;
 const alerts: string[] = [];
 const alerter: Alerter = { async send(a) { alerts.push(`${a.dayId} ${a.kind}`); console.log(`ALERT ${a.kind} ${a.dayId}: ${a.text}`); } };
 const ledger = new Ledger(":memory:");
-const runner = new PickupRunner({ ledger, vision: visionFromEnv(), frames: [replayFrameSource(days)], tracking: fixtureTracking, alerter, clock: () => now, settleMs: SETTLE_MS, evidenceDir: "data/replay-evidence" });
+const vision = visionFromEnv();
+const runner = new PickupRunner({ ledger, vision, frames: [replayFrameSource(days)], tracking: fixtureTracking, alerter, clock: () => now, settleMs: SETTLE_MS, evidenceDir: "data/replay-evidence" });
 let playing = false;
 // One seller, three scheduled parcels, three days back to back: nobody collects them, one leaves, all leave and nothing is scanned.
 const DEMO_STEPS = [
@@ -44,6 +47,7 @@ let base = "";
 const pace = () => new Promise<void>((r) => setTimeout(r, Math.max(paceMs, 800)));
 const server = createApp({
   signingKey: SIM_KEY, ledger, runner,
+  ring: ringIntegrationFromEnv(process.env, { session: new RingSession({ tokenFile: "data/ring-refresh-token" }), vision, port, tokenFile: "data/ring-refresh-token", photoDir: "data/ring-photos" }),
   devices: async () => [{ id: REPLAY_DEVICE, name: "Front door", provenance: "replay" }],
   replay: {
     days: () => days.map((d) => ({ dayId: d.dayId, labels: d.labels.length, startMs: d.windowStartMs })),

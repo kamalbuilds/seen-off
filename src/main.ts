@@ -2,8 +2,9 @@ import { mkdirSync } from "node:fs";
 import { fanoutAlerter, fileAlerter, webhookAlerter } from "./alerts.ts";
 import { Ledger } from "./store/ledger.ts";
 import { PickupRunner } from "./pickup/runner.ts";
-import { RingClient, RingSnapshotSource, ringAuthFromEnv } from "./ring/client.ts";
-import { withPersistedRefreshToken } from "./ring/token-store.ts";
+import { RingSnapshotSource } from "./ring/client.ts";
+import { ringIntegrationFromEnv } from "./ring/integration.ts";
+import { RingSession } from "./ring/session.ts";
 import { WhepFrameSource } from "./ring/whep.ts";
 import { ShippoTracking } from "./shippo/client.ts";
 import { visionFromEnv } from "./vision/index.ts";
@@ -22,10 +23,14 @@ if (process.env.ALERT_WEBHOOK_URL) channels.push({ name: "phone", alerter: webho
 const alerter = fanoutAlerter(channels);
 
 const ledger = new Ledger(process.env.LEDGER_PATH ?? "data/outbox.sqlite");
-const ring = new RingClient({ auth: withPersistedRefreshToken(ringAuthFromEnv(), process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token") });
+const tokenFile = process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token";
+const port = Number(process.env.PORT ?? 8787);
+// Ring credentials come from the Connect Ring link on the seller page (or RING_* env); the server starts either way.
+const ring = new RingSession({ tokenFile });
+const vision = visionFromEnv();
 const runner = new PickupRunner({
   ledger,
-  vision: visionFromEnv(),
+  vision,
   frames: [new RingSnapshotSource(ring), new WhepFrameSource(ring)],
   tracking: new ShippoTracking(need("SHIPPO_API_KEY")),
   alerter,
@@ -35,10 +40,10 @@ const runner = new PickupRunner({
 
 const scheduler = new Scheduler({ ledger, runner, onError: (job, e) => console.error(`job ${job.kind} ${job.dayId} failed (attempt ${job.attempts + 1}): ${e.message}`) });
 
-const port = Number(process.env.PORT ?? 8787);
 createApp({
   signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner,
-  devices: async () => (await ring.listDevices()).map((d) => ({ id: d.id, name: d.name, provenance: "live" as const })),
+  devices: async () => (ring.connected ? (await ring.listDevices()).map((d) => ({ id: d.id, name: d.name, provenance: "live" as const })) : []),
+  ring: ringIntegrationFromEnv(process.env, { session: ring, vision, port, tokenFile, photoDir: "data/ring-photos" }),
 }).listen(port, () => {
   console.log(`outbox listening on :${port}`);
   scheduler.start();

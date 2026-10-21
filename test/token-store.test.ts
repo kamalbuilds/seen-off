@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { mkdtempSync, readFileSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { AddressInfo } from "node:net";
@@ -27,7 +27,8 @@ test("a rotated refresh token is saved 0600 and the next process starts from it,
     const first = new RingClient({ auth: withPersistedRefreshToken(refresh("from-env"), file), oauthBase });
     await first.accessToken();
     assert.deepEqual(seen, ["from-env"]);
-    assert.equal(readFileSync(file, "utf8").trim(), "rotated-1");
+    assert.equal(loadRefreshToken(file), "rotated-1");
+    assert.ok(!readFileSync(file, "utf8").includes("rotated-1"), "the token is not in the file in the clear");
     assert.equal(statSync(file).mode & 0o777, 0o600);
 
     // a restart: .env still holds the original, now revoked, token
@@ -44,4 +45,28 @@ test("a Playground token is passed through untouched and no file is written", ()
   assert.equal(withPersistedRefreshToken(a, file), a);
   saveRefreshToken(file, "x");
   assert.equal(loadRefreshToken(file), "x");
+});
+
+test("the token file is AES-GCM sealed: wrong key and a flipped byte both refuse to decrypt, and a pre-encryption bare token is still read", () => {
+  const dir = mkdtempSync(join(tmpdir(), "tok-"));
+  const file = join(dir, "t");
+  saveRefreshToken(file, "secret-refresh-token");
+  const sealed = readFileSync(file, "utf8");
+  assert.match(sealed, /^v1\./);
+  assert.ok(!sealed.includes("secret-refresh-token"));
+  assert.equal(statSync(`${file}.key`).mode & 0o777, 0o600, "the generated key file is 0600");
+  assert.equal(loadRefreshToken(file), "secret-refresh-token");
+
+  const flipped = sealed.trim().slice(0, -2) + (sealed.trim().endsWith("AA") ? "BB" : "AA");
+  writeFileSync(file, flipped);
+  assert.throws(() => loadRefreshToken(file), /cannot be decrypted/);
+
+  writeFileSync(file, sealed);
+  process.env.RING_TOKEN_KEY = "00".repeat(32);
+  try { assert.throws(() => loadRefreshToken(file), /cannot be decrypted/); } finally { delete process.env.RING_TOKEN_KEY; }
+
+  writeFileSync(file, "legacy-bare-token\n");
+  assert.equal(loadRefreshToken(file), "legacy-bare-token");
+  saveRefreshToken(file, "legacy-bare-token");
+  assert.match(readFileSync(file, "utf8"), /^v1\./, "the next save encrypts it");
 });

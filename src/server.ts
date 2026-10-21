@@ -7,6 +7,10 @@ import { DAY_ID, validatePlan } from "./pickup/plan.ts";
 import type { Ledger } from "./store/ledger.ts";
 import type { PickupRunner } from "./pickup/runner.ts";
 import type { Provenance } from "./provenance.ts";
+import type { RingIntegration } from "./ring/integration.ts";
+import { RingLinkError } from "./ring/oauth.ts";
+import { RingNotConnected } from "./ring/session.ts";
+import { RingApiError } from "./ring/client.ts";
 
 const UI_HTML = readFileSync(new URL("./ui/index.html", import.meta.url), "utf8");
 
@@ -31,6 +35,8 @@ export interface AppOptions {
   runner: PickupRunner;
   /** Devices the seller can pick in the form, each labelled with where the list came from. */
   devices?: () => Promise<{ id: string; name: string; provenance: Provenance }[]>;
+  /** Connect Ring (partner-initiated OAuth), the seller's doorbells and a porch photo taken on demand. */
+  ring?: RingIntegration;
   /** Recorded pickup days the seller can play through the pipeline from the page. */
   replay?: {
     days(): { dayId: string; labels: number; startMs: number }[];
@@ -93,6 +99,46 @@ export function createApp(o: AppOptions): Server {
           const p = o.runner.packetOf(d.dayId);
           return { dayId: p.dayId, status: p.status, verdict: p.verdict, window: p.window, labels: p.labels.length, baselineCount: p.baselineCount, closeCount: p.closeCount, alert: p.alert?.kind ?? null, provenance: p.provenance.verdict ?? p.provenance.frames };
         }) });
+      }
+      if (url.pathname.startsWith("/ring/") || url.pathname === "/api/ring" || url.pathname.startsWith("/api/ring/")) {
+        const ring = o.ring;
+        if (!ring) return send(404, { error: "ring is not available on this server" });
+        const fail = (e: unknown) => {
+          if (e instanceof RingNotConnected) return send(409, { error: "ring not connected", errors: [e.message] });
+          if (e instanceof RingLinkError) return send(e.code === "unknown_device" ? 404 : 400, { error: e.code, errors: [e.message] });
+          if (e instanceof RingApiError) return send(502, { error: "ring error", errors: [`Ring answered ${e.status} ${e.code}.`] });
+          return send(500, { error: (e as Error).message });
+        };
+        if (req.method === "GET" && url.pathname === "/api/ring") return send(200, ring.status());
+        if (req.method === "GET" && url.pathname === "/ring/connect") {
+          try { res.writeHead(302, { location: ring.connect(), "cache-control": "no-store" }); return void res.end(); } catch (e) { return fail(e); }
+        }
+        if (req.method === "GET" && url.pathname === "/ring/callback") {
+          let to = "/?ring=connected";
+          try { await ring.callback(url.searchParams); } catch (e) {
+            to = `/?ring=error&reason=${encodeURIComponent(e instanceof RingLinkError ? e.message : "Something went wrong linking Ring. Try again.")}`;
+          }
+          res.writeHead(302, { location: to, "cache-control": "no-store" });
+          return void res.end();
+        }
+        if (req.method === "GET" && url.pathname === "/api/ring/devices") { try { return send(200, { devices: await ring.devices() }); } catch (e) { return fail(e); } }
+        if (req.method === "POST" && url.pathname === "/api/ring/snapshot") {
+          let body: { deviceId?: unknown };
+          try { body = JSON.parse((await readBody(req)).toString("utf8")); } catch (e) {
+            if (e instanceof BodyTooLarge) throw e;
+            return send(400, { error: "invalid request", errors: ["body is not valid JSON"] });
+          }
+          if (typeof body.deviceId !== "string" || body.deviceId.length === 0 || body.deviceId.length > 128) return send(400, { error: "invalid request", errors: ["deviceId must be a doorbell id"] });
+          try { return send(200, await ring.photo(body.deviceId)); } catch (e) { return fail(e); }
+        }
+        const ph = url.pathname.match(/^\/api\/ring\/photos\/([^/]+)$/);
+        if (req.method === "GET" && ph) {
+          const bytes = ring.photoFile(decodeURIComponent(ph[1]));
+          if (!bytes) return send(404, { error: "no such photo" });
+          res.writeHead(200, { "content-type": "image/jpeg", "cache-control": "private, max-age=3600" });
+          return void res.end(bytes);
+        }
+        return send(404, { error: "not found" });
       }
       if (req.method === "GET" && url.pathname === "/api/stream") {
         // Server-sent events: one "change" per burst of ledger writes, so an open page redraws as each frame, verdict and scan lands.

@@ -77,6 +77,15 @@ fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--s2); min-
 .errors:empty { display: none; }
 .replay-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s2); margin-top: var(--s4); }
 
+.doorbell { display: grid; gap: var(--s3); padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+.doorbell .row { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+.doorbell .name { font-weight: 700; }
+.photo { display: grid; gap: var(--s2); }
+.photo img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--paper-3); }
+.photo .big { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.photo .meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.setup { padding: var(--s3) var(--s4); background: var(--paper-2); font-size: 15px; }
+
 /* day index */
 .index-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: var(--s2); }
 .index-head h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
@@ -224,6 +233,13 @@ tbody tr:hover { background: var(--paper-2); }
 <div class="shell">
   <div class="main">
     <aside class="rail" aria-label="Pickup days">
+      <section class="block" id="ring" aria-label="Your doorbells">
+        <h2>Your doorbells</h2>
+        <p class="hint">Link your Ring account on Ring's own sign-in page, then take a porch photo and have it read.</p>
+        <p class="setup" id="ringNote" role="status" hidden></p>
+        <div id="ringBody"></div>
+      </section>
+
       <details class="new block" id="newday">
         <summary>New pickup day</summary>
         <form id="form" novalidate>
@@ -352,6 +368,48 @@ $("#form").addEventListener("submit", async (ev) => {
     $("#errors").replaceChildren(...(e.errors?.length ? e.errors : [e.message]).map((m) => h("li", {}, plain(m))));
   } finally { btn.disabled = false; btn.textContent = "Arm this pickup day"; }
 });
+
+/* ---------- Ring: connect, doorbells, porch photo ---------- */
+function photoCard(p) {
+  if (p.error) return h("p", { class: "hint", role: "alert" }, p.error);
+  const read = p.porch.error ? `The porch read did not finish: ${p.porch.error}` : `${plural(p.porch.count, "parcel")} on the porch`;
+  return h("div", { class: "photo" },
+    h("a", { href: p.image, target: "_blank", rel: "noopener" }, h("img", { src: p.image, alt: `Porch photo from ${p.name}: ${read}` })),
+    h("span", { class: "big" }, read),
+    h("span", { class: "meta" }, `${p.name}, taken ${when(Date.parse(p.mediaTimestamp))}. ${p.width ?? "?"} by ${p.height ?? "?"} px, ${p.bytes} bytes, ${p.latencyMs} ms from Ring, ${p.mediaOrigin}. sha256 ${p.sha256.slice(0, 16)}`));
+}
+async function takePhoto(d, slot, btn) {
+  btn.disabled = true; btn.textContent = "Taking the photo";
+  slot.replaceChildren();
+  try { slot.replaceChildren(photoCard(await api("/api/ring/snapshot", { method: "POST", body: JSON.stringify({ deviceId: d.id }) }))); }
+  catch (e) { slot.replaceChildren(photoCard({ error: e.errors?.[0] ?? e.message })); }
+  finally { btn.disabled = false; btn.textContent = "Take a porch photo now"; }
+}
+async function loadRing() {
+  const body = $("#ringBody");
+  let st;
+  try { st = await api("/api/ring"); } catch { $("#ring").hidden = true; return; }
+  if (!st.connected) {
+    body.replaceChildren(h("button", { type: "button", class: "btn primary", onclick: () => { if (st.configured) location.href = "/ring/connect"; else { $("#ringNote").textContent = st.setup; $("#ringNote").hidden = false; } } }, "Connect Ring"));
+    return;
+  }
+  try {
+    const devices = (await api("/api/ring/devices")).devices;
+    state.devices = devices.map((d) => ({ ...d, provenance: "live" }));
+    body.replaceChildren(...(devices.length ? devices.map((d) => {
+      const slot = h("div", {});
+      const btn = h("button", { type: "button", class: "btn primary", onclick: () => takePhoto(d, slot, btn) }, "Take a porch photo now");
+      return h("div", { class: "doorbell" }, h("div", { class: "row" }, h("span", { class: "name" }, d.name), btn), slot);
+    }) : [h("p", { class: "hint" }, "Ring shared no doorbells with this app yet. Choose devices when you connect.")]));
+  } catch (e) { body.replaceChildren(h("p", { class: "hint", role: "alert" }, e.errors?.[0] ?? e.message)); }
+}
+(function ringReturn() {
+  const q = new URLSearchParams(location.search), r = q.get("ring");
+  if (!r) return;
+  $("#ringNote").hidden = false;
+  $("#ringNote").textContent = r === "connected" ? "Ring is connected." : (q.get("reason") ?? "Ring could not be connected.");
+  history.replaceState(null, "", location.pathname + location.hash);
+})();
 
 /* ---------- replay a pickup day ---------- */
 async function loadReplay(first = false) {
@@ -563,7 +621,7 @@ async function loadDevices() {
 document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id && id !== state.selected) select(id); });
 resetForm(); renderIndex(); renderDetail();
-await loadDevices(); await loadReplay(true); await refresh();
+await loadRing(); await loadDevices(); await loadReplay(true); await refresh();
 if (state.demo && !state.demo.running && (state.days?.length ?? 0) === 0 && new URLSearchParams(location.search).get("demo") !== "0") await playDemo();
 $("#newday").open = (state.days?.length ?? 0) === 0 && !state.demo;
 // Live updates: the server pushes a change after every frame, verdict and scan. The slow poll below is only the fallback if the stream drops.

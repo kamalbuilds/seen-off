@@ -50,6 +50,9 @@ export function ringAuthFromEnv(env: NodeJS.ProcessEnv = process.env): RingAuth 
   return { kind: "refresh", clientId, clientSecret, refreshToken };
 }
 
+/** What the rest of the app needs from Ring. RingClient implements it directly; RingSession implements it over a link the seller makes from the page. */
+export type RingApi = Pick<RingClient, "accessToken" | "listDevices" | "history" | "snapshotAt" | "whepStart" | "whepStop">;
+
 export class RingClient {
   readonly #auth: RingAuth;
   readonly #api: string;
@@ -169,11 +172,11 @@ async function toApiError(res: Response): Promise<RingApiError> {
 export class RingSnapshotSource implements FrameSource {
   readonly name = "ring-snapshot";
   readonly provenance = "live" as const;
-  readonly #client: RingClient;
+  readonly #client: RingApi;
   readonly #attempts: number;
   readonly #waitMs: number;
 
-  constructor(client: RingClient, attempts = 4, waitMs = 3000) {
+  constructor(client: RingApi, attempts = 4, waitMs = 3000) {
     this.#client = client;
     this.#attempts = attempts;
     this.#waitMs = waitMs;

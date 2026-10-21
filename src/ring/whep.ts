@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import type { Frame, FrameSource } from "../pickup/runner.ts";
-import type { RingClient } from "./client.ts";
+import type { RingApi } from "./client.ts";
 
 const run = promisify(execFile);
 const LIVE_WINDOW_MS = 2 * 60_000;
@@ -16,11 +16,11 @@ const LIVE_WINDOW_MS = 2 * 60_000;
 export class WhepFrameSource implements FrameSource {
   readonly name = "ring-whep";
   readonly provenance = "live" as const;
-  readonly #client: RingClient;
+  readonly #client: RingApi;
   readonly #python: string;
   readonly #apiBase: string | undefined;
 
-  constructor(client: RingClient, python = process.env.WHEP_PYTHON ?? "python3", apiBase?: string) {
+  constructor(client: RingApi, python = process.env.WHEP_PYTHON ?? "python3", apiBase?: string) {
     this.#client = client;
     this.#python = python;
     this.#apiBase = apiBase;
