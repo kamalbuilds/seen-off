@@ -7,6 +7,7 @@
 //   npm run ring:probe -- devices | history <deviceId> | snapshot <deviceId> [epochMs] [out.jpg] | whep <deviceId> [out.jpg]
 import { writeFileSync } from "node:fs";
 import { RingClient, ringAuthFromEnv } from "../src/ring/client.ts";
+import { withPersistedRefreshToken } from "../src/ring/token-store.ts";
 import { runProbe } from "../src/ring/probe.ts";
 import { WhepFrameSource } from "../src/ring/whep.ts";
 import { visionFromEnv } from "../src/vision/index.ts";
@@ -20,7 +21,7 @@ const whepFlag = argv.includes("--whep");
 
 let ring: RingClient;
 try {
-  ring = new RingClient({ auth: ringAuthFromEnv(), apiBase: process.env.RING_API_BASE });
+  ring = new RingClient({ auth: withPersistedRefreshToken(ringAuthFromEnv(), process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token"), apiBase: process.env.RING_API_BASE });
 } catch (e) {
   console.error(`No Ring call made: ${(e as Error).message}`);
   console.error("Set RING_PLAYGROUND_TOKEN (Ring Playground, 30 minute token) or RING_CLIENT_ID, RING_CLIENT_SECRET and RING_REFRESH_TOKEN in .env, then run this again.");

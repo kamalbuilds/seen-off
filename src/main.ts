@@ -2,6 +2,7 @@ import { appendFileSync, mkdirSync } from "node:fs";
 import { Ledger } from "./store/ledger.ts";
 import { PickupRunner, type Alerter } from "./pickup/runner.ts";
 import { RingClient, RingSnapshotSource, ringAuthFromEnv } from "./ring/client.ts";
+import { withPersistedRefreshToken } from "./ring/token-store.ts";
 import { WhepFrameSource } from "./ring/whep.ts";
 import { ShippoTracking } from "./shippo/client.ts";
 import { visionFromEnv } from "./vision/index.ts";
@@ -23,7 +24,7 @@ const alerter: Alerter = {
 };
 
 const ledger = new Ledger(process.env.LEDGER_PATH ?? "data/outbox.sqlite");
-const ring = new RingClient({ auth: ringAuthFromEnv() });
+const ring = new RingClient({ auth: withPersistedRefreshToken(ringAuthFromEnv(), process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token") });
 const runner = new PickupRunner({
   ledger,
   vision: visionFromEnv(),
