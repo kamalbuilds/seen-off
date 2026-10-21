@@ -374,12 +374,18 @@ function say(p) {
 
 const KIND_LABEL = { label: "Labels", window_open: "Window", motion_event: "Ring motion", frame: "Porch frame", window_verdict: "Window verdict", alert: "Alert", tracking: "Carrier tracking", final_verdict: "Final verdict" };
 
+function alertLine(a) {
+  const ok = (a.delivery?.channels ?? []).filter((c) => c.ok).map((c) => c.name);
+  const failed = (a.delivery?.channels ?? []).filter((c) => !c.ok).map((c) => c.name);
+  return `Alert sent ${when(a.atMs)}${ok.length ? ` to ${ok.join(", ")}` : ""}${failed.length ? `. Not delivered to ${failed.join(", ")}` : ""}`;
+}
+
 function plate(p) {
   const word = p.status === "watching" ? "watching" : VERDICT_WORD[p.verdict] ?? p.verdict;
   return h("section", { class: "plate", "aria-label": "Verdict" },
     h("div", { class: "word" }, word, h("span", { class: "period" })),
     h("p", { class: "say" }, say(p)),
-    p.alert ? h("p", { class: "meta" }, `Alert sent ${when(p.alert.atMs)}`) : null);
+    p.alert ? h("p", { class: "meta" }, alertLine(p.alert)) : null);
 }
 
 function facts(p) {

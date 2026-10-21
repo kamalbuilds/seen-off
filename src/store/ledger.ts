@@ -1,6 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import type { IdempotencyStore, RingEvent } from "../ring/webhook.ts";
 import type { DayVerdict, TrackingStatus, WindowVerdict } from "../pickup/verdict.ts";
+import type { AlertDelivery } from "../pickup/runner.ts";
 import { eventProvenance, type Provenance } from "../provenance.ts";
 
 export interface LabelRow {
@@ -23,6 +24,7 @@ export interface DayRow {
   alertedAtMs: number | null;
   alertKind: string | null;
   alertText: string | null;
+  alertDelivery: AlertDelivery | null;
   createdAtMs: number | null;
 }
 
@@ -94,6 +96,7 @@ const ADDED_COLUMNS: [table: string, column: string, decl: string][] = [
   ["days", "created_at", "integer"],
   ["days", "alert_kind", "text"],
   ["days", "alert_text", "text"],
+  ["days", "alert_delivery", "text"],
   ["observations", "source", "text"],
   ["observations", "provenance", "text not null default 'simulated'"],
   ["events", "provenance", "text not null default 'simulated'"],
@@ -202,7 +205,8 @@ export class Ledger implements IdempotencyStore {
       baselineCount: r.baseline_count as number | null, closeCount: r.close_count as number | null,
       windowVerdict: r.window_verdict as WindowVerdict | null, handoffMs: r.handoff_ms as number | null,
       finalVerdict: r.final_verdict as DayVerdict | null, alertedAtMs: r.alerted_at as number | null,
-      alertKind: r.alert_kind as string | null, alertText: r.alert_text as string | null, createdAtMs: r.created_at as number | null,
+      alertKind: r.alert_kind as string | null, alertText: r.alert_text as string | null,
+      alertDelivery: r.alert_delivery ? (JSON.parse(r.alert_delivery as string) as AlertDelivery) : null, createdAtMs: r.created_at as number | null,
     };
   }
 
@@ -239,8 +243,9 @@ export class Ledger implements IdempotencyStore {
     this.db.prepare("update days set final_verdict = ? where day_id = ?").run(verdict, dayId);
   }
 
-  setAlerted(dayId: string, atMs: number, kind: string, text: string): void {
-    this.db.prepare("update days set alerted_at = ?, alert_kind = ?, alert_text = ? where day_id = ?").run(atMs, kind, text, dayId);
+  setAlerted(dayId: string, atMs: number, kind: string, text: string, delivery: AlertDelivery | null = null): void {
+    this.db.prepare("update days set alerted_at = ?, alert_kind = ?, alert_text = ?, alert_delivery = ? where day_id = ?")
+      .run(atMs, kind, text, delivery ? JSON.stringify(delivery) : null, dayId);
   }
 
   /** Motion and button events Ring delivered for a device inside [fromMs, toMs]. */

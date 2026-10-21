@@ -29,8 +29,13 @@ export interface TrackingSource {
 
 export type AlertKind = "missed" | "partial" | "unverified" | "unscanned";
 
+/** Which channels an alert reached. A channel that failed is recorded with its error. */
+export interface AlertDelivery {
+  channels: { name: string; ok: boolean; status?: number; error?: string }[];
+}
+
 export interface Alerter {
-  send(alert: { dayId: string; kind: AlertKind; text: string }): Promise<void>;
+  send(alert: { dayId: string; kind: AlertKind; text: string }): Promise<AlertDelivery | void>;
 }
 
 export interface RunnerDeps {
@@ -134,8 +139,8 @@ export class PickupRunner {
         : verdict === "partial"
           ? `${taken} of ${day.baselineCount} parcels taken, ${left} still on the porch at ${hhmm(day.windowEndMs)}.`
           : `Could not read the porch at ${hhmm(day.windowEndMs)}. Check the Ring app before the carrier cut-off.`;
-      await this.d.alerter.send({ dayId: day.dayId, kind: verdict, text });
-      this.d.ledger.setAlerted(day.dayId, this.d.clock(), verdict, text);
+      const delivery = await this.d.alerter.send({ dayId: day.dayId, kind: verdict, text });
+      this.d.ledger.setAlerted(day.dayId, this.d.clock(), verdict, text, delivery ?? null);
     }
     this.d.ledger.savePacket(day.dayId, this.packetOf(day.dayId));
     return verdict;
@@ -155,8 +160,8 @@ export class PickupRunner {
     this.d.ledger.savePacket(dayId, this.packetOf(dayId));
     if (verdict === "unscanned" && day.alertKind !== "unscanned") {
       const text = `Parcels left the porch but ${tracking.filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length} of ${tracking.length} labels show no carrier scan after 24 h. Evidence packet ready.`;
-      await this.d.alerter.send({ dayId, kind: "unscanned", text });
-      this.d.ledger.setAlerted(dayId, this.d.clock(), "unscanned", text);
+      const delivery = await this.d.alerter.send({ dayId, kind: "unscanned", text });
+      this.d.ledger.setAlerted(dayId, this.d.clock(), "unscanned", text, delivery ?? null);
       this.d.ledger.savePacket(dayId, this.packetOf(dayId));
     }
     return verdict;

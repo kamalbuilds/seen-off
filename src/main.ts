@@ -1,6 +1,7 @@
-import { appendFileSync, mkdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
+import { fanoutAlerter, fileAlerter, webhookAlerter } from "./alerts.ts";
 import { Ledger } from "./store/ledger.ts";
-import { PickupRunner, type Alerter } from "./pickup/runner.ts";
+import { PickupRunner } from "./pickup/runner.ts";
 import { RingClient, RingSnapshotSource, ringAuthFromEnv } from "./ring/client.ts";
 import { withPersistedRefreshToken } from "./ring/token-store.ts";
 import { WhepFrameSource } from "./ring/whep.ts";
@@ -16,12 +17,9 @@ const need = (k: string) => {
 };
 
 mkdirSync("data", { recursive: true });
-const alerter: Alerter = {
-  async send(a) {
-    appendFileSync("data/alerts.jsonl", JSON.stringify({ at: new Date().toISOString(), ...a }) + "\n");
-    console.log(`ALERT ${a.kind} ${a.dayId}: ${a.text}`);
-  },
-};
+const channels = [{ name: "file", alerter: fileAlerter("data/alerts.jsonl") }];
+if (process.env.ALERT_WEBHOOK_URL) channels.push({ name: "phone", alerter: webhookAlerter(process.env.ALERT_WEBHOOK_URL, "phone") });
+const alerter = fanoutAlerter(channels);
 
 const ledger = new Ledger(process.env.LEDGER_PATH ?? "data/outbox.sqlite");
 const ring = new RingClient({ auth: withPersistedRefreshToken(ringAuthFromEnv(), process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token") });

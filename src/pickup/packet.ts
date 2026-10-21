@@ -85,7 +85,7 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
     createdAtMs: day.createdAtMs,
     verdict: day.finalVerdict, windowVerdict: day.windowVerdict,
     baselineCount: day.baselineCount, closeCount: day.closeCount, takenCount, handoffMs: day.handoffMs,
-    alert: day.alertedAtMs === null ? null : { atMs: day.alertedAtMs, kind: day.alertKind, text: day.alertText },
+    alert: day.alertedAtMs === null ? null : { atMs: day.alertedAtMs, kind: day.alertKind, text: day.alertText, delivery: day.alertDelivery },
     labels: day.labels.map((l) => ({ ...l, status: tracking.find((t) => t.trackingNumber === l.trackingNumber)?.status ?? null })),
     tracking: tracking.length === 0 ? null : tracking.map((t) => ({ trackingNumber: t.trackingNumber, status: t.status, readAtMs: t.readAtMs, provenance: t.provenance })),
     frames, timeline,
