@@ -55,7 +55,7 @@ Every scheduled check lives in the ledger, not in a timer: the window-open basel
 | Probe: `npm run ring:probe` lists devices, reads history, downloads a snapshot (`--whep` adds a live frame) and prints the returned device and frame metadata | `src/ring/probe.ts`, `scripts/ring-probe.ts` |
 | v1.1 webhook: `X-Signature` HMAC-SHA256 over the raw bytes, 5 s ack, `meta.request_id` idempotency | `src/ring/webhook.ts`, `src/ring/signature.ts` |
 
-Webhook handling follows the Ring reference exactly. The signature is checked over the bytes as received, before parsing. A delivery is acknowledged inside the 5 s budget (4 s internal cap, then `503` so Ring retries). The `request_id` is marked processed only after the handler succeeds, so a failed delivery that Ring retries is processed, not swallowed.
+The full contract, requirement by requirement with the code and test behind each, is in `docs/ring-contract.md`. Webhook handling follows the Ring reference exactly. The signature is checked over the bytes as received, before parsing. A delivery is acknowledged inside the 5 s budget (4 s internal cap, then `503` so Ring retries). The `request_id` is marked processed only after the handler succeeds, so a failed delivery that Ring retries is processed, not swallowed.
 
 ## Pipeline
 
@@ -109,9 +109,9 @@ Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3
 ## Run it
 
 ```
-npm test                  # 60 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
+npm test                  # 76 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
 npm run test:whep         # WHEP worker against a local WHEP server serving a real frame
-npm run mutation          # 25 mutations: signature, idempotency order, verdict logic, provenance, scheduler persistence, plan validation, probe. Each must turn the suite red
+npm run mutation          # 35 mutations: signature, idempotency order, verdict logic, scheduler persistence, plan validation, probe, replay, alerts, evidence hashes, token store, scoring. Each must turn the suite red
 cp .env.example .env      # names only; fill values yourself
 npm run ring:probe         # one real device discovery and frame capture, once RING_* is set
 npm run serve:replay      # the seller page with Replay a pickup day over the 30 recorded days, no credentials
