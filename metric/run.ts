@@ -13,6 +13,7 @@ import { PickupRunner, type Alerter, type TrackingSource } from "../src/pickup/r
 import { createApp } from "../src/server.ts";
 import { ShippoTracking } from "../src/shippo/client.ts";
 import { visionFromEnv, type PorchReading, type VisionProvider } from "../src/vision/index.ts";
+import { score } from "./score.ts";
 import { signBody } from "../src/ring/signature.ts";
 import { deliver, motionEnvelope } from "../simulator/webhook-simulator.ts";
 import { SETTLE_MS, SIM_KEY as KEY, fixtureTracking, loadDays, playDay, replayFrameSource, root, type DaySpec } from "../simulator/replay.ts";
@@ -89,6 +90,7 @@ const countOk = rows.filter((r) => r.baseline === r.truthBase && r.close === r.t
 const summary = {
   vision: `${vision.name}/${vision.model}`, tracking: trackingMode === "shippo" ? "shippo-test-mode" : "fixture (Shippo test-number convention)",
   days: rows.length, correct_verdicts: `${correct}/${rows.length}`, by_scenario: byScenario, confusion,
+  scoring: score(rows),
   day_count_readings_exact: `${countOk}/${rows.length} days with both counts exact`,
   seconds_window_close_to_missed_alert: missedAlerts.length ? { n: missedAlerts.length, median: pct(missedAlerts, 50) / 1000, max: Math.max(...missedAlerts) / 1000 } : null,
   webhook_ack_ms_replay: { n: acks.length, p50: Math.round(pct(acks, 50)), p95: Math.round(pct(acks, 95)) },

@@ -95,7 +95,8 @@ Frames: two real fixed-camera doorstep clips from Wikimedia Commons (CC BY 3.0, 
 | Run | Result |
 |---|---|
 | Bedrock Qwen3-VL, verdict per pickup day | 29/30 correct (taken 10/10, missed 10/10, part-taken 4/5, unscanned 5/5), both parcel counts exact on 23/30 days |
-| Days with parcels still on the porch reported as taken | 0 |
+| Days with parcels still on the porch reported as taken | 0 of 15 |
+| Precision and recall, taken / missed / part-taken / unscanned | precision 100% / 100% / 100% / 83%, recall 100% / 100% / 80% / 100% (`metric/score.ts`) |
 | Must-fail: vision always answers "1 parcel present" | 10/30 (every day becomes "missed") |
 | Must-fail: verdict logic mutated so a missed day reads as taken | 22/30 (missed 3/10) |
 

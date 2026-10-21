@@ -16,16 +16,78 @@
    "taken -> missed": 10,
    "partial -> missed": 5
   },
+  "scoring": {
+   "matrix": {
+    "taken": {
+     "taken": 0,
+     "missed": 10,
+     "partial": 0,
+     "unscanned": 0,
+     "unverified": 0,
+     "none": 0
+    },
+    "missed": {
+     "taken": 0,
+     "missed": 10,
+     "partial": 0,
+     "unscanned": 0,
+     "unverified": 0,
+     "none": 0
+    },
+    "partial": {
+     "taken": 0,
+     "missed": 5,
+     "partial": 0,
+     "unscanned": 0,
+     "unverified": 0,
+     "none": 0
+    },
+    "unscanned": {
+     "taken": 0,
+     "missed": 5,
+     "partial": 0,
+     "unscanned": 0,
+     "unverified": 0,
+     "none": 0
+    }
+   },
+   "perClass": {
+    "taken": {
+     "support": 10,
+     "recall": 0,
+     "precision": null
+    },
+    "missed": {
+     "support": 10,
+     "recall": 1,
+     "precision": 0.3333333333333333
+    },
+    "partial": {
+     "support": 5,
+     "recall": 0,
+     "precision": null
+    },
+    "unscanned": {
+     "support": 5,
+     "recall": 0,
+     "precision": null
+    }
+   },
+   "falseReassurance": {
+    "count": 0,
+    "of": 15
+   }
+  },
   "day_count_readings_exact": "4/30 days with both counts exact",
   "seconds_window_close_to_missed_alert": {
    "n": 10,
    "median": 0.001,
-   "max": 0.002
+   "max": 0.001
   },
   "webhook_ack_ms_replay": {
    "n": 54,
    "p50": 0,
-   "p95": 2
+   "p95": 1
   },
   "webhook_ack_ms_load_100": {
    "n": 100,
@@ -53,7 +115,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 3,
-   "alertMs": 2
+   "alertMs": 1
   },
   {
    "dayId": "day02",
@@ -63,7 +125,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 0,
-   "alertMs": 1
+   "alertMs": 0
   },
   {
    "dayId": "day03",
@@ -93,7 +155,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 3,
-   "alertMs": 1
+   "alertMs": 0
   },
   {
    "dayId": "day06",
@@ -233,7 +295,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 0,
-   "alertMs": 1
+   "alertMs": 0
   },
   {
    "dayId": "day20",
@@ -253,7 +315,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 0,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day22",
