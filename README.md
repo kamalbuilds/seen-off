@@ -37,7 +37,11 @@ Each post is one verdict: a pickup the seller can prove, a handoff with no carri
 
 `npm run serve` serves one page at `/`. The seller arms a pickup day (doorbell, window, one label per parcel), watches the day timeline fill (labels registered, window open, each porch frame with its thumbnail, Ring motion events, window verdict, alert, carrier tracking, final verdict), and opens the evidence packet: the window-open and window-close frames side by side with their hashes, every timestamp, each label's tracking state, and the packet as JSON.
 
-**Replay a pickup day.** `npm run serve:replay` adds a Replay control to the page: pick one of 30 recorded pickup days and watch Outbox work through it, step by step, on the production receiver, runner, ledger and vision stage. The day arrives as HMAC-signed Ring v1.1 motion deliveries, each porch frame is read by Qwen3-VL on Bedrock, the verdict lands, the alert fires and the evidence packet fills in. It runs with no credentials, so any reviewer can watch a missed pickup, a part-taken day and a handoff that never got scanned in under a minute (`--days day01,day13` picks the days played at start, `--pace-ms 1500` slows each step).
+**The demo plays on page load.** `npm run serve:replay` opens on one seller with three scheduled parcels and plays three pickup days back to back: a missed day, a part-taken day (1 of 3 taken, 2 still on the porch) and a day where everything leaves the porch and the carrier never scans it. Each ends in its verdict, its alert and its evidence packet. The timeline updates as each event arrives, pushed to the page over server-sent events, and a step strip jumps between the three finished days. `?demo=0` opens the page without playing it.
+
+**Two tracks.** Every day answers two questions separately: did the parcels leave the porch, and did the carrier scan them. Each track states where it stands in plain words, so "unscanned" explains itself: the parcels left at 23:08, and 24 h later 3 of 3 labels still read "label created". The timeline runs the same two lanes, On the porch and With the carrier.
+
+**Replay a pickup day.** The Replay control plays any one of 30 recorded pickup days on the production receiver, runner, ledger and vision stage. The day arrives as HMAC-signed Ring v1.1 motion deliveries, each porch frame is read by Qwen3-VL on Bedrock, the verdict lands, the alert fires and the evidence packet fills in. It runs with no credentials (`--demo day05,day06,day15` picks the three demo days, `--days day01,day13` replays days before serving, `--pace-ms 1500` slows each step).
 
 `POST /days` validates the plan: a window that ends before it starts or runs past 24 h, an empty label list, a path-unsafe day name and malformed JSON are each a `400` that lists every reason; a repeated day name is `409`.
 
@@ -125,9 +129,9 @@ Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3
 ## Run it
 
 ```
-npm test                  # 76 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
+npm test                  # 79 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
 npm run test:whep         # WHEP worker against a local WHEP server serving a real frame
-npm run mutation          # 35 mutations: signature, idempotency order, verdict logic, scheduler persistence, plan validation, probe, replay, alerts, evidence hashes, token store, scoring. Each must turn the suite red
+npm run mutation          # 38 mutations: signature, idempotency order, verdict logic, scheduler persistence, plan validation, probe, replay, alerts, evidence hashes, token store, scoring. Each must turn the suite red
 cp .env.example .env      # names only; fill values yourself
 npm run ring:probe         # one real device discovery and frame capture, once RING_* is set
 npm run serve:replay      # the seller page with Replay a pickup day over the 30 recorded days, no credentials
