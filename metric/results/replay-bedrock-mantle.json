@@ -3,27 +3,25 @@
   "vision": "bedrock-mantle/qwen.qwen3-vl-235b-a22b-instruct",
   "tracking": "fixture (Shippo test-number convention)",
   "days": 30,
-  "correct_verdicts": "25/30",
+  "correct_verdicts": "29/30",
   "by_scenario": {
    "taken": "10/10",
-   "missed": "7/10",
+   "missed": "10/10",
    "partial": "4/5",
-   "unscanned": "4/5"
+   "unscanned": "5/5"
   },
   "confusion": {
-   "missed -> unverified": 3,
-   "unscanned -> unscanned": 4,
+   "missed -> missed": 10,
+   "unscanned -> unscanned": 5,
    "taken -> taken": 10,
-   "missed -> missed": 7,
    "partial -> partial": 4,
-   "unscanned -> unverified": 1,
    "partial -> unscanned": 1
   },
-  "day_count_readings_exact": "22/30 days with both counts exact",
+  "day_count_readings_exact": "23/30 days with both counts exact",
   "seconds_window_close_to_missed_alert": {
    "n": 10,
-   "median": 2.173,
-   "max": 3.025
+   "median": 1.478,
+   "max": 4.278
   },
   "webhook_ack_ms_replay": {
    "n": 54,
@@ -33,9 +31,9 @@
   "webhook_ack_ms_load_100": {
    "n": 100,
    "ok": 100,
-   "p50": 1,
-   "p95": 5,
-   "max": 18
+   "p50": 0,
+   "p95": 1,
+   "max": 2
   },
   "idempotency": {
    "replay_duplicates_acked": 27,
@@ -51,12 +49,12 @@
   {
    "dayId": "day01",
    "truth": "missed",
-   "verdict": "unverified",
-   "baseline": 4,
+   "verdict": "missed",
+   "baseline": 3,
    "close": 6,
    "truthBase": 3,
    "truthClose": 3,
-   "alertMs": 2491
+   "alertMs": 4278
   },
   {
    "dayId": "day02",
@@ -96,7 +94,7 @@
    "close": 3,
    "truthBase": 3,
    "truthClose": 3,
-   "alertMs": 1887
+   "alertMs": 1142
   },
   {
    "dayId": "day06",
@@ -106,7 +104,7 @@
    "close": 2,
    "truthBase": 3,
    "truthClose": 2,
-   "alertMs": 1404
+   "alertMs": 1789
   },
   {
    "dayId": "day07",
@@ -116,7 +114,7 @@
    "close": 2,
    "truthBase": 2,
    "truthClose": 2,
-   "alertMs": 1089
+   "alertMs": 848
   },
   {
    "dayId": "day08",
@@ -146,7 +144,7 @@
    "close": 3,
    "truthBase": 3,
    "truthClose": 3,
-   "alertMs": 1473
+   "alertMs": 2150
   },
   {
    "dayId": "day11",
@@ -166,17 +164,17 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 1,
-   "alertMs": 2202
+   "alertMs": 1203
   },
   {
    "dayId": "day13",
    "truth": "unscanned",
-   "verdict": "unverified",
-   "baseline": 0,
+   "verdict": "unscanned",
+   "baseline": 2,
    "close": 0,
    "truthBase": 2,
    "truthClose": 0,
-   "alertMs": 1443
+   "alertMs": null
   },
   {
    "dayId": "day14",
@@ -186,7 +184,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 1,
-   "alertMs": 2330
+   "alertMs": 1858
   },
   {
    "dayId": "day15",
@@ -206,7 +204,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 1,
-   "alertMs": 3025
+   "alertMs": 1553
   },
   {
    "dayId": "day17",
@@ -241,12 +239,12 @@
   {
    "dayId": "day20",
    "truth": "missed",
-   "verdict": "unverified",
+   "verdict": "missed",
    "baseline": 3,
    "close": 4,
    "truthBase": 2,
    "truthClose": 2,
-   "alertMs": 2434
+   "alertMs": 1478
   },
   {
    "dayId": "day21",
@@ -266,7 +264,7 @@
    "close": 1,
    "truthBase": 2,
    "truthClose": 1,
-   "alertMs": 1063
+   "alertMs": 2220
   },
   {
    "dayId": "day23",
@@ -276,7 +274,7 @@
    "close": 2,
    "truthBase": 3,
    "truthClose": 2,
-   "alertMs": 912
+   "alertMs": 1221
   },
   {
    "dayId": "day24",
@@ -321,12 +319,12 @@
   {
    "dayId": "day28",
    "truth": "missed",
-   "verdict": "unverified",
+   "verdict": "missed",
    "baseline": 1,
    "close": 2,
    "truthBase": 1,
    "truthClose": 1,
-   "alertMs": 1540
+   "alertMs": 1370
   },
   {
    "dayId": "day29",
@@ -336,7 +334,7 @@
    "close": 2,
    "truthBase": 2,
    "truthClose": 2,
-   "alertMs": 2173
+   "alertMs": 2174
   },
   {
    "dayId": "day30",
@@ -346,7 +344,7 @@
    "close": 2,
    "truthBase": 3,
    "truthClose": 2,
-   "alertMs": 1475
+   "alertMs": 3986
   }
  ]
 }

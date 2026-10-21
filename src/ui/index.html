@@ -301,6 +301,12 @@ function resetForm() {
   $("#errors").replaceChildren();
   utcPreview();
 }
+// The API names fields; the seller sees the form's own words.
+const plain = (m) => m
+  .replace(/labels\[(\d+)\]\.trackingNumber/g, (_, i) => `Label ${+i + 1} tracking number`)
+  .replace(/labels\[(\d+)\]\.carrier/g, (_, i) => `Label ${+i + 1} carrier`)
+  .replace(/windowStartMs/g, "Window opens").replace(/windowEndMs/g, "Window closes")
+  .replace(/\bdayId\b/g, "Pickup day id").replace(/\bdeviceId\b/g, "Doorbell").replace(/\blabels\b/g, "Labels");
 $("#addLabel").addEventListener("click", () => $("#labels").append(labelRow()));
 $("#start").addEventListener("input", utcPreview); $("#end").addEventListener("input", utcPreview);
 
@@ -320,7 +326,7 @@ $("#form").addEventListener("submit", async (ev) => {
     resetForm();
     if (innerWidth <= 960) $("#newday").open = false;
   } catch (e) {
-    $("#errors").replaceChildren(...(e.errors?.length ? e.errors : [e.message]).map((m) => h("li", {}, m)));
+    $("#errors").replaceChildren(...(e.errors?.length ? e.errors : [e.message]).map((m) => h("li", {}, plain(m))));
   } finally { btn.disabled = false; btn.textContent = "Arm this pickup day"; }
 });
 

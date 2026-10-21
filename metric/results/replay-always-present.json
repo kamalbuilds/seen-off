@@ -19,13 +19,13 @@
   "day_count_readings_exact": "4/30 days with both counts exact",
   "seconds_window_close_to_missed_alert": {
    "n": 10,
-   "median": 0,
-   "max": 0
+   "median": 0.001,
+   "max": 0.002
   },
   "webhook_ack_ms_replay": {
    "n": 54,
    "p50": 0,
-   "p95": 1
+   "p95": 2
   },
   "webhook_ack_ms_load_100": {
    "n": 100,
@@ -53,7 +53,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 3,
-   "alertMs": 0
+   "alertMs": 2
   },
   {
    "dayId": "day02",
@@ -63,7 +63,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 0,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day03",
@@ -73,7 +73,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 0,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day04",
@@ -83,7 +83,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 0,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day05",
@@ -93,7 +93,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 3,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day06",
@@ -103,7 +103,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 2,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day07",
@@ -113,7 +113,7 @@
    "close": 1,
    "truthBase": 2,
    "truthClose": 2,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day08",
@@ -163,7 +163,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 1,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day13",
@@ -183,7 +183,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 1,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day15",
@@ -193,7 +193,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 0,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day16",
@@ -233,7 +233,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 0,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day20",
@@ -243,7 +243,7 @@
    "close": 1,
    "truthBase": 2,
    "truthClose": 2,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day21",
@@ -313,7 +313,7 @@
    "close": 1,
    "truthBase": 2,
    "truthClose": 0,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day28",
@@ -323,7 +323,7 @@
    "close": 1,
    "truthBase": 1,
    "truthClose": 1,
-   "alertMs": 0
+   "alertMs": 1
   },
   {
    "dayId": "day29",
@@ -343,7 +343,7 @@
    "close": 1,
    "truthBase": 3,
    "truthClose": 2,
-   "alertMs": 0
+   "alertMs": 1
   }
  ]
 }

@@ -7,7 +7,7 @@ SHIPPO_TRANSIT (carrier scan exists) and SHIPPO_PRE_TRANSIT (label created, neve
 
 Run:  .venv/bin/python simulator/build_days.py   (needs spikes/porch/src from fetch_sources.sh)
 """
-import json, random, sys
+import json, os, random, sys
 from pathlib import Path
 import cv2, numpy as np
 
@@ -15,8 +15,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "spikes" / "porch"))
 import build_frames as bf  # noqa: E402
 
-OUT = ROOT / "simulator" / "days"
-rng = random.Random(20261022)
+# BUILD_SEED, BUILD_OUT and BUILD_JSON build a different batch beside the shipped one (the held-out set); the defaults rebuild the shipped 30 days.
+OUT = ROOT / "simulator" / os.environ.get("BUILD_OUT", "days")
+rng = random.Random(int(os.environ.get("BUILD_SEED", 20261022)))
 DEVICE = "ava1.ring.device.REPLAYSIMULATOR01"
 H = 3600_000
 DAY0 = 1792947600000  # 2026-10-25T17:00:00Z = 10:00 PDT, replay dates are simulated
@@ -106,7 +107,7 @@ def main():
             close_parcels, taken = len(left), j
         days.append({"dayId": did, "scenario": scenario, "truth": scenario, "deviceId": DEVICE, "windowStartMs": start, "windowEndMs": end,
                      "labels": labels, "frames": frames, "motion": motion, "truthCounts": {"baseline": k, "close": close_parcels, "taken": taken}})
-    (ROOT / "simulator" / "days.json").write_text(json.dumps(days, indent=1))
+    (ROOT / "simulator" / os.environ.get("BUILD_JSON", "days.json")).write_text(json.dumps(days, indent=1))
     from collections import Counter
     print(len(days), Counter(d["truth"] for d in days))
 

@@ -1,0 +1,353 @@
+{
+ "summary": {
+  "vision": "bedrock-mantle/qwen.qwen3-vl-235b-a22b-instruct",
+  "tracking": "fixture (Shippo test-number convention)",
+  "days": 30,
+  "correct_verdicts": "25/30",
+  "by_scenario": {
+   "taken": "10/10",
+   "missed": "7/10",
+   "partial": "3/5",
+   "unscanned": "5/5"
+  },
+  "confusion": {
+   "missed -> missed": 7,
+   "unscanned -> unscanned": 5,
+   "taken -> taken": 10,
+   "missed -> partial": 1,
+   "partial -> unverified": 1,
+   "missed -> unverified": 2,
+   "partial -> partial": 3,
+   "partial -> missed": 1
+  },
+  "day_count_readings_exact": "18/30 days with both counts exact",
+  "seconds_window_close_to_missed_alert": {
+   "n": 10,
+   "median": 1.271,
+   "max": 2.613
+  },
+  "webhook_ack_ms_replay": {
+   "n": 44,
+   "p50": 1,
+   "p95": 5
+  },
+  "webhook_ack_ms_load_100": {
+   "n": 100,
+   "ok": 100,
+   "p50": 0,
+   "p95": 1,
+   "max": 10
+  },
+  "idempotency": {
+   "replay_duplicates_acked": 22,
+   "load_duplicates_acked": "100/100"
+  },
+  "forged_signatures_rejected": {
+   "replay": "22/22",
+   "load": "10/10"
+  },
+  "errors": 0
+ },
+ "rows": [
+  {
+   "dayId": "day01",
+   "truth": "missed",
+   "verdict": "missed",
+   "baseline": 2,
+   "close": 2,
+   "truthBase": 2,
+   "truthClose": 2,
+   "alertMs": 2330
+  },
+  {
+   "dayId": "day02",
+   "truth": "missed",
+   "verdict": "missed",
+   "baseline": 2,
+   "close": 3,
+   "truthBase": 3,
+   "truthClose": 3,
+   "alertMs": 1863
+  },
+  {
+   "dayId": "day03",
+   "truth": "missed",
+   "verdict": "missed",
+   "baseline": 1,
+   "close": 1,
+   "truthBase": 1,
+   "truthClose": 1,
+   "alertMs": 1269
+  },
+  {
+   "dayId": "day04",
+   "truth": "unscanned",
+   "verdict": "unscanned",
+   "baseline": 2,
+   "close": 0,
+   "truthBase": 2,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day05",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 3,
+   "close": 0,
+   "truthBase": 2,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day06",
+   "truth": "missed",
+   "verdict": "partial",
+   "baseline": 3,
+   "close": 2,
+   "truthBase": 3,
+   "truthClose": 3,
+   "alertMs": 2172
+  },
+  {
+   "dayId": "day07",
+   "truth": "partial",
+   "verdict": "unverified",
+   "baseline": 0,
+   "close": 0,
+   "truthBase": 3,
+   "truthClose": 1,
+   "alertMs": 1292
+  },
+  {
+   "dayId": "day08",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 2,
+   "close": 0,
+   "truthBase": 2,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day09",
+   "truth": "unscanned",
+   "verdict": "unscanned",
+   "baseline": 1,
+   "close": 0,
+   "truthBase": 1,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day10",
+   "truth": "missed",
+   "verdict": "unverified",
+   "baseline": 0,
+   "close": 2,
+   "truthBase": 2,
+   "truthClose": 2,
+   "alertMs": 1102
+  },
+  {
+   "dayId": "day11",
+   "truth": "missed",
+   "verdict": "missed",
+   "baseline": 1,
+   "close": 1,
+   "truthBase": 1,
+   "truthClose": 1,
+   "alertMs": 1479
+  },
+  {
+   "dayId": "day12",
+   "truth": "missed",
+   "verdict": "missed",
+   "baseline": 1,
+   "close": 1,
+   "truthBase": 1,
+   "truthClose": 1,
+   "alertMs": 2613
+  },
+  {
+   "dayId": "day13",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 1,
+   "close": 0,
+   "truthBase": 1,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day14",
+   "truth": "partial",
+   "verdict": "partial",
+   "baseline": 2,
+   "close": 1,
+   "truthBase": 2,
+   "truthClose": 1,
+   "alertMs": 3206
+  },
+  {
+   "dayId": "day15",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 3,
+   "close": 0,
+   "truthBase": 3,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day16",
+   "truth": "unscanned",
+   "verdict": "unscanned",
+   "baseline": 2,
+   "close": 0,
+   "truthBase": 3,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day17",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 4,
+   "close": 0,
+   "truthBase": 3,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day18",
+   "truth": "partial",
+   "verdict": "partial",
+   "baseline": 2,
+   "close": 1,
+   "truthBase": 3,
+   "truthClose": 1,
+   "alertMs": 1040
+  },
+  {
+   "dayId": "day19",
+   "truth": "unscanned",
+   "verdict": "unscanned",
+   "baseline": 1,
+   "close": 0,
+   "truthBase": 1,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day20",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 1,
+   "close": 0,
+   "truthBase": 1,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day21",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 1,
+   "close": 0,
+   "truthBase": 1,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day22",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 2,
+   "close": 0,
+   "truthBase": 2,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day23",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 2,
+   "close": 0,
+   "truthBase": 2,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day24",
+   "truth": "missed",
+   "verdict": "missed",
+   "baseline": 1,
+   "close": 1,
+   "truthBase": 1,
+   "truthClose": 1,
+   "alertMs": 1102
+  },
+  {
+   "dayId": "day25",
+   "truth": "missed",
+   "verdict": "unverified",
+   "baseline": 0,
+   "close": 0,
+   "truthBase": 2,
+   "truthClose": 2,
+   "alertMs": 1271
+  },
+  {
+   "dayId": "day26",
+   "truth": "partial",
+   "verdict": "partial",
+   "baseline": 2,
+   "close": 1,
+   "truthBase": 2,
+   "truthClose": 1,
+   "alertMs": 1413
+  },
+  {
+   "dayId": "day27",
+   "truth": "missed",
+   "verdict": "missed",
+   "baseline": 3,
+   "close": 3,
+   "truthBase": 3,
+   "truthClose": 3,
+   "alertMs": 1058
+  },
+  {
+   "dayId": "day28",
+   "truth": "taken",
+   "verdict": "taken",
+   "baseline": 2,
+   "close": 0,
+   "truthBase": 1,
+   "truthClose": 0,
+   "alertMs": null
+  },
+  {
+   "dayId": "day29",
+   "truth": "partial",
+   "verdict": "missed",
+   "baseline": 3,
+   "close": 3,
+   "truthBase": 3,
+   "truthClose": 2,
+   "alertMs": 1250
+  },
+  {
+   "dayId": "day30",
+   "truth": "unscanned",
+   "verdict": "unscanned",
+   "baseline": 3,
+   "close": 0,
+   "truthBase": 2,
+   "truthClose": 0,
+   "alertMs": null
+  }
+ ]
+}

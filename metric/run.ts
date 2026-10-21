@@ -3,6 +3,7 @@
 //
 //   VISION_PROVIDER=openrouter node metric/run.ts                    headline run
 //   node metric/run.ts --always-present                                must-fail: vision always says "1 parcel present"
+//   --set holdout                                                     the held-out 30 days
 //   ... --tracking shippo                                            read tracking from Shippo test mode (needs SHIPPO_API_KEY)
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -20,8 +21,11 @@ const args = process.argv.slice(2);
 const alwaysPresentRun = args.includes("--always-present");
 const trackingMode = args.includes("--tracking") ? args[args.indexOf("--tracking") + 1] : "fixture";
 
-const days: DaySpec[] = loadDays();
-const replayFrames = replayFrameSource(days);
+// --set holdout: 30 days built with a different seed (simulator/holdout.json), never used while choosing the verdict logic.
+const set = args.includes("--set") ? args[args.indexOf("--set") + 1] : "days";
+if (set !== "days" && set !== "holdout") throw new Error(`--set must be days or holdout, got ${set}`);
+const days: DaySpec[] = loadDays(set === "days" ? "simulator/days.json" : "simulator/holdout.json");
+const replayFrames = replayFrameSource(days, set === "days" ? "simulator/days" : "simulator/holdout");
 let tracking: TrackingSource = fixtureTracking;
 if (trackingMode === "shippo") {
   if (!process.env.SHIPPO_API_KEY) throw new Error("--tracking shippo needs SHIPPO_API_KEY");
@@ -96,5 +100,5 @@ const summary = {
 console.log(JSON.stringify(summary, null, 2));
 for (const r of rows.filter((x) => x.verdict !== x.truth)) console.log("WRONG", r.dayId, "truth", r.truth, "got", r.verdict, `counts ${r.baseline}/${r.close} truth ${r.truthBase}/${r.truthClose}`, r.error ?? "");
 mkdirSync(join(root, "metric/results"), { recursive: true });
-writeFileSync(join(root, "metric/results", alwaysPresentRun ? "replay-always-present.json" : `replay-${vision.name}.json`), JSON.stringify({ summary, rows }, null, 1));
+writeFileSync(join(root, "metric/results", `replay-${alwaysPresentRun ? "always-present" : vision.name}${set === "days" ? "" : `-${set}`}.json`), JSON.stringify({ summary, rows }, null, 1));
 void webhooksSent;

@@ -53,6 +53,7 @@ export interface DayPlan {
   labels: LabelRow[];
 }
 
+const ZERO_REREADS = 2;
 const hhmm = (ms: number) => new Date(ms).toISOString().slice(11, 16) + " UTC";
 
 export class PickupRunner {
@@ -76,7 +77,8 @@ export class PickupRunner {
   /** Window opens: count the parcels on the porch. */
   async takeBaseline(dayId: string): Promise<number | null> {
     const day = this.d.ledger.getDay(dayId);
-    const count = await this.observe(dayId, day.deviceId, "baseline", day.windowStartMs);
+    // A day with labels and an empty porch at window open is implausible, and the vision stage is not perfectly repeatable on one frame: read again before accepting zero.
+    const count = await this.observe(dayId, day.deviceId, "baseline", day.windowStartMs, day.labels.length > 0 ? ZERO_REREADS : 0);
     this.d.ledger.setBaseline(dayId, count);
     return count;
   }
@@ -110,7 +112,8 @@ export class PickupRunner {
     // Re-entry after a crash or a failed alert: the verdict is already stored, so only a missing alert is still owed.
     if (day.windowVerdict !== null) return this.settleAlert(day);
     const closeCount = await this.observe(dayId, day.deviceId, "close", day.windowEndMs);
-    const { verdict, takenCount } = decideWindowVerdict({ baselineCount: day.baselineCount, closeCount });
+    const midCounts = this.d.ledger.observations(dayId).filter((o) => o.kind === "motion" && o.count !== null).map((o) => o.count!);
+    const { verdict, takenCount } = decideWindowVerdict({ baselineCount: day.baselineCount, closeCount, midCounts });
     const handoff = verdict === "taken" || verdict === "partial"
       ? this.d.ledger.observations(dayId).find((o) => o.kind === "motion" && o.count !== null && day.baselineCount !== null && o.count < day.baselineCount)?.atMs ?? null
       : null;
@@ -123,7 +126,8 @@ export class PickupRunner {
   private async settleAlert(day: DayRow): Promise<DayVerdict> {
     const verdict = day.windowVerdict!;
     if ((verdict === "missed" || verdict === "partial" || verdict === "unverified") && day.alertedAtMs === null) {
-      const left = day.closeCount ?? 0;
+      // When the close count exceeds the baseline the two readings disagree; the lower one is the claim the evidence supports.
+      const left = day.closeCount !== null && day.baselineCount !== null ? Math.min(day.closeCount, day.baselineCount) : day.closeCount ?? 0;
       const taken = day.baselineCount !== null ? Math.max(0, day.baselineCount - left) : 0;
       const text = verdict === "missed"
         ? `${left} parcel${left === 1 ? "" : "s"} still on the porch at ${hhmm(day.windowEndMs)}: the carrier did not take them.`
@@ -164,7 +168,7 @@ export class PickupRunner {
   }
 
   /** One frame, one count. A failure is recorded as a null count, never guessed. */
-  private async observe(dayId: string, deviceId: string, kind: "baseline" | "motion" | "close", atMs: number): Promise<number | null> {
+  private async observe(dayId: string, deviceId: string, kind: "baseline" | "motion" | "close", atMs: number, zeroRereads = 0): Promise<number | null> {
     const errors: string[] = [];
     for (const src of this.d.frames) {
       let frame: Frame;
@@ -178,7 +182,8 @@ export class PickupRunner {
         writeFileSync(path, frame.jpeg);
       }
       try {
-        const r = await this.d.vision.readPorch(frame.jpeg);
+        let r = await this.d.vision.readPorch(frame.jpeg);
+        for (let i = 0; i < zeroRereads && r.count === 0; i++) r = await this.d.vision.readPorch(frame.jpeg);
         this.d.ledger.addObservation({ dayId, kind, atMs, count: r.count, frameSha256: sha, framePath: path, error: null, source: src.name, provenance: src.provenance ?? "simulated" });
         return r.count;
       } catch (e) {

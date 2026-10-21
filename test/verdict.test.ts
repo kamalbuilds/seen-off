@@ -18,7 +18,13 @@ test("window verdict: unreadable or contradictory evidence is unverified, never 
   assert.equal(w(null, 0).verdict, "unverified", "no baseline");
   assert.equal(w(3, null).verdict, "unverified", "no close reading");
   assert.equal(w(0, 0).verdict, "unverified", "nothing was on the porch at arming, so nothing can have been taken");
-  assert.equal(w(1, 2).verdict, "unverified", "more parcels at close than at arming");
+});
+
+test("window verdict: a close count above the baseline is a counting error. Nothing seen leaving means missed; a seen decrease that then reverses is a contradiction", () => {
+  assert.deepEqual(w(1, 2), { verdict: "missed", takenCount: 0 }, "no frame ever showed fewer parcels than at open");
+  assert.deepEqual(decideWindowVerdict({ baselineCount: 3, closeCount: 4, midCounts: [3, 4] }), { verdict: "missed", takenCount: 0 });
+  assert.deepEqual(decideWindowVerdict({ baselineCount: 3, closeCount: 4, midCounts: [2] }), { verdict: "unverified", takenCount: 0 }, "a frame showed 2, then the close frame 4");
+  assert.deepEqual(decideWindowVerdict({ baselineCount: 3, closeCount: 4, midCounts: [] }), { verdict: "missed", takenCount: 0 });
 });
 
 const t = (...s: ("PRE_TRANSIT" | "TRANSIT" | "DELIVERED" | "UNKNOWN" | "FAILURE" | "RETURNED")[]) => s.map((status, i) => ({ trackingNumber: `T${i}`, status }));

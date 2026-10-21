@@ -9,10 +9,10 @@ fail=0
 # exit 0 only when the suite ran and every test passed; "red" below additionally requires a real test failure, not a crash.
 run_suite() { (cd "$1" && node --test "test/$2" >"$TMP/out.txt" 2>&1); }
 real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
-fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
+fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -31,7 +31,7 @@ src/ring/webhook.ts@@s/\.then\(\(\) => opts\.handle\(event\)\)\s*$/.then(() => {
 src/ring/webhook.ts@@s/if \(opts\.store\.isDone\(event\.requestId\)\) return/if (false) return/@@webhook.test.ts@@duplicate request_id reprocessed
 src/pickup/verdict.ts@@s/if \(c === b\) return \{ verdict: "missed"/if (c === b) return { verdict: "taken"/@@verdict.test.ts@@missed reported as taken
 src/pickup/verdict.ts@@s/if \(c === 0\) return \{ verdict: "taken"/if (c <= 1) return { verdict: "taken"/@@verdict.test.ts@@partial collapsed into taken
-src/pickup/verdict.ts@@s/b <= 0 \|\| c > b/c > b/@@verdict.test.ts@@empty baseline no longer unverified
+src/pickup/verdict.ts@@s/ \|\| b <= 0\) return/) return/@@verdict.test.ts@@empty baseline no longer unverified
 src/pickup/verdict.ts@@s/SCANNED.has\(t.status\)/true/@@verdict.test.ts@@unscanned never detected
 src/provenance.ts@@s/ORDER.indexOf\(p\) > ORDER.indexOf\(w\)/ORDER.indexOf(p) < ORDER.indexOf(w)/@@packet.test.ts@@verdict provenance no longer the weakest input
 src/provenance.ts@@s/SIMULATOR\|FIXTURE/NEVERMATCH/@@packet.test.ts@@simulated webhooks labelled live
@@ -44,10 +44,16 @@ src/store/ledger.ts@@s/job.run\(d.dayId, "close", d.windowEndMs\);//@@scheduler.
 src/pickup/runner.ts@@s/if \(day.windowVerdict !== null\) return this.settleAlert\(day\);//@@scheduler.test.ts@@close re-entry repeats the observation
 src/pickup/scheduler.ts@@s/await runner.drain\(\); //@@scheduler.test.ts@@close job skips the webhook drain
 src/pickup/scheduler.ts@@s/ledger.completeJob\(job.id, clock\(\)\);//@@scheduler.test.ts@@finished job never marked done
+src/ring/probe.ts@@s/width: \(b\[i \+ 7\] << 8\) \| b\[i \+ 8\]/width: 1/@@probe.test.ts@@probe reports the wrong frame width
+src/ring/probe.ts@@s/writeFileSync\(file, f.jpeg\);//@@probe.test.ts@@probe does not save the frame
+src/pickup/verdict.ts@@s/return seenLeaving \? \{ verdict: "unverified", takenCount: 0 \} : \{ verdict: "missed", takenCount: 0 \};/return { verdict: "unverified", takenCount: 0 };/@@replay-regressions.test.ts@@overcounted close frame goes back to unverified
+src/pickup/verdict.ts@@s/const seenLeaving = .*/const seenLeaving = false;/@@verdict.test.ts@@a seen decrease no longer blocks the missed call
+src/pickup/runner.ts@@s/i < zeroRereads/i < 0/@@replay-regressions.test.ts@@zero baseline is not read again
+src/pickup/runner.ts@@s/Math.min\(day.closeCount, day.baselineCount\)/day.closeCount/@@replay-regressions.test.ts@@alert quotes the larger disagreeing count
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail

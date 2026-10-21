@@ -1,0 +1,1380 @@
+[
+ {
+  "dayId": "day01",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793034000000,
+  "windowEndMs": 1793059200000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793034000000,
+    "file": "day01_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793052030000,
+    "file": "day01_after.jpg",
+    "parcels": 2,
+    "kind": "after"
+   },
+   {
+    "atMs": 1793059200000,
+    "file": "day01_close.jpg",
+    "parcels": 2,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1793052000000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 2,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day02",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793120400000,
+  "windowEndMs": 1793145600000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793120400000,
+    "file": "day02_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793145600000,
+    "file": "day02_close.jpg",
+    "parcels": 3,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 3,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day03",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793206800000,
+  "windowEndMs": 1793232000000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793206800000,
+    "file": "day03_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793232000000,
+    "file": "day03_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 1,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day04",
+  "scenario": "unscanned",
+  "truth": "unscanned",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793293200000,
+  "windowEndMs": 1793318400000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793293200000,
+    "file": "day04_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793314110000,
+    "file": "day04_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1793318400000,
+    "file": "day04_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1793314080000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 0,
+   "taken": 2
+  }
+ },
+ {
+  "dayId": "day05",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793379600000,
+  "windowEndMs": 1793404800000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793379600000,
+    "file": "day05_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793402190000,
+    "file": "day05_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1793404800000,
+    "file": "day05_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1793402160000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 0,
+   "taken": 2
+  }
+ },
+ {
+  "dayId": "day06",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793466000000,
+  "windowEndMs": 1793491200000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793466000000,
+    "file": "day06_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793491200000,
+    "file": "day06_close.jpg",
+    "parcels": 3,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 3,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day07",
+  "scenario": "partial",
+  "truth": "partial",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793552400000,
+  "windowEndMs": 1793577600000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793552400000,
+    "file": "day07_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793566830000,
+    "file": "day07_after.jpg",
+    "parcels": 1,
+    "kind": "after"
+   },
+   {
+    "atMs": 1793577600000,
+    "file": "day07_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1793566800000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 1,
+   "taken": 2
+  }
+ },
+ {
+  "dayId": "day08",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793638800000,
+  "windowEndMs": 1793664000000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793638800000,
+    "file": "day08_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793649570000,
+    "file": "day08_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1793664000000,
+    "file": "day08_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1793649540000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 0,
+   "taken": 2
+  }
+ },
+ {
+  "dayId": "day09",
+  "scenario": "unscanned",
+  "truth": "unscanned",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793725200000,
+  "windowEndMs": 1793750400000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793725200000,
+    "file": "day09_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793748150000,
+    "file": "day09_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1793750400000,
+    "file": "day09_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1793748120000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 0,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day10",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793811600000,
+  "windowEndMs": 1793836800000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793811600000,
+    "file": "day10_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793836800000,
+    "file": "day10_close.jpg",
+    "parcels": 2,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 2,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day11",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793898000000,
+  "windowEndMs": 1793923200000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793898000000,
+    "file": "day11_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1793923200000,
+    "file": "day11_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 1,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day12",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1793984400000,
+  "windowEndMs": 1794009600000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1793984400000,
+    "file": "day12_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794009600000,
+    "file": "day12_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 1,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day13",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794070800000,
+  "windowEndMs": 1794096000000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794070800000,
+    "file": "day13_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794095910000,
+    "file": "day13_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794096000000,
+    "file": "day13_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794095880000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 0,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day14",
+  "scenario": "partial",
+  "truth": "partial",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794157200000,
+  "windowEndMs": 1794182400000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794157200000,
+    "file": "day14_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794168030000,
+    "file": "day14_after.jpg",
+    "parcels": 1,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794182400000,
+    "file": "day14_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794168000000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 1,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day15",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794243600000,
+  "windowEndMs": 1794268800000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794243600000,
+    "file": "day15_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794251370000,
+    "file": "day15_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794268800000,
+    "file": "day15_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794251340000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 0,
+   "taken": 3
+  }
+ },
+ {
+  "dayId": "day16",
+  "scenario": "unscanned",
+  "truth": "unscanned",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794330000000,
+  "windowEndMs": 1794355200000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794330000000,
+    "file": "day16_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794337470000,
+    "file": "day16_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794355200000,
+    "file": "day16_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794337440000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 0,
+   "taken": 3
+  }
+ },
+ {
+  "dayId": "day17",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794416400000,
+  "windowEndMs": 1794441600000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794416400000,
+    "file": "day17_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794440790000,
+    "file": "day17_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794441600000,
+    "file": "day17_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794440760000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 0,
+   "taken": 3
+  }
+ },
+ {
+  "dayId": "day18",
+  "scenario": "partial",
+  "truth": "partial",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794502800000,
+  "windowEndMs": 1794528000000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794502800000,
+    "file": "day18_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794517230000,
+    "file": "day18_after.jpg",
+    "parcels": 1,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794528000000,
+    "file": "day18_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794517200000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 1,
+   "taken": 2
+  }
+ },
+ {
+  "dayId": "day19",
+  "scenario": "unscanned",
+  "truth": "unscanned",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794589200000,
+  "windowEndMs": 1794614400000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794589200000,
+    "file": "day19_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794612450000,
+    "file": "day19_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794614400000,
+    "file": "day19_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794612420000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 0,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day20",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794675600000,
+  "windowEndMs": 1794700800000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794675600000,
+    "file": "day20_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794690750000,
+    "file": "day20_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794700800000,
+    "file": "day20_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794690720000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 0,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day21",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794762000000,
+  "windowEndMs": 1794787200000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794762000000,
+    "file": "day21_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794776490000,
+    "file": "day21_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794787200000,
+    "file": "day21_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794776460000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 0,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day22",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794848400000,
+  "windowEndMs": 1794873600000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794848400000,
+    "file": "day22_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794856290000,
+    "file": "day22_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794873600000,
+    "file": "day22_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794856260000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 0,
+   "taken": 2
+  }
+ },
+ {
+  "dayId": "day23",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1794934800000,
+  "windowEndMs": 1794960000000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1794934800000,
+    "file": "day23_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1794954570000,
+    "file": "day23_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1794960000000,
+    "file": "day23_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1794954540000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 0,
+   "taken": 2
+  }
+ },
+ {
+  "dayId": "day24",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1795021200000,
+  "windowEndMs": 1795046400000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1795021200000,
+    "file": "day24_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1795046400000,
+    "file": "day24_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 1,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day25",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1795107600000,
+  "windowEndMs": 1795132800000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1795107600000,
+    "file": "day25_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1795114830000,
+    "file": "day25_after.jpg",
+    "parcels": 2,
+    "kind": "after"
+   },
+   {
+    "atMs": 1795132800000,
+    "file": "day25_close.jpg",
+    "parcels": 2,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1795114800000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 2,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day26",
+  "scenario": "partial",
+  "truth": "partial",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1795194000000,
+  "windowEndMs": 1795219200000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1795194000000,
+    "file": "day26_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1795201230000,
+    "file": "day26_after.jpg",
+    "parcels": 1,
+    "kind": "after"
+   },
+   {
+    "atMs": 1795219200000,
+    "file": "day26_close.jpg",
+    "parcels": 1,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1795201200000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 1,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day27",
+  "scenario": "missed",
+  "truth": "missed",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1795280400000,
+  "windowEndMs": 1795305600000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1795280400000,
+    "file": "day27_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1795305600000,
+    "file": "day27_close.jpg",
+    "parcels": 3,
+    "kind": "close"
+   }
+  ],
+  "motion": [],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 3,
+   "taken": 0
+  }
+ },
+ {
+  "dayId": "day28",
+  "scenario": "taken",
+  "truth": "taken",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1795366800000,
+  "windowEndMs": 1795392000000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1795366800000,
+    "file": "day28_open.jpg",
+    "parcels": 1,
+    "kind": "open"
+   },
+   {
+    "atMs": 1795377930000,
+    "file": "day28_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1795392000000,
+    "file": "day28_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1795377900000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 1,
+   "close": 0,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day29",
+  "scenario": "partial",
+  "truth": "partial",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1795453200000,
+  "windowEndMs": 1795478400000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1795453200000,
+    "file": "day29_open.jpg",
+    "parcels": 3,
+    "kind": "open"
+   },
+   {
+    "atMs": 1795474830000,
+    "file": "day29_after.jpg",
+    "parcels": 2,
+    "kind": "after"
+   },
+   {
+    "atMs": 1795478400000,
+    "file": "day29_close.jpg",
+    "parcels": 2,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1795474800000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 3,
+   "close": 2,
+   "taken": 1
+  }
+ },
+ {
+  "dayId": "day30",
+  "scenario": "unscanned",
+  "truth": "unscanned",
+  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "windowStartMs": 1795539600000,
+  "windowEndMs": 1795564800000,
+  "labels": [
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   },
+   {
+    "trackingNumber": "SHIPPO_PRE_TRANSIT",
+    "carrier": "shippo"
+   }
+  ],
+  "frames": [
+   {
+    "atMs": 1795539600000,
+    "file": "day30_open.jpg",
+    "parcels": 2,
+    "kind": "open"
+   },
+   {
+    "atMs": 1795559130000,
+    "file": "day30_after.jpg",
+    "parcels": 0,
+    "kind": "after"
+   },
+   {
+    "atMs": 1795564800000,
+    "file": "day30_close.jpg",
+    "parcels": 0,
+    "kind": "close"
+   }
+  ],
+  "motion": [
+   {
+    "atMs": 1795559100000,
+    "subType": "human"
+   }
+  ],
+  "truthCounts": {
+   "baseline": 2,
+   "close": 0,
+   "taken": 2
+  }
+ }
+]
