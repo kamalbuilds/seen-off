@@ -1,0 +1,106 @@
+{
+ "summary": {
+  "set": "painted-out",
+  "provider": "bedrock-mantle",
+  "model": "qwen.qwen3-vl-235b-a22b-instruct",
+  "frames": 10,
+  "errors": 0,
+  "present_absent_accuracy": "100.0% (10/10)",
+  "count_exact_accuracy_on_labelled": "100.0% (10/10)",
+  "median_ms": 2158,
+  "present_absent_painted-out": "100.0% (10/10)",
+  "truth_gone_correct": "100.0% (10/10)"
+ },
+ "rows": [
+  {
+   "id": "p01",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 2025
+  },
+  {
+   "id": "p02",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1941
+  },
+  {
+   "id": "p03",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 2158
+  },
+  {
+   "id": "p04",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 2351
+  },
+  {
+   "id": "p05",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 2115
+  },
+  {
+   "id": "p06",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 2294
+  },
+  {
+   "id": "p07",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 3077
+  },
+  {
+   "id": "p08",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 2498
+  },
+  {
+   "id": "p09",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1923
+  },
+  {
+   "id": "p10",
+   "kind": "painted-out",
+   "truth": false,
+   "truthCount": 0,
+   "pred": false,
+   "predCount": 0,
+   "ms": 1358
+  }
+ ]
+}

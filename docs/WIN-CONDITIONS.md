@@ -5,7 +5,7 @@ Asset we will own: 30 replayed pickup days plus 60 labelled watermarked frames (
 Off-platform buyer: home seller on a scheduled carrier pickup: https://x.com/kancewe/status/2010451767621013639 , https://x.com/Nydollxo__/status/2104719305418084376
 Single entry: Outbox, carrier-pickup proof for people who ship from home (Ring track, plus AWS Builder and Open Source)
 Verb the brief names: "A working app or new feature that utilizes Ring APIs, SDKs, simulators, or devices, demonstrated through a simulator or an actual device"
-Our product performs that verb: yes; path = GET /v1/devices, then WHEP live-view frames and image/download, then v1.1 webhook with X-Signature HMAC, then a vision stage (Nova Lite behind a provider interface), then a pickup ledger and verdict engine, then an alert.
+Our product performs that verb: yes; path = GET /v1/devices, then WHEP live-view frames and image/download, then v1.1 webhook with X-Signature HMAC, then a vision stage (Qwen3-VL on Amazon Bedrock behind a provider interface; 98.3% present-or-gone on 60 frames, 25/30 correct verdicts on the 30-day replay), then a pickup ledger and verdict engine, then an alert.
 Metric plan: outcome accuracy on 30 pickup days (must-fail stub = 10/30); per-frame present/absent at least 90% on 60 frames; missed-pickup alert within 60 s of window close; webhook ack under 5 s (p95 over 100 signed deliveries).
 Live by: Oct 22 2026 20:00 PDT (deadline Oct 23 12:00 PDT).
 Deviation from research: 0 physical Ring devices, so webhooks come from a signed v1.1 simulator (forum 45511) and frames from public CC BY doorstep footage plus labelled composites (spikes/porch/FINDINGS.md); 0 real users before judging.
