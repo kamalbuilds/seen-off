@@ -9,6 +9,7 @@ import type { PickupRunner } from "./pickup/runner.ts";
 import type { Provenance } from "./provenance.ts";
 import type { RingIntegration } from "./ring/integration.ts";
 import { RingLinkError } from "./ring/oauth.ts";
+import { linkPage, linkProblemPage } from "./ring/link-page.ts";
 import { RingNotConnected } from "./ring/session.ts";
 import { RingApiError } from "./ring/client.ts";
 
@@ -105,7 +106,7 @@ export function createApp(o: AppOptions): Server {
         if (!ring) return send(404, { error: "ring is not available on this server" });
         const fail = (e: unknown) => {
           if (e instanceof RingNotConnected) return send(409, { error: "ring not connected", errors: [e.message] });
-          if (e instanceof RingLinkError) return send(e.code === "unknown_device" ? 404 : 400, { error: e.code, errors: [e.message] });
+          if (e instanceof RingLinkError) return send(e.code === "unknown_device" ? 404 : e.code === "ring_driven" ? 409 : 400, { error: e.code, errors: [e.message] });
           if (e instanceof RingApiError) return send(502, { error: "ring error", errors: [`Ring answered ${e.status} ${e.code}.`] });
           return send(500, { error: (e as Error).message });
         };
@@ -120,6 +121,28 @@ export function createApp(o: AppOptions): Server {
           }
           res.writeHead(302, { location: to, "cache-control": "no-store" });
           return void res.end();
+        }
+        const html = (status: number, body: string) => { res.writeHead(status, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" }); res.end(body); };
+        const form = async () => new URLSearchParams((await readBody(req)).toString("utf8"));
+        if (req.method === "POST" && url.pathname === "/ring/oauth/token") {
+          // Token Exchange URL: Ring posts the single-use authorization code here, form-encoded.
+          try { await ring.tokenExchange((await form()).get("code")); return send(200, { status: "ok" }); }
+          catch (e) { if (e instanceof RingLinkError) return send(e.code === "code_rejected" || e.code === "token_failed" ? 502 : 400, { error: e.code }); throw e; }
+        }
+        if (req.method === "GET" && url.pathname === "/ring/link") {
+          // Account Link URL: Ring sends the user here with nonce and time; the sign-in is shown only for a fresh, well-formed link.
+          try { const l = ring.linkEntry(url.searchParams.get("nonce"), url.searchParams.get("time")); return html(200, linkPage(l)); }
+          catch (e) { if (e instanceof RingLinkError) return html(400, linkProblemPage(e.message)); throw e; }
+        }
+        if (req.method === "POST" && url.pathname === "/ring/link") {
+          const f = await form();
+          const sub = { nonce: f.get("nonce"), time: f.get("time"), email: f.get("email") ?? "", passcode: f.get("passcode") ?? "" };
+          try { await ring.linkSubmit(sub); res.writeHead(302, { location: "/?ring=connected", "cache-control": "no-store" }); return void res.end(); }
+          catch (e) {
+            if (!(e instanceof RingLinkError)) throw e;
+            if ((e.code === "bad_sign_in" || e.code === "locked") && sub.nonce && sub.time) return html(e.code === "locked" ? 429 : 401, linkPage({ nonce: sub.nonce, time: sub.time, email: sub.email, error: e.message }));
+            return html(400, linkProblemPage(e.message));
+          }
         }
         if (req.method === "GET" && url.pathname === "/api/ring/devices") { try { return send(200, { devices: await ring.devices() }); } catch (e) { return fail(e); } }
         if (req.method === "POST" && url.pathname === "/api/ring/snapshot") {

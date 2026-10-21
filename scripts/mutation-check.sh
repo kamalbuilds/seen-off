@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -67,14 +67,20 @@ src/ring/oauth.ts@@s/    this.#pending.delete\(state\); \/\/ single use, whateve
 src/ring/oauth.ts@@s/if \(this.#c.now\(\) - pending.createdAtMs > STATE_TTL_MS\) throw/if (false) throw/@@ring-link.test.ts@@an expired sign-in is accepted
 src/ring/oauth.ts@@s/code_verifier: pending.verifier, //@@ring-link.test.ts@@the PKCE verifier is not sent
 src/ring/oauth.ts@@s/if \(!pending\) throw new RingLinkError\("bad_state"[^;]*;/if (!pending) pending0();/@@ring-link.test.ts@@a forged state reaches Ring
-src/ring/token-store.ts@@s/writeAtomic\(path, `\$\{encrypt\(token, keyFor\(path\)\)\}\\n`\)/writeAtomic(path, `${token}\\n`)/@@token-store.test.ts@@the token is saved in the clear
+src/ring/token-store.ts@@s/writeAtomic\(path, `\$\{encrypt\(text, keyFor\(keyOwner\)\)\}\\n`\)/writeAtomic(path, `${text}\\n`)/@@token-store.test.ts@@the token is saved in the clear
 src/server.ts@@s/to = `\/\?ring=error&reason=/to = `\/?ring=connected\&x=/@@ring-link.test.ts@@a failed callback reports success
 src/ring/preflight.ts@@s/export const preflightOk = \(steps: PreflightStep\[\]\) => steps.every\(\(s\) => s.status !== "fail"\);/export const preflightOk = (steps: PreflightStep[]) => true;/@@preflight.test.ts@@a failed surface still exits ok
 src/ring/preflight.ts@@s/      blocked = `\$\{name\} failed`;//@@preflight.test.ts@@steps after a failure still run and can pass
+src/ring/oneway.ts@@s/sameBytes\(Buffer.from\(computeNonce\(this.#c.hmacKey, time, t.accountId\)\), Buffer.from\(nonce\)\) \&\& !matched/!matched/@@ring-driven.test.ts@@any nonce claims the first waiting token
+src/ring/oneway.ts@@s/if \(age > WINDOW_MS \|\| age < -SKEW_MS\) throw/if (false) throw/@@ring-driven.test.ts@@an expired Ring link is accepted
+src/ring/oneway.ts@@s/ \|\| !sameBytes\(sha\(f.passcode\), sha\(this.#c.signInCode\)\)//@@ring-driven.test.ts@@the partner sign-in code is not checked
+src/ring/oneway.ts@@s/    this.#savePool\(pool.filter\(\(t\) => t !== matched\)\);//@@ring-driven.test.ts@@a claimed token stays claimable so a nonce replays
+src/ring/oneway.ts@@s/method: "PATCH"/method: "PUT"/@@ring-driven.test.ts@@the link is never marked completed
+src/ring/oneway.ts@@s/const MAX_FAILURES = 5;/const MAX_FAILURES = 5000;/@@ring-driven.test.ts@@wrong sign-ins never lock
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail

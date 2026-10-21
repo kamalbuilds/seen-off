@@ -84,6 +84,10 @@ fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--s2); min-
 .photo img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--paper-3); }
 .photo .big { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
 .photo .meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.console { margin-top: var(--s3); font-size: 14px; }
+.console summary { cursor: pointer; font-weight: 700; min-height: 32px; display: flex; align-items: center; }
+.console dt { font-size: 13px; font-weight: 600; color: var(--muted); margin-top: var(--s2); }
+.console dd { margin: 0; overflow-wrap: anywhere; user-select: all; }
 .setup { padding: var(--s3) var(--s4); background: var(--paper-2); font-size: 15px; }
 
 /* day index */
@@ -390,7 +394,17 @@ async function loadRing() {
   let st;
   try { st = await api("/api/ring"); } catch { $("#ring").hidden = true; return; }
   if (!st.connected) {
-    body.replaceChildren(h("button", { type: "button", class: "btn primary", onclick: () => { if (st.configured) location.href = "/ring/connect"; else { $("#ringNote").textContent = st.setup; $("#ringNote").hidden = false; } } }, "Connect Ring"));
+    const rows = st.console ? [["Account Link URL", st.console.accountLinkUrl], ["Token Exchange URL", st.console.tokenExchangeUrl], ["Webhook URL", st.console.webhookUrl], ["App Homepage URL", st.console.appHomepageUrl], ["Scope", st.console.scopes]] : [];
+    const consoleBox = rows.length ? h("details", { class: "console" }, h("summary", {}, "Ring developer console settings"),
+      h("dl", {}, rows.flatMap(([k, v]) => [h("dt", {}, k), h("dd", {}, v)]))) : null;
+    const go = () => {
+      if (!st.configured) { $("#ringNote").textContent = st.setup; $("#ringNote").hidden = false; return; }
+      if (st.method === "partner-initiated") { location.href = "/ring/connect"; return; }
+      // Ring-driven: the seller taps Connect in the Ring app; this panel waits for the link to finish.
+      $("#ringNote").textContent = st.steps; $("#ringNote").hidden = false;
+      const timer = setInterval(async () => { try { if ((await api("/api/ring")).connected) { clearInterval(timer); await loadRing(); $("#ringNote").textContent = "Ring is connected."; } } catch { /* keep waiting */ } }, 3000);
+    };
+    body.replaceChildren(h("button", { type: "button", class: "btn primary", onclick: go }, "Connect Ring"), consoleBox);
     return;
   }
   try {

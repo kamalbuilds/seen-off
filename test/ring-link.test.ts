@@ -10,6 +10,7 @@ import { RingLink, RingLinkError, maskIdentifier } from "../src/ring/oauth.ts";
 import { RingSession } from "../src/ring/session.ts";
 import { ringIntegrationFromEnv, SETUP_NOTE } from "../src/ring/integration.ts";
 import { loadRefreshToken } from "../src/ring/token-store.ts";
+import { preflightOk, runPreflight } from "../src/ring/preflight.ts";
 import { Ledger } from "../src/store/ledger.ts";
 import { PickupRunner } from "../src/pickup/runner.ts";
 import { createApp } from "../src/server.ts";
@@ -42,6 +43,7 @@ async function ring(opts: { denyImage?: boolean } = {}) {
       calls.patch.push({ auth: req.headers.authorization, body: JSON.parse(await text(req)) });
       return j(200, { status: "completed" });
     }
+    if (req.url?.includes("/events?")) return j(200, { data: [] });
     if (req.url?.startsWith("/v1/devices?include=")) return j(200, { data: [{ id: "ava1.ring.device.A", attributes: { name: "Front Door" } }], included: [] });
     if (req.method === "POST" && req.url?.endsWith("/media/image/download")) {
       if (opts.denyImage) return j(403, { errors: [{ status: "403", code: "FORBIDDEN", detail: "no consent for this device" }] });
@@ -175,15 +177,15 @@ async function app(env: NodeJS.ProcessEnv, r: { base: string }) {
   const integration = ringIntegrationFromEnv({ ...env, RING_API_BASE: r.base, RING_OAUTH_BASE: r.base, RING_AUTHORIZE_URL: `${r.base}/authorize` }, { session, vision, port: 8787, tokenFile, photoDir: join(dir, "photos") });
   const srv = createApp({ signingKey: "k", ledger, runner, ring: integration });
   await new Promise<void>((ok) => srv.listen(0, "127.0.0.1", ok));
-  return { base: `http://127.0.0.1:${(srv.address() as AddressInfo).port}`, close: () => srv.close() };
+  return { base: `http://127.0.0.1:${(srv.address() as AddressInfo).port}`, session, close: () => srv.close() };
 }
 
 test("without a client id the page gets the one setup step in plain words, Connect Ring does not redirect, and no device or photo is offered", async () => {
   const r = await ring();
   const a = await app({}, r);
   try {
-    const st = await (await fetch(`${a.base}/api/ring`)).json() as { configured: boolean; connected: boolean; setup: string };
-    assert.deepEqual([st.configured, st.connected, st.setup], [false, false, SETUP_NOTE]);
+    const st = await (await fetch(`${a.base}/api/ring`)).json() as { configured: boolean; connected: boolean; setup: string; method: string };
+    assert.deepEqual([st.configured, st.connected, st.setup, st.method], [false, false, SETUP_NOTE, "ring-driven"]);
     assert.match(SETUP_NOTE, /RING_CLIENT_ID/);
     const c = await fetch(`${a.base}/ring/connect`, { redirect: "manual" });
     assert.equal(c.status, 400);
@@ -196,9 +198,10 @@ test("without a client id the page gets the one setup step in plain words, Conne
 
 test("end to end over HTTP: Connect Ring redirects to Ring, the callback links, doorbells list from Ring, and Take a porch photo returns a real download with the porch read", async () => {
   const r = await ring();
-  const a = await app({ RING_CLIENT_ID: CLIENT.id, RING_CLIENT_SECRET: CLIENT.secret }, r);
+  const a = await app({ RING_CLIENT_ID: CLIENT.id, RING_CLIENT_SECRET: CLIENT.secret, RING_LINK_METHOD: "partner-initiated" }, r);
   try {
-    assert.deepEqual(await (await fetch(`${a.base}/api/ring`)).json(), { configured: true, connected: false, setup: null });
+    const before = await (await fetch(`${a.base}/api/ring`)).json() as Record<string, unknown>;
+    assert.deepEqual([before.configured, before.connected, before.method, before.setup], [true, false, "partner-initiated", null]);
     const c = await fetch(`${a.base}/ring/connect`, { redirect: "manual" });
     assert.equal(c.status, 302);
     const authorize = c.headers.get("location")!;
@@ -212,7 +215,8 @@ test("end to end over HTTP: Connect Ring redirects to Ring, the callback links, 
 
     const ok = await fetch(`${a.base}/ring/callback?code=${code}&state=${new URL(authorize).searchParams.get("state")}`, { redirect: "manual" });
     assert.equal(ok.headers.get("location"), "/?ring=connected");
-    assert.deepEqual(await (await fetch(`${a.base}/api/ring`)).json(), { configured: true, connected: true, setup: null });
+    const after = await (await fetch(`${a.base}/api/ring`)).json() as Record<string, unknown>;
+    assert.deepEqual([after.configured, after.connected], [true, true]);
 
     const devices = await (await fetch(`${a.base}/api/ring/devices`)).json() as { devices: { id: string; name: string }[] };
     assert.deepEqual(devices.devices, [{ id: "ava1.ring.device.A", name: "Front Door" }]);
@@ -230,6 +234,9 @@ test("end to end over HTTP: Connect Ring redirects to Ring, the callback links, 
     assert.equal(unknown.status, 404);
     assert.equal(r.calls.snapshot, 1, "no download for a doorbell that is not on the account");
     assert.equal((await fetch(`${a.base}/api/ring/photos/..%2Fsecret.jpg`)).status, 404);
+
+    const steps = await runPreflight(a.session, { whep: null });
+    assert.equal(preflightOk(steps), true, "ring:preflight passes after the partner-initiated link too");
   } finally { a.close(); r.close(); }
 });
 

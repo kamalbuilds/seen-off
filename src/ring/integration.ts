@@ -4,10 +4,30 @@ import { join } from "node:path";
 import type { VisionProvider } from "../vision/types.ts";
 import { RingSnapshotSource } from "./client.ts";
 import { RingLink, RingLinkError } from "./oauth.ts";
+import { RingDrivenLink } from "./oneway.ts";
 import { jpegSize } from "./probe.ts";
 import type { RingSession } from "./session.ts";
 
-export const SETUP_NOTE = "Connect Ring signs you in on Ring's own page. One step first: add this app's Ring client ID and secret as RING_CLIENT_ID and RING_CLIENT_SECRET in .env, then restart.";
+export const SETUP_NOTE = "Connect Ring needs one setup step: add this app's Ring client ID, client secret and HMAC key as RING_CLIENT_ID, RING_CLIENT_SECRET and RING_WEBHOOK_SIGNING_KEY, plus a sign-in code as OUTBOX_SIGN_IN_CODE and this server's public https address as OUTBOX_PUBLIC_URL, in .env, then restart.";
+export const SETUP_NOTE_PARTNER = "Connect Ring signs you in on Ring's own page. One step first: add this app's Ring client ID and secret as RING_CLIENT_ID and RING_CLIENT_SECRET in .env, then restart.";
+export const RING_DRIVEN_STEPS = "Open the Ring app, go to Appstore, choose Outbox and tap Connect. Ring brings you back here for a quick sign-in, and this panel updates when the link is done.";
+
+/** The values to enter under Account linking, Webhook and scopes in the Ring Developer Portal, from the public HTTPS address of this server. */
+export interface ConsoleSettings {
+  accountLinkUrl: string;
+  tokenExchangeUrl: string;
+  webhookUrl: string;
+  appHomepageUrl: string;
+  oauthRedirectUri: string;
+  scopes: string;
+}
+
+export function consoleSettings(publicUrl: string | undefined): ConsoleSettings | null {
+  if (!publicUrl) return null;
+  const u = publicUrl.replace(/\/+$/, "");
+  if (!/^https:\/\//.test(u)) return null;
+  return { accountLinkUrl: `${u}/ring/link`, tokenExchangeUrl: `${u}/ring/oauth/token`, webhookUrl: `${u}/ring/webhook`, appHomepageUrl: `${u}/`, oauthRedirectUri: `${u}/ring/callback`, scopes: "Cameras and Doorbells" };
+}
 
 export interface PorchPhoto {
   deviceId: string;
@@ -23,11 +43,19 @@ export interface PorchPhoto {
   porch: { provider: string; model: string; present: boolean; count: number } | { error: string };
 }
 
+export type LinkMethod = "ring-driven" | "partner-initiated";
+
 export interface RingIntegration {
-  status(): { configured: boolean; connected: boolean; setup: string | null };
-  /** The Ring sign-in URL. Throws RingLinkError with the setup note when no client id is configured. */
+  status(): { configured: boolean; connected: boolean; method: LinkMethod; setup: string | null; steps: string | null; console: ConsoleSettings | null; waiting: number };
+  /** Partner-initiated: the Ring sign-in URL. Ring-driven: throws the steps to take in the Ring app. Throws the setup note when not configured. */
   connect(): string;
   callback(q: URLSearchParams): Promise<void>;
+  /** Ring-driven: Token Exchange URL (Ring posts the authorization code here). */
+  tokenExchange(code: unknown): Promise<void>;
+  /** Ring-driven: Account Link URL entry. Throws RingLinkError for an expired or malformed link. */
+  linkEntry(nonce: string | null, time: string | null): { nonce: string; time: string };
+  /** Ring-driven: the seller's sign-in, nonce match and confirmation. */
+  linkSubmit(f: { nonce: string | null; time: string | null; email: string; passcode: string }): Promise<void>;
   devices(): Promise<{ id: string; name: string }[]>;
   photo(deviceId: string): Promise<PorchPhoto>;
   photoFile(name: string): Buffer | null;
@@ -37,23 +65,49 @@ export interface RingIntegrationOptions {
   session: RingSession;
   vision: VisionProvider;
   photoDir: string;
-  /** Present only when RING_CLIENT_ID and RING_CLIENT_SECRET are configured. */
+  method?: LinkMethod;
+  /** Partner-initiated OAuth: present only for an allowlisted app with RING_CLIENT_ID and RING_CLIENT_SECRET. */
   link?: RingLink;
+  /** Ring-driven account linking: present with the client id, secret, HMAC key and a sign-in code. */
+  driven?: RingDrivenLink;
+  console?: ConsoleSettings | null;
   now?: () => number;
 }
 
 export function createRingIntegration(o: RingIntegrationOptions): RingIntegration {
   const now = o.now ?? Date.now;
   const PHOTO = /^[A-Za-z0-9_-]{1,80}\.jpg$/;
+  const method = o.method ?? "ring-driven";
+  const ready = method === "ring-driven" ? Boolean(o.driven) : Boolean(o.link);
+  const setup = method === "ring-driven" ? SETUP_NOTE : SETUP_NOTE_PARTNER;
   return {
-    status: () => ({ configured: o.session.configured || Boolean(o.link), connected: o.session.connected, setup: o.link || o.session.configured ? null : SETUP_NOTE }),
+    status: () => ({
+      configured: ready, connected: o.session.connected, method,
+      setup: ready || o.session.connected ? null : setup,
+      steps: method === "ring-driven" && ready ? RING_DRIVEN_STEPS : null,
+      console: o.console ?? null, waiting: o.driven?.pending() ?? 0,
+    }),
     connect() {
-      if (!o.link) throw new RingLinkError("not_configured", SETUP_NOTE);
-      return o.link.begin();
+      if (!ready) throw new RingLinkError("not_configured", setup);
+      if (method === "ring-driven") throw new RingLinkError("ring_driven", RING_DRIVEN_STEPS);
+      return o.link!.begin();
     },
     async callback(q) {
-      if (!o.link) throw new RingLinkError("not_configured", SETUP_NOTE);
+      if (!o.link) throw new RingLinkError("not_configured", SETUP_NOTE_PARTNER);
       await o.link.complete(q);
+      o.session.reset();
+    },
+    async tokenExchange(code) {
+      if (!o.driven) throw new RingLinkError("not_configured", SETUP_NOTE);
+      await o.driven.receiveCode(code);
+    },
+    linkEntry(nonce, time) {
+      if (!o.driven) throw new RingLinkError("not_configured", SETUP_NOTE);
+      return o.driven.check(nonce, time);
+    },
+    async linkSubmit(f) {
+      if (!o.driven) throw new RingLinkError("not_configured", SETUP_NOTE);
+      await o.driven.link(f);
       o.session.reset();
     },
     async devices() {
@@ -87,14 +141,26 @@ export function createRingIntegration(o: RingIntegrationOptions): RingIntegratio
   };
 }
 
-/** Builds the integration from env: a link only when the app's client id and secret are present. */
+/**
+ * Builds the integration from env. RING_LINK_METHOD picks the link: ring-driven (default, any registered app) or partner-initiated (allowlisted apps).
+ * Ring-driven needs RING_CLIENT_ID, RING_CLIENT_SECRET, RING_WEBHOOK_SIGNING_KEY (the app's HMAC key) and OUTBOX_SIGN_IN_CODE.
+ */
 export function ringIntegrationFromEnv(env: NodeJS.ProcessEnv, deps: { session: RingSession; vision: VisionProvider; port: number; tokenFile: string; photoDir: string; fetchImpl?: typeof fetch }): RingIntegration {
-  const link = env.RING_CLIENT_ID && env.RING_CLIENT_SECRET
+  const method: LinkMethod = env.RING_LINK_METHOD === "partner-initiated" ? "partner-initiated" : "ring-driven";
+  const hasApp = Boolean(env.RING_CLIENT_ID && env.RING_CLIENT_SECRET);
+  const publicUrl = env.OUTBOX_PUBLIC_URL?.replace(/\/+$/, "");
+  const link = method === "partner-initiated" && hasApp
     ? new RingLink({
-      clientId: env.RING_CLIENT_ID, clientSecret: env.RING_CLIENT_SECRET, tokenFile: deps.tokenFile, fetchImpl: deps.fetchImpl,
-      redirectUri: env.RING_REDIRECT_URI ?? `http://localhost:${deps.port}/ring/callback`,
+      clientId: env.RING_CLIENT_ID!, clientSecret: env.RING_CLIENT_SECRET!, tokenFile: deps.tokenFile, fetchImpl: deps.fetchImpl,
+      redirectUri: env.RING_REDIRECT_URI ?? `${publicUrl ?? `http://localhost:${deps.port}`}/ring/callback`,
       authorizeUrl: env.RING_AUTHORIZE_URL, oauthBase: env.RING_OAUTH_BASE, apiBase: env.RING_API_BASE,
     })
     : undefined;
-  return createRingIntegration({ session: deps.session, vision: deps.vision, photoDir: deps.photoDir, link });
+  const driven = method === "ring-driven" && hasApp && env.RING_WEBHOOK_SIGNING_KEY && env.OUTBOX_SIGN_IN_CODE
+    ? new RingDrivenLink({
+      clientId: env.RING_CLIENT_ID!, clientSecret: env.RING_CLIENT_SECRET!, hmacKey: env.RING_WEBHOOK_SIGNING_KEY, signInCode: env.OUTBOX_SIGN_IN_CODE,
+      tokenFile: deps.tokenFile, fetchImpl: deps.fetchImpl, oauthBase: env.RING_OAUTH_BASE, apiBase: env.RING_API_BASE,
+    })
+    : undefined;
+  return createRingIntegration({ session: deps.session, vision: deps.vision, photoDir: deps.photoDir, method, link, driven, console: consoleSettings(publicUrl) });
 }

@@ -52,20 +52,25 @@ function decrypt(blob: string, key: Buffer): string {
 }
 
 /**
- * The newest refresh token saved on disk, or null when none has been saved. Ring rotates the token on every exchange, so the file wins over .env.
- * A file written before encryption existed (a bare token) is still read, and is encrypted on the next save.
+ * Text saved on disk sealed with the key that belongs to `keyOwner` (default: the file itself). Null when the file does not exist.
+ * A file written before encryption existed (bare text) is still read, and is encrypted on the next save.
  */
-export function loadRefreshToken(path: string): string | null {
+export function loadSecret(path: string, keyOwner = path): string | null {
   if (!existsSync(path)) return null;
   const raw = readFileSync(path, "utf8").trim();
   if (raw.length === 0) return null;
-  return raw.startsWith(PREFIX) ? decrypt(raw, keyFor(path)) : raw;
+  return raw.startsWith(PREFIX) ? decrypt(raw, keyFor(keyOwner)) : raw;
 }
 
-/** Encrypts the token and writes it 0600 by temp-file rename, so a crash mid-write leaves the previous token intact. */
-export function saveRefreshToken(path: string, token: string): void {
-  writeAtomic(path, `${encrypt(token, keyFor(path))}\n`);
+/** Encrypts the text and writes it 0600 by temp-file rename, so a crash mid-write leaves the previous file intact. */
+export function saveSecret(path: string, text: string, keyOwner = path): void {
+  writeAtomic(path, `${encrypt(text, keyFor(keyOwner))}\n`);
 }
+
+/** The newest refresh token saved on disk, or null when none has been saved. Ring rotates the token on every exchange, so the file wins over .env. */
+export const loadRefreshToken = (path: string): string | null => loadSecret(path);
+
+export const saveRefreshToken = (path: string, token: string): void => saveSecret(path, token);
 
 /** For a registered app: start from the saved refresh token when there is one, and save every rotated token. Playground tokens pass through unchanged. */
 export function withPersistedRefreshToken(auth: RingAuth, path: string): RingAuth {
