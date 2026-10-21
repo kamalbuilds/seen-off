@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import { createWebhookReceiver } from "./ring/webhook.ts";
+import { validatePlan } from "./pickup/plan.ts";
 import type { Ledger } from "./store/ledger.ts";
 import type { PickupRunner, DayPlan } from "./pickup/runner.ts";
 import type { Provenance } from "./provenance.ts";
@@ -9,12 +10,14 @@ const UI_HTML = readFileSync(new URL("./ui/index.html", import.meta.url), "utf8"
 
 const MAX_BODY = 1_000_000;
 
+class BodyTooLarge extends Error {}
+
 async function readBody(req: IncomingMessage): Promise<Buffer> {
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const c of req) {
     size += (c as Buffer).length;
-    if (size > MAX_BODY) throw new Error("body too large");
+    if (size > MAX_BODY) throw new BodyTooLarge("body too large");
     chunks.push(c as Buffer);
   }
   return Buffer.concat(chunks);
@@ -59,10 +62,17 @@ export function createApp(o: AppOptions): Server {
         return;
       }
       if (req.method === "POST" && url.pathname === "/days") {
-        const plan = JSON.parse((await readBody(req)).toString("utf8")) as DayPlan;
-        const baseline = await o.runner.arm(plan);
-        o.onDayArmed?.(plan);
-        return send(201, { dayId: plan.dayId, baselineCount: baseline });
+        let body: unknown;
+        try { body = JSON.parse((await readBody(req)).toString("utf8")); } catch (e) {
+          if (e instanceof BodyTooLarge) throw e;
+          return send(400, { error: "invalid pickup day", errors: ["body is not valid JSON"] });
+        }
+        const check = validatePlan(body);
+        if (!check.ok) return send(400, { error: "invalid pickup day", errors: check.errors });
+        if (o.ledger.hasDay(check.plan.dayId)) return send(409, { error: "pickup day exists", errors: [`dayId ${check.plan.dayId} is already armed`] });
+        const baseline = await o.runner.arm(check.plan);
+        o.onDayArmed?.(check.plan);
+        return send(201, { dayId: check.plan.dayId, baselineCount: baseline });
       }
       if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
         res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
@@ -92,6 +102,7 @@ export function createApp(o: AppOptions): Server {
       }
       send(404, { error: "not found" });
     } catch (e) {
+      if (e instanceof BodyTooLarge) return send(413, { error: "body too large" });
       send(500, { error: (e as Error).message });
     }
   });

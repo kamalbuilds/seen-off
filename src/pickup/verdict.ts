@@ -14,12 +14,13 @@ export interface WindowReading {
 
 /**
  * Window-close verdict from two porch counts.
- * Anything that cannot be concluded (a count is missing, nothing was on the porch at arming, more parcels at close than at arming)
+ * Anything that cannot be concluded (a count is missing, negative or fractional, nothing was on the porch at arming, more parcels at close than at arming)
  * is "unverified": the product never claims a pickup it did not see.
  */
 export function decideWindowVerdict(r: WindowReading): { verdict: WindowVerdict; takenCount: number } {
   const { baselineCount: b, closeCount: c } = r;
-  if (b === null || c === null || b <= 0 || c > b) return { verdict: "unverified", takenCount: 0 };
+  const bad = (n: number | null) => n !== null && (!Number.isInteger(n) || n < 0);
+  if (bad(b) || bad(c) || b === null || c === null || b <= 0 || c > b) return { verdict: "unverified", takenCount: 0 };
   if (c === b) return { verdict: "missed", takenCount: 0 };
   if (c === 0) return { verdict: "taken", takenCount: b };
   return { verdict: "partial", takenCount: b - c };

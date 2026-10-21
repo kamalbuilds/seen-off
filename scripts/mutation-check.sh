@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -36,10 +36,14 @@ src/pickup/verdict.ts@@s/SCANNED.has\(t.status\)/true/@@verdict.test.ts@@unscann
 src/provenance.ts@@s/ORDER.indexOf\(p\) > ORDER.indexOf\(w\)/ORDER.indexOf(p) < ORDER.indexOf(w)/@@packet.test.ts@@verdict provenance no longer the weakest input
 src/provenance.ts@@s/SIMULATOR\|FIXTURE/NEVERMATCH/@@packet.test.ts@@simulated webhooks labelled live
 src/pickup/runner.ts@@s/src\.provenance \?\? "simulated"/src.provenance ?? "live"/g@@packet.test.ts@@unlabelled frame source reads as live
+src/pickup/plan.ts@@s/\(end as number\) <= \(start as number\)/false/@@plan.test.ts@@window may end before it starts
+src/pickup/plan.ts@@s/\|\| labels.length === 0//@@plan.test.ts@@empty labels accepted
+src/pickup/plan.ts@@s/\[A-Za-z0-9\._-\]/[A-Za-z0-9._\/-]/@@plan.test.ts@@dayId may contain a slash
+src/pickup/verdict.ts@@s/n < 0\)/false)/@@plan.test.ts@@negative count read as a verdict
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail
