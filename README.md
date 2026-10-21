@@ -13,6 +13,34 @@ A seller leaves parcels on the porch for a scheduled USPS or UPS pickup. Outbox 
 
 When a frame cannot be read, the seller is alerted to check the Ring app. Outbox never reports a pickup it did not see.
 
+## Impact
+
+Sellers already use the doorbell as their receipt for outgoing parcels, by hand, and carrier tracking still disagrees with it. Three posts from X, copied from the fetched post text (`docs/xsignals-ring/signals.md`, all 117 records in it re-verified with `xsignals verify`):
+
+> Everything I send out I request a pickup from USPS during the daily delivery. I put it on a table in front of my Ring doorbell, making sure the Ring can see the label. This gives me a record of the physical pickup.
+
+[@kancewe, Jan 11 2026](https://x.com/kancewe/status/2010451767621013639)
+
+> I had the post office pickup two orders to ship Monday, I literally have ring camera footage of the mailman taking them and they never arrived at the fucking post office according to the tracking numbers. This is twice in a month this has happened to me.
+
+[@AQualityMess, Feb 4 2026](https://x.com/AQualityMess/status/2018955222945832974)
+
+> I had a pick up scheduled for today. I was notified that an attempt was made, but it was not picked up for some reason. I looked at my ring camera footage and it shows the UPS man picking up one of the three packages and then leaving for some reason.
+
+[@Violetsvanity7, Dec 18 2025](https://x.com/Violetsvanity7/status/2001482225116754149)
+
+Each post is one verdict: a pickup the seller can prove, a handoff with no carrier scan, a part-taken day. Outbox produces that proof and the alert while there is still time to act.
+
+## Seller page
+
+`npm run serve` serves one page at `/`. The seller arms a pickup day (doorbell, window, one label per parcel), watches the day timeline fill (labels registered, window open, each porch frame with its thumbnail, Ring motion webhooks, window verdict, alert, carrier tracking, final verdict), and opens the evidence packet: the window-open and window-close frames side by side, every timestamp, each label's tracking state, and the packet as JSON. Every external input carries a **LIVE**, **REPLAY** or **SIMULATED** badge, and a verdict shows the least live of its inputs, so a replayed day can never read as a live one.
+
+`npm run serve:replay` runs the same page and the same production code over the 30 recorded pickup days with no Ring credentials (`--days day01,day13` picks days, `--pace-ms 1500` spreads the steps out so the timeline fills in front of you). Frames are labelled REPLAY, signed test webhooks and test-mode tracking are labelled SIMULATED.
+
+`POST /days` validates the plan: a window that ends before it starts or runs past 24 h, an empty label list, a path-unsafe day id and malformed JSON are each a `400` that lists every reason; a repeated day id is `409`.
+
+Every scheduled check lives in the ledger, not in a timer: the window-open baseline, the window-close verdict and the 24 h tracking check survive a restart, and a restart mid-window still delivers the verdict and the alert. A failed job is retried with a backoff; a verdict and an alert are stored once.
+
 ## Ring surfaces called
 
 | Surface | Code |
@@ -22,6 +50,7 @@ When a frame cannot be read, the seller is alerted to check the Ring app. Outbox
 | `POST /v1/devices/{id}/media/image/download` (303 to the signed URL) | `RingClient.snapshotAt`, `RingSnapshotSource` (retries `RECORDING_NOT_READY`) |
 | `GET /v1/history/devices/{id}/events?event_types=` with `links.next` paging | `RingClient.history` |
 | WHEP live view: recvonly offer, `201` + SDP answer, `DELETE` the session, sharpest of N frames | `worker/whep_frame.py` (aiortc), `src/ring/whep.ts` |
+| Probe: `npm run ring:probe` lists devices, reads history, downloads a snapshot (`--whep` adds a live frame) and prints the returned device and frame metadata | `src/ring/probe.ts`, `scripts/ring-probe.ts` |
 | v1.1 webhook: `X-Signature` HMAC-SHA256 over the raw bytes, 5 s ack, `meta.request_id` idempotency | `src/ring/webhook.ts`, `src/ring/signature.ts` |
 
 Webhook handling follows the Ring reference exactly. The signature is checked over the bytes as received, before parsing. A delivery is acknowledged inside the 5 s budget (4 s internal cap, then `503` so Ring retries). The `request_id` is marked processed only after the handler succeeds, so a failed delivery that Ring retries is processed, not swallowed.
@@ -61,27 +90,30 @@ Frames: two real fixed-camera doorstep clips from Wikimedia Commons (CC BY 3.0, 
 
 `node spikes/porch/run.ts main` (Bedrock by default when `AWS_BEARER_TOKEN_BEDROCK` is set)
 
-**Does the verdict match the day?** 30 replayed pickup days: 10 taken, 10 missed, 5 part-taken, 5 taken but unscanned. Webhooks are signed by a simulator that follows the Ring v1.1 envelope and HMAC rules; the receiver, runner, ledger and vision stage are the production code (`metric/run.ts`).
+**Does the verdict match the day?** 30 replayed pickup days: 10 taken, 10 missed, 5 part-taken, 5 taken but unscanned. Webhooks are signed by a simulator that follows the Ring v1.1 envelope and HMAC rules; the receiver, runner, ledger and vision stage are the production code (`metric/run.ts`). A second batch of 30 days, built with a different seed and held out while the verdict logic was chosen, is scored the same way (`node metric/run.ts --set holdout`).
 
 | Run | Correct verdicts |
 |---|---|
-| Bedrock Qwen3-VL | 25/30 (taken 10/10, missed 7/10, part-taken 4/5, unscanned 4/5), both counts exact on 22/30 days |
-| Nova Lite via OpenRouter | 23/30 (taken 8/10, missed 7/10, part-taken 4/5, unscanned 4/5), both counts exact on 19/30 days |
+| Bedrock Qwen3-VL, the 30 days | 29/30 (taken 10/10, missed 10/10, part-taken 4/5, unscanned 5/5), both counts exact on 23/30 days |
+| Bedrock Qwen3-VL, held-out 30 days | 25/30 (taken 10/10, missed 7/10, part-taken 3/5, unscanned 5/5) |
 | Must-fail: vision always answers "1 parcel present" | 10/30 (every day becomes "missed") |
-| Must-fail: verdict logic mutated so a missed day reads as taken | 17/30 (missed 0/10) |
+| Must-fail: verdict logic mutated so a missed day reads as taken | 22/30 (missed 3/10) |
 
-Missed-pickup alert on Bedrock Qwen3-VL: median 2.2 s from window close, max 3.0 s (Nova Lite via OpenRouter: median 1.3 s, max 2.0 s). Webhook ack over 100 signed deliveries: p95 1 ms, max 1 ms, 100/100 duplicates acknowledged without reprocessing, 10/10 forged bodies answered `401`.
+The verdict reads the whole window, not two frames. A departure needs positive evidence, a count below the baseline, because a wrong "taken" silences the alert. A close count above the baseline is a counting error: with no frame ever showing fewer parcels it is a missed pickup, and with a frame that did show the parcels leave it is a contradiction, so Outbox claims nothing and asks the seller to check the Ring app. An empty porch at window open on a day with labels is read again before it is accepted. Each day the earlier logic got wrong has a named regression in `test/replay-regressions.test.ts`.
 
-`node metric/run.ts`, and `node metric/run.ts --always-present` for the always-present row.
+Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3 s. Webhook ack over 100 signed deliveries: p95 1 ms, max 2 ms, 100/100 duplicates acknowledged without reprocessing, 10/10 forged bodies answered `401`.
+
+`node metric/run.ts`, `node metric/run.ts --set holdout`, and `node metric/run.ts --always-present` for the always-present row.
 
 ## Run it
 
 ```
-npm test                  # 33 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, runner, Ring client, Shippo, HTTP server
+npm test                  # 60 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
 npm run test:whep         # WHEP worker against a local WHEP server serving a real frame
-npm run mutation          # breaks the signature check, the idempotency order and the verdict logic, expects red each time
+npm run mutation          # 25 mutations: signature, idempotency order, verdict logic, provenance, scheduler persistence, plan validation, probe. Each must turn the suite red
 cp .env.example .env      # names only; fill values yourself
-npm run ring:probe devices
+npm run ring:probe         # one real device discovery and frame capture, once RING_* is set
+npm run serve:replay      # the seller page over the 30 recorded days, no credentials
 npm run serve
 ```
 
