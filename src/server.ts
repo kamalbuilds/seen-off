@@ -12,6 +12,7 @@ import { RingLinkError } from "./ring/oauth.ts";
 import { linkPage, linkProblemPage } from "./ring/link-page.ts";
 import { RingNotConnected } from "./ring/session.ts";
 import { RingApiError } from "./ring/client.ts";
+import { isPublicRoute, type OperatorAuth } from "./operator.ts";
 
 const UI_HTML = readFileSync(new URL("./ui/index.html", import.meta.url), "utf8");
 
@@ -38,6 +39,8 @@ export interface AppOptions {
   devices?: () => Promise<{ id: string; name: string; provenance: Provenance }[]>;
   /** Connect Ring (partner-initiated OAuth), the seller's doorbells and a porch photo taken on demand. */
   ring?: RingIntegration;
+  /** Operator sign-in. When set, every route except Ring's own (webhook, link, token exchange), /health and the sign-in form needs a session cookie; unset leaves the console open (local use). */
+  operator?: OperatorAuth;
   /** Recorded pickup days the seller can play through the pipeline from the page. */
   replay?: {
     days(): { dayId: string; labels: number; startMs: number }[];
@@ -73,6 +76,20 @@ export function createApp(o: AppOptions): Server {
     try {
       const url = new URL(req.url ?? "/", "http://x");
       if (req.method === "GET" && url.pathname === "/health") return send(200, { ok: true });
+      if (o.operator) {
+        const op = o.operator;
+        const page = (status: number, body: string) => { res.writeHead(status, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" }); res.end(body); };
+        if (req.method === "POST" && url.pathname === "/login") {
+          const r = op.login(new URLSearchParams((await readBody(req)).toString("utf8")).get("code") ?? "");
+          if ("cookie" in r) { res.writeHead(302, { location: "/", "set-cookie": r.cookie, "cache-control": "no-store" }); return void res.end(); }
+          return page(r.locked ? 429 : 401, op.page(r.error));
+        }
+        if (req.method === "POST" && url.pathname === "/logout") { res.writeHead(302, { location: "/", "set-cookie": op.logoutCookie(), "cache-control": "no-store" }); return void res.end(); }
+        if (!isPublicRoute(req.method, url.pathname) && !op.authed(req)) {
+          if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) return page(200, op.page());
+          return send(401, { error: "sign in required" });
+        }
+      }
       if (req.method === "POST" && url.pathname === "/ring/webhook") {
         const r = await receive(await readBody(req), req.headers);
         send(r.status, r.body);

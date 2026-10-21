@@ -313,6 +313,7 @@ const state = { days: null, selected: location.hash.slice(1) || null, packet: nu
 
 async function api(path, init) {
   const res = await fetch(path, { ...init, signal: AbortSignal.timeout(15000) });
+  if (res.status === 401) { location.reload(); return new Promise(() => {}); } // the sign-in page answers at /
   const body = await res.json().catch(() => ({}));
   if (!res.ok) { const e = new Error(body.error || `HTTP ${res.status}`); e.errors = body.errors; e.status = res.status; throw e; }
   return body;

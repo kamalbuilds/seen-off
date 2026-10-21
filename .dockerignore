@@ -1,0 +1,14 @@
+.env
+.env.*
+.git
+.venv*
+.progress
+.taste-skill
+.uicraft-read.json
+data
+node_modules
+spikes
+metric
+simulator
+test
+docs

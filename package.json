@@ -18,6 +18,7 @@
     "serve:replay": "node scripts/replay-serve.ts",
     "ring:probe": "node scripts/ring-probe.ts",
     "ring:preflight": "node scripts/ring-preflight.ts",
-    "ring:setup": "node scripts/ring-setup.ts"
+    "ring:setup": "node scripts/ring-setup.ts",
+    "railway:deploy": "scripts/railway-deploy.sh"
   }
 }

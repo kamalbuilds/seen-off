@@ -47,6 +47,8 @@ Each post is one verdict: a pickup the seller can prove, a handoff with no carri
 
 `npm run ring:setup` prints the values to enter in the Ring Developer Portal for this server: Account Link URL `/ring/link`, Token Exchange URL `/ring/oauth/token`, Webhook URL `/ring/webhook`, App Homepage URL `/`, and the Cameras and Doorbells scope.
 
+**Public deploy.** `scripts/railway-deploy.sh` ships the server to Railway from the `Dockerfile` (Node 24, the aiortc WHEP worker in a Python venv, a persistent volume at `/app/data` for the ledger, frames and sealed Ring token) and prints the Ring Developer Portal URLs. The seller console sits behind an operator sign-in (`OUTBOX_SIGN_IN_CODE`, a signed HttpOnly SameSite session cookie, `Secure` and `__Host-` prefixed on https, a ten-minute lockout after five misses); every seller route, the evidence files, delete and the one-click demo answer `401` without a session. Ring's own routes (`/ring/link`, `/ring/oauth/token`, `/ring/webhook`) and `/health` stay public and verify their HMAC, nonce and code themselves (`src/operator.ts`, `test/operator.test.ts`).
+
 `npm run ring:preflight` prints a one-screen report for auth, devices, history, snapshot and WHEP, each with its timing and Ring's own status on failure; it exits non-zero on any failed surface.
 
 `POST /days` validates the plan: a window that ends before it starts or runs past 24 h, an empty label list, a path-unsafe day name and malformed JSON are each a `400` that lists every reason; a repeated day name is `409`.
