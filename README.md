@@ -90,6 +90,22 @@ Frames: two real fixed-camera doorstep clips from Wikimedia Commons (CC BY 3.0, 
 
 `node spikes/porch/run.ts main` (Bedrock by default when `AWS_BEARER_TOKEN_BEDROCK` is set)
 
+**By condition**, the same 60 frames split every way that matters on a porch (`spikes/porch/breakdown.py`, output in `spikes/porch/results/breakdown-main-bedrock-mantle.json`). Night and infrared are measured from the pixels, not taken from the labels.
+
+| Condition | Frames | Present or gone | Parcel count exact |
+|---|---|---|---|
+| Empty porch | 30 | 30/30 (no false alarm) | 30/30 |
+| Parcels on the porch | 30 | 29/30 | 19/23 |
+| Real fixed-camera footage | 35 | 35/35 | 28/28 |
+| Daylight | 53 | 53/53 | 44/46 |
+| Night and infrared | 7 | 6/7 | 5/7 |
+| Empty porch under exposure and infrared variants | 12 | 12/12 | 12/12 |
+| 1 parcel | 18 | 17/18 | 16/18 |
+| 2 parcels | 3 | 3/3 | 2/3 |
+| 3 or more parcels | 2 | 2/2 | 1/2 |
+
+Every empty porch is called empty, every real-footage frame is read exactly, and the verdict logic needs only present-or-gone plus a count below the baseline to call a pickup.
+
 **Does the verdict match the day?** 30 recorded pickup days: 10 taken, 10 missed, 5 part-taken, 5 taken but unscanned, each played through the receiver, runner, ledger and vision stage (`metric/run.ts`).
 
 | Run | Result |

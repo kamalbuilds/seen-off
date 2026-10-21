@@ -1,0 +1,72 @@
+{
+ "run": "results/main-bedrock-mantle.json",
+ "model": "qwen.qwen3-vl-235b-a22b-instruct",
+ "groups": {
+  "all frames": {
+   "frames": 60,
+   "present_ok": 59,
+   "count_n": 53,
+   "count_ok": 49
+  },
+  "parcels on the porch": {
+   "frames": 30,
+   "present_ok": 29,
+   "count_n": 23,
+   "count_ok": 19
+  },
+  "real footage": {
+   "frames": 35,
+   "present_ok": 35,
+   "count_n": 28,
+   "count_ok": 28
+  },
+  "daylight": {
+   "frames": 53,
+   "present_ok": 53,
+   "count_n": 46,
+   "count_ok": 44
+  },
+  "1 parcel on the porch": {
+   "frames": 18,
+   "present_ok": 17,
+   "count_n": 18,
+   "count_ok": 16
+  },
+  "porch empty": {
+   "frames": 30,
+   "present_ok": 30,
+   "count_n": 30,
+   "count_ok": 30
+  },
+  "parcels composited in": {
+   "frames": 13,
+   "present_ok": 12,
+   "count_n": 13,
+   "count_ok": 9
+  },
+  "3 or more parcels": {
+   "frames": 2,
+   "present_ok": 2,
+   "count_n": 2,
+   "count_ok": 1
+  },
+  "night / infrared": {
+   "frames": 7,
+   "present_ok": 6,
+   "count_n": 7,
+   "count_ok": 5
+  },
+  "2 parcels on the porch": {
+   "frames": 3,
+   "present_ok": 3,
+   "count_n": 3,
+   "count_ok": 2
+  },
+  "empty porch, exposure and IR variants": {
+   "frames": 12,
+   "present_ok": 12,
+   "count_n": 12,
+   "count_ok": 12
+  }
+ }
+}
