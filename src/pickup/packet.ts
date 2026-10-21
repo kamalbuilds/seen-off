@@ -45,7 +45,7 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
   }
   timeline.push({ atMs: day.windowStartMs, kind: "window_open", provenance: null, text: "Pickup window opens. Outbox watches the porch." });
   for (const e of events) {
-    timeline.push({ atMs: e.tsMs!, kind: "motion_event", provenance: e.provenance, text: `Ring ${e.type}${e.subType ? ` (${e.subType})` : ""}` });
+    timeline.push({ atMs: e.tsMs!, kind: "motion_event", provenance: e.provenance, text: `${e.type === "button_press" ? "Doorbell button pressed" : "Motion at the door"}${e.subType ? ` (${e.subType})` : ""}` });
   }
   frames.forEach((f) => {
     timeline.push({

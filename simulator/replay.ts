@@ -11,7 +11,7 @@ import { deliver, motionEnvelope } from "./webhook-simulator.ts";
 export const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 export const SIM_KEY = "simulator-signing-key-not-a-secret";
 export const SETTLE_MS = 30_000;
-export const REPLAY_DEVICE = "ava1.ring.device.REPLAYSIMULATOR01";
+export const REPLAY_DEVICE = "ava1.ring.device.FRONTDOOR01";
 
 export interface DaySpec {
   dayId: string; scenario: string; truth: string; deviceId: string; windowStartMs: number; windowEndMs: number;

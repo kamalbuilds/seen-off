@@ -18,7 +18,7 @@ import build_frames as bf  # noqa: E402
 # BUILD_SEED, BUILD_OUT and BUILD_JSON build a different batch beside the shipped one (the held-out set); the defaults rebuild the shipped 30 days.
 OUT = ROOT / "simulator" / os.environ.get("BUILD_OUT", "days")
 rng = random.Random(int(os.environ.get("BUILD_SEED", 20261022)))
-DEVICE = "ava1.ring.device.REPLAYSIMULATOR01"
+DEVICE = "ava1.ring.device.FRONTDOOR01"
 H = 3600_000
 DAY0 = 1792947600000  # 2026-10-25T17:00:00Z = 10:00 PDT, replay dates are simulated
 

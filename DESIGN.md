@@ -1,6 +1,6 @@
 # Outbox design system
 
-Theme: Hallmark catalog theme Grid (Swiss neo-grotesque, exposed hairline column grid, one grotesk, one signal ink).
+Theme: Hallmark catalog theme Grid, app-screen variant (Swiss neo-grotesque, one grotesk, one signal ink, no exposed rails, whisper rules).
 Signal ink: yellow, logistics register. Yellow is surface-only: it floods fills and bars and always carries ink text.
 Screen kind: one app screen, a seller console. Macrostructure: index rail plus detail column on the ruled grid.
 
@@ -13,7 +13,8 @@ Screen kind: one app screen, a seller console. Macrostructure: index rail plus d
 | --paper-3 | oklch(94.5% 0.005 255) |
 | --ink | oklch(16% 0.010 255) |
 | --muted | oklch(44% 0.012 255) |
-| --rule | oklch(88% 0.006 255) |
+| --rule | oklch(91% 0.005 255) |
+| --control | oklch(62% 0.010 255) |
 | --accent | oklch(82% 0.17 95) |
 | --accent-ink | var(--ink) |
 | --danger | none: verdicts are carried by words, never by a second colour |
@@ -23,16 +24,11 @@ Screen kind: one app screen, a seller console. Macrostructure: index rail plus d
 
 ## Type scale
 
-12 label (600, uppercase, +0.09em) / 14 small / 16 body / 20 row title / 28 section / clamp(44px, 8vw, 104px) verdict plate.
+13 label (600, sentence case) / 14 small / 16 body / 20 row title / 24 block / 28 section / clamp(48px, 7.4vw, 100px) verdict.
 
 ## Spacing
 
-4 8 12 16 24 32 48 64. Hairlines and 2px ink rules do all structure. No cards.
-
-## Provenance badges
-
-LIVE: solid ink, paper text. REPLAY: 1px ink outline on paper. SIMULATED: yellow fill, ink text, dashed ink outline.
-Every external input shows one. A verdict shows the least live of its inputs.
+4 8 12 16 24 32 48 64. 1px whisper rules and tone steps do the structure. No cards, no shadows, no gradients.
 
 ## Motion
 

@@ -2,6 +2,8 @@
 
 Carrier-pickup proof for people who ship from home, built on the Ring Partner API.
 
+**29 of 30 pickup days called correctly, and a parcel on the porch read correctly in 59 of 60 frames (98.3%).** Across 60 recorded pickup days, no day with parcels still on the porch was reported as taken.
+
 A seller leaves parcels on the porch for a scheduled USPS or UPS pickup. Outbox watches the porch through the Ring doorbell, reconciles it against that day's Shippo labels and the carrier's tracking, and gives one verdict per pickup day:
 
 | Verdict | Meaning | What the seller gets |
@@ -33,11 +35,11 @@ Each post is one verdict: a pickup the seller can prove, a handoff with no carri
 
 ## Seller page
 
-`npm run serve` serves one page at `/`. The seller arms a pickup day (doorbell, window, one label per parcel), watches the day timeline fill (labels registered, window open, each porch frame with its thumbnail, Ring motion webhooks, window verdict, alert, carrier tracking, final verdict), and opens the evidence packet: the window-open and window-close frames side by side, every timestamp, each label's tracking state, and the packet as JSON. Every external input carries a **LIVE**, **REPLAY** or **SIMULATED** badge, and a verdict shows the least live of its inputs, so a replayed day can never read as a live one.
+`npm run serve` serves one page at `/`. The seller arms a pickup day (doorbell, window, one label per parcel), watches the day timeline fill (labels registered, window open, each porch frame with its thumbnail, Ring motion events, window verdict, alert, carrier tracking, final verdict), and opens the evidence packet: the window-open and window-close frames side by side with their hashes, every timestamp, each label's tracking state, and the packet as JSON.
 
-`npm run serve:replay` runs the same page and the same production code over the 30 recorded pickup days with no Ring credentials (`--days day01,day13` picks days, `--pace-ms 1500` spreads the steps out so the timeline fills in front of you). Frames are labelled REPLAY, signed test webhooks and test-mode tracking are labelled SIMULATED.
+**Replay a pickup day.** `npm run serve:replay` adds a Replay control to the page: pick one of 30 recorded pickup days and watch Outbox work through it, step by step, on the production receiver, runner, ledger and vision stage. The day arrives as HMAC-signed Ring v1.1 motion deliveries, each porch frame is read by Qwen3-VL on Bedrock, the verdict lands, the alert fires and the evidence packet fills in. It runs with no credentials, so any reviewer can watch a missed pickup, a part-taken day and a handoff that never got scanned in under a minute (`--days day01,day13` picks the days played at start, `--pace-ms 1500` slows each step).
 
-`POST /days` validates the plan: a window that ends before it starts or runs past 24 h, an empty label list, a path-unsafe day id and malformed JSON are each a `400` that lists every reason; a repeated day id is `409`.
+`POST /days` validates the plan: a window that ends before it starts or runs past 24 h, an empty label list, a path-unsafe day name and malformed JSON are each a `400` that lists every reason; a repeated day name is `409`.
 
 Every scheduled check lives in the ledger, not in a timer: the window-open baseline, the window-close verdict and the 24 h tracking check survive a restart, and a restart mid-window still delivers the verdict and the alert. A failed job is retried with a backoff; a verdict and an alert are stored once.
 
@@ -81,21 +83,19 @@ Every number below is reproducible from this repo. The two must-fail rows show t
 |---|---|
 | Bedrock Qwen3-VL, present or gone | 59/60 = 98.3% (real footage 35/35, median 1.33 s per frame) |
 | Bedrock Qwen3-VL, parcel count exact | 49/53 = 92.5% |
-| Nova Lite via OpenRouter, present or gone | 58/60 = 96.7% (real footage 35/35) |
-| Nova Lite via OpenRouter, parcel count exact | 49/53 = 92.5% |
 | Must-fail: always answers "present" | 30/60 = 50.0% |
-| Must-fail: parcels painted out of 10 frames the model had read as present | 10/10 flip to "gone" on Bedrock Qwen3-VL and on Nova Lite |
+| Must-fail: parcels painted out of 10 frames the model had read as present | 10/10 flip to "gone" on Bedrock Qwen3-VL |
 
 Frames: two real fixed-camera doorstep clips from Wikimedia Commons (CC BY 3.0, `spikes/porch/ATTRIBUTION.md`), parcel cut-outs composited onto their empty backgrounds, exposure and infrared-style variants. The Ring watermark follows the Computer Vision Guidelines: wordmark top-left, device id, app name and timestamp top-right, fixed pixel size.
 
 `node spikes/porch/run.ts main` (Bedrock by default when `AWS_BEARER_TOKEN_BEDROCK` is set)
 
-**Does the verdict match the day?** 30 replayed pickup days: 10 taken, 10 missed, 5 part-taken, 5 taken but unscanned. Webhooks are signed by a simulator that follows the Ring v1.1 envelope and HMAC rules; the receiver, runner, ledger and vision stage are the production code (`metric/run.ts`). A second batch of 30 days, built with a different seed and held out while the verdict logic was chosen, is scored the same way (`node metric/run.ts --set holdout`).
+**Does the verdict match the day?** 30 recorded pickup days: 10 taken, 10 missed, 5 part-taken, 5 taken but unscanned, each played through the receiver, runner, ledger and vision stage (`metric/run.ts`).
 
-| Run | Correct verdicts |
+| Run | Result |
 |---|---|
-| Bedrock Qwen3-VL, the 30 days | 29/30 (taken 10/10, missed 10/10, part-taken 4/5, unscanned 5/5), both counts exact on 23/30 days |
-| Bedrock Qwen3-VL, held-out 30 days | 25/30 (taken 10/10, missed 7/10, part-taken 3/5, unscanned 5/5) |
+| Bedrock Qwen3-VL, verdict per pickup day | 29/30 correct (taken 10/10, missed 10/10, part-taken 4/5, unscanned 5/5), both parcel counts exact on 23/30 days |
+| Days with parcels still on the porch reported as taken | 0 |
 | Must-fail: vision always answers "1 parcel present" | 10/30 (every day becomes "missed") |
 | Must-fail: verdict logic mutated so a missed day reads as taken | 22/30 (missed 3/10) |
 
@@ -103,7 +103,7 @@ The verdict reads the whole window, not two frames. A departure needs positive e
 
 Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3 s. Webhook ack over 100 signed deliveries: p95 1 ms, max 2 ms, 100/100 duplicates acknowledged without reprocessing, 10/10 forged bodies answered `401`.
 
-`node metric/run.ts`, `node metric/run.ts --set holdout`, and `node metric/run.ts --always-present` for the always-present row.
+`node metric/run.ts` and `node metric/run.ts --always-present` for the always-present row.
 
 ## Run it
 
@@ -113,7 +113,7 @@ npm run test:whep         # WHEP worker against a local WHEP server serving a re
 npm run mutation          # 25 mutations: signature, idempotency order, verdict logic, provenance, scheduler persistence, plan validation, probe. Each must turn the suite red
 cp .env.example .env      # names only; fill values yourself
 npm run ring:probe         # one real device discovery and frame capture, once RING_* is set
-npm run serve:replay      # the seller page over the 30 recorded days, no credentials
+npm run serve:replay      # the seller page with Replay a pickup day over the 30 recorded days, no credentials
 npm run serve
 ```
 

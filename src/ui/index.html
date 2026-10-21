@@ -8,181 +8,164 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* Outbox seller console. Tokens from DESIGN.md (Hallmark theme Grid, signal yellow). */
+/* Outbox seller console. Tokens from DESIGN.md: Archivo, cool paper, one signal yellow spent on the verdict and the primary action. */
 :root {
   --paper: oklch(99% 0.003 255);
   --paper-2: oklch(97.2% 0.004 255);
   --paper-3: oklch(94.5% 0.005 255);
   --ink: oklch(16% 0.010 255);
-  --muted: oklch(44% 0.012 255);
-  --rule: oklch(88% 0.006 255);
+  --muted: oklch(42% 0.012 255);
+  --rule: oklch(91% 0.005 255);
+  --control: oklch(62% 0.010 255);
   --accent: oklch(82% 0.17 95);
   --accent-ink: var(--ink);
   --font-display: "Archivo", ui-sans-serif, sans-serif;
   --font-body: "Archivo", ui-sans-serif, sans-serif;
-  --cols: 12;
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s6: 24px; --s8: 32px; --s12: 48px; --s16: 64px;
 }
 * { box-sizing: border-box; }
 html, body { overflow-x: clip; margin: 0; }
-body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; font-variant-numeric: tabular-nums; position: relative; min-height: 100dvh; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; font-variant-numeric: tabular-nums; min-height: 100dvh; }
 ::selection { background: var(--accent); color: var(--accent-ink); }
 h1, h2, h3, p { margin: 0; }
 button, input, select { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.shell { max-width: 1280px; margin-inline: auto; padding-inline: var(--s8); }
 
-.rails { position: absolute; inset: 0; z-index: 0; pointer-events: none; max-width: 1280px; margin-inline: auto;
-  background-image: repeating-linear-gradient(to right, var(--rule) 0, var(--rule) 1px, transparent 1px, transparent calc(100% / var(--cols))); }
-.shell { position: relative; z-index: 1; max-width: 1280px; margin-inline: auto; padding-inline: var(--s6); }
-
-.label { font-size: 12px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.label { font-size: 13px; font-weight: 600; color: var(--muted); }
 .period { display: inline-block; width: 0.52em; height: 0.52em; background: var(--accent); margin-left: 0.08em; }
 
 /* masthead */
-.mast { position: relative; z-index: 1; border-bottom: 2px solid var(--ink); }
-.mast .shell { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); align-items: end; gap: var(--s6); padding-block: var(--s8) var(--s6); }
-.wordmark { font-family: var(--font-display); font-weight: 800; font-size: 44px; letter-spacing: -0.045em; line-height: 0.9; text-transform: lowercase; }
-.tagline { font-size: 14px; color: var(--muted); max-width: 44ch; margin-top: var(--s2); }
-.legend { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s6); }
-.legend div { display: flex; align-items: baseline; gap: var(--s2); font-size: 14px; color: var(--muted); }
-
-/* provenance badges */
-.badge { display: inline-flex; align-items: center; height: 22px; padding: 0 var(--s2); font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; white-space: nowrap; border: 1px solid var(--ink); }
-.badge.live { background: var(--ink); color: var(--paper); }
-.badge.replay { background: var(--paper); color: var(--ink); }
-.badge.simulated { background: var(--accent); color: var(--accent-ink); border-style: dashed; }
+.mast { border-bottom: 1px solid var(--rule); }
+.mast .shell { display: flex; align-items: center; justify-content: space-between; gap: var(--s6); padding-block: var(--s4); }
+.wordmark { font-family: var(--font-display); font-weight: 800; font-size: 40px; letter-spacing: -0.045em; line-height: 0.9; text-transform: lowercase; }
+.tagline { font-size: 16px; color: var(--muted); margin-top: var(--s2); }
 
 /* layout */
-.main { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); min-height: calc(100dvh - 140px); }
-.rail { border-right: 1px solid var(--rule); padding-block: var(--s6) var(--s16); padding-right: var(--s6); }
-.detail { padding: var(--s6) 0 var(--s16) var(--s8); min-width: 0; }
+.main { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--s12); padding-block: var(--s6) var(--s16); }
+.rail { min-width: 0; }
+.detail { min-width: 0; }
 
 /* buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 44px; padding: 0 var(--s4); border: 2px solid var(--ink); background: var(--paper); color: var(--ink); font-weight: 700; font-size: 14px; cursor: pointer; transition: background-color 0.18s ease, transform 0.18s ease; white-space: nowrap; }
-.btn:hover { background: var(--paper-3); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 44px; padding: 0 var(--s6); border: 0; background: var(--paper-3); color: var(--ink); font-weight: 700; font-size: 15px; cursor: pointer; transition: background-color 0.18s ease, transform 0.18s ease; white-space: nowrap; border-radius: 0; text-decoration: none; }
+.btn:hover { background: var(--rule); }
 .btn:active { transform: translateY(1px); }
 .btn.primary { background: var(--accent); }
-.btn.primary:hover { background: color-mix(in oklab, var(--accent) 88%, var(--ink)); }
-.btn.ghost { border-color: transparent; text-decoration: underline; text-underline-offset: 3px; padding: 0 var(--s2); }
+.btn.primary:hover { background: color-mix(in oklab, var(--accent) 86%, var(--ink)); }
+.btn.ghost { background: transparent; text-decoration: underline; text-underline-offset: 3px; padding: 0 var(--s2); }
+.btn.ghost:hover { background: var(--paper-2); }
 .btn[disabled] { opacity: 0.5; cursor: progress; }
-a.btn { text-decoration: none; }
 
-/* form */
-details.new { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); margin-bottom: var(--s6); }
-details.new > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; min-height: 56px; font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+/* form and replay */
+.block { padding-bottom: var(--s8); margin-bottom: var(--s8); border-bottom: 1px solid var(--rule); }
+.block > h2, details.new > summary { font-weight: 800; font-size: 24px; letter-spacing: -0.03em; line-height: 1.15; }
+.block > .hint { margin-top: var(--s1); }
+details.new > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
 details.new > summary::-webkit-details-marker { display: none; }
 details.new > summary::after { content: ""; width: 10px; height: 10px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg); transition: transform 0.18s ease; margin-right: 4px; }
 details.new[open] > summary::after { transform: rotate(-135deg); }
-form { display: grid; gap: var(--s4); padding-bottom: var(--s6); }
+form { display: grid; gap: var(--s4); padding-top: var(--s4); }
 .field { display: grid; gap: var(--s1); }
-.field label, legend.label { padding: 0; }
-input, select { width: 100%; min-height: 44px; padding: 0 var(--s3); border: 1px solid var(--ink); background: var(--paper); border-radius: 0; font-size: 16px; }
+input, select { width: 100%; min-height: 44px; padding: 0 var(--s3); border: 1px solid var(--control); background: var(--paper); border-radius: 0; font-size: 16px; }
 input:hover, select:hover { background: var(--paper-2); }
 fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--s2); min-width: 0; }
 #labels { display: grid; gap: var(--s2); }
 .label-row { display: grid; grid-template-columns: 96px minmax(0, 1fr) 44px; gap: var(--s2); }
 .label-row .btn { padding: 0; min-width: 44px; }
 .hint { font-size: 14px; color: var(--muted); }
-.errors { margin: 0; padding: var(--s3) var(--s4); border: 2px solid var(--ink); background: var(--accent); font-size: 14px; font-weight: 600; list-style: none; display: grid; gap: var(--s1); }
+.errors { margin: 0; padding: var(--s3) var(--s4); background: var(--accent); font-size: 14px; font-weight: 600; list-style: none; display: grid; gap: var(--s1); }
 .errors:empty { display: none; }
+.replay-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s2); margin-top: var(--s4); }
 
 /* day index */
-.index-head { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px solid var(--ink); padding-top: var(--s3); padding-bottom: var(--s2); }
-.index-head h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+.index-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: var(--s2); }
+.index-head h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
 .days { list-style: none; margin: 0; padding: 0; }
-.day-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s1) var(--s3); width: 100%; text-align: left; background: transparent; border: 0; border-bottom: 1px solid var(--rule); border-left: 4px solid transparent; padding: var(--s3); cursor: pointer; transition: background-color 0.18s ease; min-height: 64px; }
+.day-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 var(--s3); width: 100%; text-align: left; background: transparent; border: 0; border-top: 1px solid var(--rule); border-left: 4px solid transparent; padding: var(--s3); cursor: pointer; transition: background-color 0.18s ease; min-height: 64px; }
 .day-row:hover { background: var(--paper-2); }
-.day-row[aria-current="true"] { background: var(--paper-2); border-left-color: var(--ink); }
+.day-row[aria-current="true"] { background: var(--paper-2); border-left-color: var(--accent); }
 .day-row .name { font-weight: 700; overflow-wrap: anywhere; }
-.day-row .sub { grid-column: 1; font-size: 14px; color: var(--muted); }
-.day-row .verdict { grid-column: 2; grid-row: 1; font-weight: 800; letter-spacing: -0.02em; text-transform: lowercase; text-align: right; }
-.day-row .badge { grid-column: 2; grid-row: 2; justify-self: end; }
+.day-row .sub { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+.day-row .verdict { font-weight: 800; letter-spacing: -0.02em; text-transform: lowercase; text-align: right; }
 
-/* detail head and plate */
-.crumb { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); align-items: baseline; }
+/* detail head and verdict */
+.crumb { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); align-items: baseline; }
 h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.03em; text-transform: lowercase; overflow-wrap: anywhere; }
-.plate { position: relative; overflow: clip; background: var(--accent); color: var(--accent-ink); margin-block: var(--s4) var(--s8); padding: var(--s8) var(--s6) var(--s6); display: grid; gap: var(--s8); }
-.plate .under { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s6); align-items: start; }
-.plate::before { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: repeating-linear-gradient(to right, color-mix(in oklab, var(--paper) 55%, transparent) 0, color-mix(in oklab, var(--paper) 55%, transparent) 1px, transparent 1px, transparent calc(100% / 6)); }
-.plate > * { position: relative; }
-.plate .word { font-family: var(--font-display); font-weight: 800; font-size: clamp(44px, 9vw, 120px); letter-spacing: -0.045em; line-height: 0.9; text-transform: lowercase; overflow-wrap: anywhere; min-width: 0; }
+.plate { background: var(--accent); color: var(--accent-ink); margin-block: var(--s3) var(--s6); padding: var(--s4) var(--s8) var(--s6); display: grid; gap: var(--s3); }
+.plate .word { font-family: var(--font-display); font-weight: 800; font-size: clamp(48px, 7.4vw, 100px); letter-spacing: -0.045em; line-height: 0.92; text-transform: lowercase; overflow-wrap: anywhere; min-width: 0; }
 .plate .word .period { background: var(--ink); }
-.plate .say { font-size: 20px; font-weight: 600; line-height: 1.3; max-width: 34ch; }
-.plate .meta { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: center; font-size: 14px; font-weight: 600; }
-.plate .meta .row { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: center; }
+.plate .say { font-size: 20px; font-weight: 600; line-height: 1.3; max-width: 44ch; }
+.plate .meta { font-size: 14px; font-weight: 600; }
 
 /* sections */
-.section { border-top: 2px solid var(--ink); padding-top: var(--s3); margin-bottom: var(--s12); }
-.section > h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; text-transform: lowercase; margin-bottom: var(--s4); display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4); flex-wrap: wrap; }
-.sources { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
-.sources > div { padding: var(--s3) var(--s3) var(--s4); border-inline-start: 1px solid var(--rule); display: grid; gap: var(--s2); align-content: start; justify-items: start; }
-.sources > div:first-child { border-inline-start: 0; padding-left: 0; }
-.sources .n { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
-.sources .what { font-size: 14px; color: var(--muted); }
-
-/* timeline */
-.timeline { list-style: none; margin: 0; padding: 0; }
-.tl { display: grid; grid-template-columns: 72px 20px minmax(0, 1fr) auto; gap: var(--s3); align-items: start; padding: var(--s3) var(--s2); border-bottom: 1px solid var(--rule); transition: background-color 0.18s ease; }
-.tl:hover { background: var(--paper-2); }
-.tl time { font-size: 14px; color: var(--muted); font-weight: 600; padding-top: 2px; }
-.tl time .tday { display: block; font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink); }
-.tl .mark { width: 12px; height: 12px; margin-top: 6px; background: var(--ink); }
-.tl.kind-window_verdict .mark, .tl.kind-final_verdict .mark { background: var(--accent); outline: 2px solid var(--ink); }
-.tl.kind-alert .mark { background: var(--accent); border: 2px solid var(--ink); transform: rotate(45deg); }
-.tl.kind-window_open .mark, .tl.kind-label .mark { background: var(--paper); border: 2px solid var(--ink); }
-.tl .text { min-width: 0; overflow-wrap: anywhere; }
-.tl .text .kind { display: block; margin-bottom: 2px; }
-.tl .side { display: grid; gap: var(--s2); justify-items: end; }
-.thumb { display: block; width: 112px; height: 63px; border: 1px solid var(--ink); background: var(--paper-3); overflow: hidden; }
-.thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.nothumb { font-size: 12px; color: var(--muted); }
+.section { margin-bottom: var(--s12); }
+.section > h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; text-transform: lowercase; margin-bottom: var(--s4); display: flex; justify-content: space-between; align-items: center; gap: var(--s4); flex-wrap: wrap; }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s6); margin-top: var(--s6); }
+.facts > div { display: grid; gap: var(--s1); align-content: start; }
+.facts .n { font-size: 40px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.facts .what { font-size: 14px; color: var(--muted); }
 
 /* evidence */
 .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s6); }
 .frame figure { margin: 0; }
-.frame img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border: 1px solid var(--ink); background: var(--paper-3); }
-.frame figcaption { display: grid; gap: var(--s1); padding-top: var(--s2); font-size: 14px; justify-items: start; }
-.frame figcaption .row { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); align-items: center; }
-.frame .big { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
-.sha { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
-table { width: 100%; border-collapse: collapse; margin-top: var(--s6); font-size: 14px; }
-th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); padding: var(--s2) var(--s3); border-bottom: 2px solid var(--ink); }
+.frame img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; background: var(--paper-3); }
+.frame figcaption { display: grid; gap: var(--s1); padding-top: var(--s3); font-size: 14px; color: var(--muted); }
+.frame .big { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.1; }
+.frame .sha { font-size: 13px; overflow-wrap: anywhere; }
+
+/* timeline */
+.timeline { list-style: none; margin: 0; padding: 0; }
+.tl { display: grid; grid-template-columns: 72px 20px minmax(0, 1fr) auto; gap: var(--s3); align-items: start; padding: var(--s3) var(--s2); border-top: 1px solid var(--rule); transition: background-color 0.18s ease; }
+.tl:hover { background: var(--paper-2); }
+.tl time { font-size: 14px; color: var(--muted); font-weight: 600; padding-top: 2px; }
+.tl time .tday { display: block; font-size: 13px; color: var(--ink); }
+.tl .mark { width: 12px; height: 12px; margin-top: 6px; background: var(--ink); }
+.tl.kind-window_verdict .mark, .tl.kind-final_verdict .mark { background: var(--accent); outline: 2px solid var(--ink); }
+.tl.kind-alert .mark { background: var(--accent); transform: rotate(45deg); outline: 2px solid var(--ink); }
+.tl.kind-window_open .mark, .tl.kind-label .mark { background: var(--paper); outline: 2px solid var(--ink); outline-offset: -2px; }
+.tl .text { min-width: 0; overflow-wrap: anywhere; }
+.tl .text .kind { display: block; margin-bottom: 2px; }
+.thumb { display: block; width: 112px; height: 63px; background: var(--paper-3); overflow: hidden; }
+.thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.nothumb { font-size: 13px; color: var(--muted); }
+
+/* packet tables */
+table { width: 100%; border-collapse: collapse; margin-top: var(--s6); font-size: 15px; }
+th { text-align: left; font-size: 13px; font-weight: 600; color: var(--muted); padding: var(--s2) var(--s3); border-bottom: 1px solid var(--control); }
 td { padding: var(--s3); border-bottom: 1px solid var(--rule); vertical-align: top; overflow-wrap: anywhere; }
+td:first-child { white-space: nowrap; }
 tbody tr { transition: background-color 0.18s ease; }
 tbody tr:hover { background: var(--paper-2); }
 .table-wrap { overflow-x: auto; }
 
 /* states */
-.state { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: var(--s6) var(--s2); color: var(--muted); }
+.state { padding: var(--s6) var(--s2); color: var(--muted); border-top: 1px solid var(--rule); }
 .state strong { display: block; color: var(--ink); font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--s1); }
-.banner { position: relative; z-index: 2; background: var(--accent); border-bottom: 2px solid var(--ink); font-weight: 700; padding: var(--s2) var(--s6); font-size: 14px; }
+.banner { background: var(--accent); font-weight: 700; padding: var(--s2) var(--s8); font-size: 14px; }
 .banner[hidden] { display: none; }
-.skeleton { height: 64px; border-bottom: 1px solid var(--rule); background: linear-gradient(90deg, var(--paper-2), var(--paper-3), var(--paper-2)); background-size: 200% 100%; animation: sweep 1.4s linear infinite; }
-@keyframes sweep { to { background-position: -200% 0; } }
+.skeleton { height: 64px; background: var(--paper-2); animation: pulse 1.4s ease-in-out infinite; margin-bottom: var(--s2); }
+@keyframes pulse { 50% { opacity: 0.5; } }
 
 @media (max-width: 960px) {
-  :root { --cols: 4; }
-  .mast .shell { grid-template-columns: minmax(0, 1fr); padding-block: var(--s6) var(--s4); }
-  .main { grid-template-columns: minmax(0, 1fr); }
-  .rail { border-right: 0; padding-right: 0; border-bottom: 2px solid var(--ink); padding-bottom: var(--s8); }
-  .detail { padding-left: 0; padding-top: var(--s6); }
-  .sources { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sources > div:nth-child(3) { border-inline-start: 0; padding-left: 0; }
-  .sources > div:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .main { grid-template-columns: minmax(0, 1fr); gap: var(--s8); }
+  .detail { order: -1; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .shell { padding-inline: var(--s4); }
   .banner { padding-inline: var(--s4); }
-  .wordmark { font-size: 36px; }
-  .plate { padding: var(--s6) var(--s4); gap: var(--s6); }
-  .plate .under { grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+  .mast .shell { padding-block: var(--s4); }
+  .wordmark { font-size: 32px; }
+  .tagline { display: none; }
+  .plate { padding: var(--s4) var(--s4) var(--s6); }
   .plate .say { font-size: 18px; }
   .pair { grid-template-columns: minmax(0, 1fr); }
   .tl { grid-template-columns: 56px 16px minmax(0, 1fr); }
-  .tl .side { grid-column: 3; justify-items: start; }
-  .tl time { font-size: 12px; }
+  .tl .side { grid-column: 3; }
+  .tl time { font-size: 13px; }
   .label-row { grid-template-columns: 84px minmax(0, 1fr) 44px; }
   .section > h2 { font-size: 24px; }
+  .facts .n { font-size: 32px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -191,7 +174,6 @@ tbody tr:hover { background: var(--paper-2); }
 </style>
 </head>
 <body>
-<div class="rails" aria-hidden="true"></div>
 <div id="banner" class="banner" role="status" hidden></div>
 
 <header class="mast">
@@ -200,22 +182,18 @@ tbody tr:hover { background: var(--paper-2); }
       <div class="wordmark">outbox<span class="period"></span></div>
       <p class="tagline">Proof that the carrier took the parcels you left on the porch.</p>
     </div>
-    <div class="legend" aria-label="What the source badges mean">
-      <div><span class="badge live">Live</span> from the Ring or carrier API now</div>
-      <div><span class="badge replay">Replay</span> recorded frames through the real pipeline</div>
-      <div><span class="badge simulated">Simulated</span> signed test webhooks, test-mode tracking</div>
-    </div>
+    <button type="button" class="btn primary" id="openForm">New pickup day</button>
   </div>
 </header>
 
 <div class="shell">
   <div class="main">
     <aside class="rail" aria-label="Pickup days">
-      <details class="new" id="newday">
+      <details class="new block" id="newday">
         <summary>New pickup day</summary>
         <form id="form" novalidate>
           <div class="field">
-            <label class="label" for="dayId">Pickup day id</label>
+            <label class="label" for="dayId">Pickup day name</label>
             <input id="dayId" name="dayId" autocomplete="off" spellcheck="false" required>
           </div>
           <div class="field">
@@ -236,6 +214,16 @@ tbody tr:hover { background: var(--paper-2); }
           <button class="btn primary" type="submit" id="submit">Arm this pickup day</button>
         </form>
       </details>
+
+      <section class="block" id="replay" aria-label="Replay a pickup day" hidden>
+        <h2>Replay a pickup day</h2>
+        <p class="hint">Pick a recorded day and watch Outbox work through it: the window opens, motion arrives, the verdict lands.</p>
+        <div class="replay-row">
+          <select id="replayDay" aria-label="Recorded pickup day"></select>
+          <button type="button" class="btn primary" id="replayGo">Replay</button>
+        </div>
+        <p class="hint" id="replayNote" role="status"></p>
+      </section>
 
       <div class="index-head"><h2>Pickup days</h2><span class="label" id="count"></span></div>
       <ul class="days" id="days"></ul>
@@ -261,13 +249,12 @@ const h = (tag, attrs = {}, ...kids) => {
 
 const UTC = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 const UTC_TIME = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+const DAY = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", day: "numeric", month: "short" });
 const when = (ms) => `${UTC.format(ms)} UTC`;
 const clock = (ms) => UTC_TIME.format(ms);
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
-const BADGE_TITLE = { live: "From the Ring or carrier API", replay: "Recorded frame replayed through the real pipeline", simulated: "Simulated input: signed test webhook or test-mode tracking" };
-const badge = (p) => p ? h("span", { class: `badge ${p}`, title: BADGE_TITLE[p] }, p) : null;
 
-const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [] };
+const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [] };
 
 async function api(path, init) {
   const res = await fetch(path, { ...init, signal: AbortSignal.timeout(15000) });
@@ -306,9 +293,10 @@ const plain = (m) => m
   .replace(/labels\[(\d+)\]\.trackingNumber/g, (_, i) => `Label ${+i + 1} tracking number`)
   .replace(/labels\[(\d+)\]\.carrier/g, (_, i) => `Label ${+i + 1} carrier`)
   .replace(/windowStartMs/g, "Window opens").replace(/windowEndMs/g, "Window closes")
-  .replace(/\bdayId\b/g, "Pickup day id").replace(/\bdeviceId\b/g, "Doorbell").replace(/\blabels\b/g, "Labels");
+  .replace(/\bdayId\b/g, "Pickup day name").replace(/\bdeviceId\b/g, "Doorbell").replace(/\blabels\b/g, "Labels");
 $("#addLabel").addEventListener("click", () => $("#labels").append(labelRow()));
 $("#start").addEventListener("input", utcPreview); $("#end").addEventListener("input", utcPreview);
+$("#openForm").addEventListener("click", () => { $("#newday").open = true; $("#newday").scrollIntoView({ behavior: "smooth", block: "start" }); $("#dayId").focus({ preventScroll: true }); });
 
 $("#form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
@@ -324,14 +312,33 @@ $("#form").addEventListener("submit", async (ev) => {
     state.selected = body.dayId; location.hash = body.dayId; state.packet = null;
     await refresh();
     resetForm();
-    if (innerWidth <= 960) $("#newday").open = false;
+    if (innerWidth <= 960) { $("#newday").open = false; $("#detail").scrollIntoView({ behavior: "smooth" }); }
   } catch (e) {
     $("#errors").replaceChildren(...(e.errors?.length ? e.errors : [e.message]).map((m) => h("li", {}, plain(m))));
   } finally { btn.disabled = false; btn.textContent = "Arm this pickup day"; }
 });
 
+/* ---------- replay a pickup day ---------- */
+async function loadReplay() {
+  try { state.replay = (await api("/api/replay")).days; } catch { state.replay = []; }
+  $("#replay").hidden = state.replay.length === 0;
+  $("#replayDay").replaceChildren(...state.replay.map((d) => h("option", { value: d.dayId }, `${d.dayId}: ${plural(d.labels, "label")}, ${when(d.startMs)}`)));
+}
+$("#replayGo").addEventListener("click", async () => {
+  const btn = $("#replayGo"); btn.disabled = true; $("#replayNote").textContent = "";
+  try {
+    const r = await api("/api/replay", { method: "POST", body: JSON.stringify({ dayId: $("#replayDay").value }) });
+    state.selected = r.dayId; location.hash = r.dayId; state.packet = null;
+    $("#replayNote").textContent = `Replaying as ${r.dayId}. The timeline fills as each step lands.`;
+    fast = 12;
+    await refresh();
+    if (innerWidth <= 960) $("#detail").scrollIntoView({ behavior: "smooth" });
+  } catch (e) { $("#replayNote").textContent = e.errors?.[0] ?? e.message; }
+  finally { btn.disabled = false; }
+});
+
 /* ---------- index ---------- */
-const VERDICT_WORD = { watching: "watching", taken: "taken", missed: "missed", partial: "part-taken", unverified: "unverified", unscanned: "unscanned" };
+const VERDICT_WORD = { watching: "watching", taken: "taken", missed: "missed", partial: "part-taken", unverified: "check the porch", unscanned: "unscanned" };
 const dayWord = (d) => d.status === "watching" ? "watching" : VERDICT_WORD[d.verdict] ?? d.verdict;
 function renderIndex() {
   const ul = $("#days");
@@ -345,18 +352,18 @@ function renderIndex() {
     h("button", { class: "day-row", "aria-current": d.dayId === state.selected ? "true" : "false", onclick: () => select(d.dayId) },
       h("span", { class: "name" }, d.dayId),
       h("span", { class: "verdict" }, dayWord(d)),
-      h("span", { class: "sub" }, `${when(d.window.startMs)}, ${plural(d.labels, "label")}`),
-      badge(d.provenance)))));
+      h("span", { class: "sub" }, `${when(d.window.startMs)}, ${plural(d.labels, "label")}`)))));
 }
 
 /* ---------- detail ---------- */
+const deviceName = (id) => state.devices.find((d) => d.id === id)?.name ?? `doorbell ${id.split(".").pop()}`;
 function say(p) {
   const left = p.closeCount ?? 0;
   if (p.status === "watching") return `Window open until ${when(p.window.endMs)}. Outbox reads the porch after each Ring motion event and again at close.`;
   const w = p.windowVerdict;
   if (w === "missed") return `${plural(left, "parcel")} still on the porch when the window closed. The alert went out while there was time to drop them off.`;
   if (w === "partial") return `${p.takenCount} of ${p.baselineCount} parcels taken, ${left} still on the porch.`;
-  if (w === "unverified") return "Outbox could not read the porch well enough to claim a pickup, so it claims nothing. Check the Ring app.";
+  if (w === "unverified") return "The porch could not be read well enough to call the pickup, so Outbox calls nothing. Check the Ring app.";
   if (p.status === "awaiting_tracking") return "Every parcel left the porch. Carrier scans are read 24 h after close.";
   if (p.verdict === "unscanned") {
     const bad = (p.tracking ?? []).filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length;
@@ -365,32 +372,26 @@ function say(p) {
   return "Every parcel left the porch and every label shows a carrier scan.";
 }
 
-const KIND_LABEL = { label: "Labels", window_open: "Window", motion_event: "Ring webhook", frame: "Frame", window_verdict: "Window verdict", alert: "Alert", tracking: "Carrier tracking", final_verdict: "Final verdict" };
+const KIND_LABEL = { label: "Labels", window_open: "Window", motion_event: "Ring motion", frame: "Porch frame", window_verdict: "Window verdict", alert: "Alert", tracking: "Carrier tracking", final_verdict: "Final verdict" };
 
 function plate(p) {
   const word = p.status === "watching" ? "watching" : VERDICT_WORD[p.verdict] ?? p.verdict;
   return h("section", { class: "plate", "aria-label": "Verdict" },
     h("div", { class: "word" }, word, h("span", { class: "period" })),
-    h("div", { class: "under" },
-      h("p", { class: "say" }, say(p)),
-      h("div", { class: "meta" },
-        h("span", { class: "row" }, ...(p.provenance.verdict ? [h("span", {}, "Verdict built from"), badge(p.provenance.verdict)] : [h("span", {}, p.provenance.frames ? "Frames so far" : "No frame read yet"), badge(p.provenance.frames)])),
-        p.alert ? h("span", {}, `Alert sent ${when(p.alert.atMs)}`) : null)));
+    h("p", { class: "say" }, say(p)),
+    p.alert ? h("p", { class: "meta" }, `Alert sent ${when(p.alert.atMs)}`) : null);
 }
 
-function sources(p) {
-  const motion = p.timeline.filter((t) => t.kind === "motion_event");
-  const order = ["live", "replay", "simulated"];
-  const motionProv = motion.length ? motion.map((m) => m.provenance).sort((a, b) => order.indexOf(a) - order.indexOf(b)).at(-1) : null;
-  const cell = (n, name, what, prov) => h("div", {}, h("span", { class: "label" }, name), h("span", { class: "n" }, n), h("span", { class: "what" }, what), prov ? badge(prov) : h("span", { class: "what" }, "none yet"));
-  return h("div", { class: "sources" },
-    cell(p.frames.length, "Porch frames", "read by the vision stage", p.provenance.frames),
-    cell(motion.length, "Ring webhooks", "motion and button events", motionProv),
-    cell(p.labels.length, "Labels", "registered for this pickup", p.provenance.tracking),
-    cell(p.tracking ? p.tracking.length : 0, "Tracking reads", "taken 24 h after close", p.tracking ? p.provenance.tracking : null));
+function facts(p) {
+  const motion = p.timeline.filter((t) => t.kind === "motion_event").length;
+  const cell = (n, what) => h("div", {}, h("span", { class: "n" }, n), h("span", { class: "what" }, what));
+  return h("div", { class: "facts" },
+    cell(p.frames.length, "porch frames read"),
+    cell(motion, "motion events"),
+    cell(p.labels.length, plural(p.labels.length, "label").replace(/^\d+ /, "") + " registered"),
+    cell(p.tracking ? p.tracking.length : 0, "carrier scans checked"));
 }
 
-const DAY = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", day: "numeric", month: "short" });
 function timeline(p) {
   let lastDay = null;
   return h("ol", { class: "timeline" }, p.timeline.map((t) => {
@@ -400,51 +401,55 @@ function timeline(p) {
       h("time", { datetime: new Date(t.atMs).toISOString() }, showDay ? h("span", { class: "tday" }, day) : null, clock(t.atMs)),
       h("span", { class: "mark", "aria-hidden": "true" }),
       h("div", { class: "text" }, h("span", { class: "label kind" }, KIND_LABEL[t.kind]), t.text),
-      h("div", { class: "side" }, badge(t.provenance),
-        f ? (f.image ? h("a", { class: "thumb", href: f.image, target: "_blank", rel: "noopener", "aria-label": `Open the full frame from ${clock(t.atMs)} UTC` }, h("img", { src: f.image, alt: "", loading: "lazy", width: 112, height: 63 })) : h("span", { class: "nothumb" }, "frame not stored")) : null));
+      h("div", { class: "side" },
+        f ? (f.image ? h("a", { class: "thumb", href: f.image, target: "_blank", rel: "noopener", "aria-label": `Open the full frame from ${clock(t.atMs)} UTC` }, h("img", { src: f.image, alt: "", loading: "lazy", width: 112, height: 63 })) : h("span", { class: "nothumb" }, "no frame stored")) : null));
   }));
 }
 
-function evidence(p) {
+function frames(p) {
   const base = p.frames.find((f) => f.kind === "baseline" && f.image);
   const close = [...p.frames].reverse().find((f) => f.kind === "close" && f.image);
   const frame = (f, title) => h("div", { class: "frame" }, f
-    ? h("figure", {}, h("a", { href: f.image, target: "_blank", rel: "noopener" }, h("img", { src: f.image, alt: `${title}: ${f.count === null ? "unreadable" : plural(f.count, "parcel")} on the porch at ${when(f.atMs)}`, loading: "lazy" })),
-        h("figcaption", {}, h("span", { class: "label" }, title), h("span", { class: "big" }, f.count === null ? "unreadable" : plural(f.count, "parcel")),
-          h("span", { class: "row" }, h("span", {}, when(f.atMs)), badge(f.provenance)), h("span", { class: "sha" }, `${f.source ?? "no source"} / sha256 ${f.sha256.slice(0, 16)}`)))
-    : h("div", { class: "state" }, h("strong", {}, "No stored frame"), "Frames are written when the server runs with an evidence directory."));
+    ? h("figure", {}, h("a", { href: f.image, target: "_blank", rel: "noopener" }, h("img", { src: f.image, alt: `${title}: ${f.count === null ? "unreadable" : plural(f.count, "parcel")} on the porch at ${when(f.atMs)}` })),
+        h("figcaption", {}, h("span", { class: "label" }, `${title}, ${when(f.atMs)}`), h("span", { class: "big" }, f.count === null ? "unreadable" : plural(f.count, "parcel")),
+          h("span", { class: "sha" }, `sha256 ${f.sha256.slice(0, 16)}`)))
+    : h("div", { class: "state" }, h("strong", {}, title), "No frame stored for this moment yet."));
+  return h("div", { class: "pair" }, frame(base, "Window open"), frame(close, "Window close"));
+}
+
+function packet(p) {
   const stamps = [
-    ["Pickup window", `${when(p.window.startMs)} to ${when(p.window.endMs)}`, null],
-    ["Handoff seen", p.handoffMs ? when(p.handoffMs) : "no handoff observed", p.handoffMs ? p.provenance.frames : null],
-    ["Alert", p.alert ? `${p.alert.kind}, ${when(p.alert.atMs)}` : "none raised", null],
-    ["Tracking read", p.tracking ? when(p.tracking[0].readAtMs) : "waiting for the 24 h check", p.tracking ? p.provenance.tracking : null],
+    ["Pickup window", `${when(p.window.startMs)} to ${when(p.window.endMs)}`],
+    ["Handoff seen", p.handoffMs ? when(p.handoffMs) : "no handoff observed"],
+    ["Alert", p.alert ? `${p.alert.kind}, ${when(p.alert.atMs)}` : "none raised"],
+    ["Carrier scans read", p.tracking ? when(p.tracking[0].readAtMs) : "24 h after the window closes"],
   ];
   return h("div", {},
-    h("div", { class: "pair" }, frame(base, "Window open"), frame(close, "Window close")),
-    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Timestamp"), h("th", {}, "Value"), h("th", {}, "Source"))),
-      h("tbody", {}, stamps.map(([a, b, c]) => h("tr", {}, h("td", {}, a), h("td", {}, b), h("td", {}, c ? badge(c) : "computed by Outbox")))))),
-    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Carrier"), h("th", {}, "Tracking number"), h("th", {}, "Tracking state"), h("th", {}, "Source"))),
-      h("tbody", {}, p.labels.map((l) => h("tr", {}, h("td", {}, l.carrier.toUpperCase()), h("td", {}, l.trackingNumber), h("td", {}, l.status ?? "not read yet"), h("td", {}, badge(p.provenance.tracking))))))));
+    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Timestamp"), h("th", {}, "Value"))),
+      h("tbody", {}, stamps.map(([a, b]) => h("tr", {}, h("td", {}, a), h("td", {}, b)))))),
+    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Carrier"), h("th", {}, "Tracking number"), h("th", {}, "Tracking state"))),
+      h("tbody", {}, p.labels.map((l) => h("tr", {}, h("td", {}, l.carrier.toUpperCase()), h("td", {}, l.trackingNumber), h("td", {}, l.status ?? "not read yet")))))));
 }
 
 function renderDetail() {
   const el = $("#detail");
   if (state.days !== null && state.days.length === 0) {
-    el.replaceChildren(h("div", { class: "state" }, h("strong", {}, "Nothing is being watched"), "Arm a pickup day and this page becomes its timeline, then its evidence packet."));
+    el.replaceChildren(h("h1", { class: "day-title" }, "pickup days"), h("div", { class: "state" }, h("strong", {}, "Nothing is being watched"), "Arm a pickup day and this page becomes its timeline, then its evidence packet."));
     return;
   }
-  if (!state.selected) { el.replaceChildren(h("div", { class: "state" }, h("strong", {}, "Pick a pickup day"), "Choose one from the list to see its timeline and evidence packet.")); return; }
+  if (!state.selected) { el.replaceChildren(h("h1", { class: "day-title" }, "pickup days"), h("div", { class: "state" }, h("strong", {}, "Pick a pickup day"), "Choose one from the list to see its timeline and evidence packet.")); return; }
   const p = state.packet;
   if (!p || p.dayId !== state.selected) { el.replaceChildren(h("div", { class: "skeleton" }), h("div", { class: "skeleton" })); return; }
   el.replaceChildren(
-    h("div", { class: "crumb" }, h("h1", { class: "day-title" }, p.dayId), h("span", { class: "label" }, p.deviceId)),
+    h("div", { class: "crumb" }, h("h1", { class: "day-title" }, p.dayId), h("span", { class: "label" }, deviceName(p.deviceId))),
     plate(p),
-    h("section", { class: "section" }, h("h2", {}, "sources"), sources(p)),
+    h("section", { class: "section" }, h("h2", {}, "porch frames"), frames(p), facts(p)),
     h("section", { class: "section" }, h("h2", {}, "day timeline"), timeline(p)),
-    h("section", { class: "section" }, h("h2", {}, "evidence packet", h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON")), evidence(p)));
+    h("section", { class: "section" }, h("h2", {}, "evidence packet", h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON")), packet(p)));
 }
 
 /* ---------- loop ---------- */
+let fast = 0;
 async function select(id) { state.selected = id; location.hash = id; state.packet = null; renderIndex(); renderDetail(); await loadPacket(); }
 async function loadPacket() {
   if (!state.selected) return;
@@ -467,15 +472,16 @@ async function loadDevices() {
     $("#devices").replaceChildren(...state.devices.map((d) => h("option", { value: d.id }, d.name)));
     if (state.devices.length) {
       if (!$("#deviceId").value) $("#deviceId").value = state.devices[0].id;
-      $("#deviceHint").textContent = `${plural(state.devices.length, "doorbell")} found, source: ${state.devices[0].provenance}.`;
+      $("#deviceHint").textContent = `${plural(state.devices.length, "doorbell")} on this account.`;
     }
-  } catch { $("#deviceHint").textContent = "Doorbell list unavailable. Paste the device id."; }
+  } catch { $("#deviceHint").textContent = "The doorbell list did not load. Paste the device id."; }
 }
+document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id && id !== state.selected) select(id); });
 resetForm(); renderIndex(); renderDetail();
-await loadDevices(); await refresh();
-$("#newday").open = innerWidth > 960 || (state.days?.length ?? 0) === 0;
-(function tick() { setTimeout(async () => { if (!document.hidden) await refresh(); tick(); }, 2500); })();
+await loadDevices(); await loadReplay(); await refresh();
+$("#newday").open = (state.days?.length ?? 0) === 0;
+(function tick() { setTimeout(async () => { if (!document.hidden) await refresh(); if (fast > 0) fast--; tick(); }, fast > 0 ? 1000 : 2500); })();
 </script>
 </body>
 </html>

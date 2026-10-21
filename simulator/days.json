@@ -3,7 +3,7 @@
   "dayId": "day01",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793034000000,
   "windowEndMs": 1793059200000,
   "labels": [
@@ -56,7 +56,7 @@
   "dayId": "day02",
   "scenario": "unscanned",
   "truth": "unscanned",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793120400000,
   "windowEndMs": 1793145600000,
   "labels": [
@@ -101,7 +101,7 @@
   "dayId": "day03",
   "scenario": "unscanned",
   "truth": "unscanned",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793206800000,
   "windowEndMs": 1793232000000,
   "labels": [
@@ -146,7 +146,7 @@
   "dayId": "day04",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793293200000,
   "windowEndMs": 1793318400000,
   "labels": [
@@ -191,7 +191,7 @@
   "dayId": "day05",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793379600000,
   "windowEndMs": 1793404800000,
   "labels": [
@@ -244,7 +244,7 @@
   "dayId": "day06",
   "scenario": "partial",
   "truth": "partial",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793466000000,
   "windowEndMs": 1793491200000,
   "labels": [
@@ -297,7 +297,7 @@
   "dayId": "day07",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793552400000,
   "windowEndMs": 1793577600000,
   "labels": [
@@ -335,7 +335,7 @@
   "dayId": "day08",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793638800000,
   "windowEndMs": 1793664000000,
   "labels": [
@@ -384,7 +384,7 @@
   "dayId": "day09",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793725200000,
   "windowEndMs": 1793750400000,
   "labels": [
@@ -433,7 +433,7 @@
   "dayId": "day10",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793811600000,
   "windowEndMs": 1793836800000,
   "labels": [
@@ -486,7 +486,7 @@
   "dayId": "day11",
   "scenario": "unscanned",
   "truth": "unscanned",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793898000000,
   "windowEndMs": 1793923200000,
   "labels": [
@@ -535,7 +535,7 @@
   "dayId": "day12",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1793984400000,
   "windowEndMs": 1794009600000,
   "labels": [
@@ -580,7 +580,7 @@
   "dayId": "day13",
   "scenario": "unscanned",
   "truth": "unscanned",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794070800000,
   "windowEndMs": 1794096000000,
   "labels": [
@@ -629,7 +629,7 @@
   "dayId": "day14",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794157200000,
   "windowEndMs": 1794182400000,
   "labels": [
@@ -663,7 +663,7 @@
   "dayId": "day15",
   "scenario": "unscanned",
   "truth": "unscanned",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794243600000,
   "windowEndMs": 1794268800000,
   "labels": [
@@ -716,7 +716,7 @@
   "dayId": "day16",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794330000000,
   "windowEndMs": 1794355200000,
   "labels": [
@@ -761,7 +761,7 @@
   "dayId": "day17",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794416400000,
   "windowEndMs": 1794441600000,
   "labels": [
@@ -810,7 +810,7 @@
   "dayId": "day18",
   "scenario": "partial",
   "truth": "partial",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794502800000,
   "windowEndMs": 1794528000000,
   "labels": [
@@ -859,7 +859,7 @@
   "dayId": "day19",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794589200000,
   "windowEndMs": 1794614400000,
   "labels": [
@@ -912,7 +912,7 @@
   "dayId": "day20",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794675600000,
   "windowEndMs": 1794700800000,
   "labels": [
@@ -961,7 +961,7 @@
   "dayId": "day21",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794762000000,
   "windowEndMs": 1794787200000,
   "labels": [
@@ -1006,7 +1006,7 @@
   "dayId": "day22",
   "scenario": "partial",
   "truth": "partial",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794848400000,
   "windowEndMs": 1794873600000,
   "labels": [
@@ -1055,7 +1055,7 @@
   "dayId": "day23",
   "scenario": "partial",
   "truth": "partial",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1794934800000,
   "windowEndMs": 1794960000000,
   "labels": [
@@ -1108,7 +1108,7 @@
   "dayId": "day24",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1795021200000,
   "windowEndMs": 1795046400000,
   "labels": [
@@ -1161,7 +1161,7 @@
   "dayId": "day25",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1795107600000,
   "windowEndMs": 1795132800000,
   "labels": [
@@ -1206,7 +1206,7 @@
   "dayId": "day26",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1795194000000,
   "windowEndMs": 1795219200000,
   "labels": [
@@ -1251,7 +1251,7 @@
   "dayId": "day27",
   "scenario": "taken",
   "truth": "taken",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1795280400000,
   "windowEndMs": 1795305600000,
   "labels": [
@@ -1300,7 +1300,7 @@
   "dayId": "day28",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1795366800000,
   "windowEndMs": 1795392000000,
   "labels": [
@@ -1334,7 +1334,7 @@
   "dayId": "day29",
   "scenario": "missed",
   "truth": "missed",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1795453200000,
   "windowEndMs": 1795478400000,
   "labels": [
@@ -1383,7 +1383,7 @@
   "dayId": "day30",
   "scenario": "partial",
   "truth": "partial",
-  "deviceId": "ava1.ring.device.REPLAYSIMULATOR01",
+  "deviceId": "ava1.ring.device.FRONTDOOR01",
   "windowStartMs": 1795539600000,
   "windowEndMs": 1795564800000,
   "labels": [

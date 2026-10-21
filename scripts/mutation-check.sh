@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -50,10 +50,11 @@ src/pickup/verdict.ts@@s/return seenLeaving \? \{ verdict: "unverified", takenCo
 src/pickup/verdict.ts@@s/const seenLeaving = .*/const seenLeaving = false;/@@verdict.test.ts@@a seen decrease no longer blocks the missed call
 src/pickup/runner.ts@@s/i < zeroRereads/i < 0/@@replay-regressions.test.ts@@zero baseline is not read again
 src/pickup/runner.ts@@s/Math.min\(day.closeCount, day.baselineCount\)/day.closeCount/@@replay-regressions.test.ts@@alert quotes the larger disagreeing count
+src/server.ts@@s/const known = o.replay.days\(\).some\(\(d\) => d.dayId === body.dayId\);/const known = true;/@@replay-api.test.ts@@replay accepts an unrecorded day
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail

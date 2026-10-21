@@ -29,6 +29,12 @@ export interface AppOptions {
   runner: PickupRunner;
   /** Devices the seller can pick in the form, each labelled with where the list came from. */
   devices?: () => Promise<{ id: string; name: string; provenance: Provenance }[]>;
+  /** Recorded pickup days the seller can play through the pipeline from the page. */
+  replay?: {
+    days(): { dayId: string; labels: number; startMs: number }[];
+    /** Starts playing the recorded day under a fresh day name and returns that name; the day fills in while it plays. */
+    start(dayId: string): string;
+  };
 }
 
 /**
@@ -80,6 +86,18 @@ export function createApp(o: AppOptions): Server {
           const p = o.runner.packetOf(d.dayId);
           return { dayId: p.dayId, status: p.status, verdict: p.verdict, window: p.window, labels: p.labels.length, baselineCount: p.baselineCount, closeCount: p.closeCount, alert: p.alert?.kind ?? null, provenance: p.provenance.verdict ?? p.provenance.frames };
         }) });
+      }
+      if (url.pathname === "/api/replay" && req.method === "GET") return send(200, { days: o.replay?.days() ?? [] });
+      if (url.pathname === "/api/replay" && req.method === "POST") {
+        if (!o.replay) return send(404, { error: "replay is not available on this server" });
+        let body: { dayId?: unknown };
+        try { body = JSON.parse((await readBody(req)).toString("utf8")); } catch (e) {
+          if (e instanceof BodyTooLarge) throw e;
+          return send(400, { error: "invalid replay request", errors: ["body is not valid JSON"] });
+        }
+        const known = o.replay.days().some((d) => d.dayId === body.dayId);
+        if (typeof body.dayId !== "string" || !known) return send(400, { error: "invalid replay request", errors: ["dayId must be one of the recorded pickup days"] });
+        try { return send(202, { dayId: o.replay.start(body.dayId) }); } catch (e) { return send(409, { error: "replay busy", errors: [(e as Error).message] }); }
       }
       if (req.method === "GET" && url.pathname === "/api/devices") {
         return send(200, { devices: o.devices ? await o.devices() : [] });

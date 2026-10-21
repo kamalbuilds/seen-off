@@ -102,7 +102,7 @@ test("server: seller page, day list, fresh packet before close, stored frame byt
     assert.equal(page.status, 200);
     assert.match(page.headers.get("content-type") ?? "", /text\/html/);
     const html = await page.text();
-    for (const needle of ["<title>Outbox: pickup days</title>", "badge live", "badge replay", "badge simulated", "/api/days", "New pickup day"]) assert.ok(html.includes(needle), needle);
+    for (const needle of ["<title>Outbox: pickup days</title>", "Replay a pickup day", "porch frames", "/api/days", "New pickup day"]) assert.ok(html.includes(needle), needle);
 
     assert.deepEqual((await (await fetch(`${base}/api/days`)).json() as { days: unknown[] }).days, [], "empty ledger lists no days");
     assert.deepEqual(await (await fetch(`${base}/api/devices`)).json(), { devices: [{ id: DEVICE, name: "Porch", provenance: "replay" }] });
