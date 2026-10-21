@@ -43,6 +43,10 @@ Each post is one verdict: a pickup the seller can prove, a handoff with no carri
 
 **Replay a pickup day.** The Replay control plays any one of 30 recorded pickup days on the production receiver, runner, ledger and vision stage. The day arrives as HMAC-signed Ring v1.1 motion deliveries, each porch frame is read by Qwen3-VL on Bedrock, the verdict lands, the alert fires and the evidence packet fills in. It runs with no credentials (`--demo day05,day06,day15` picks the three demo days, `--days day01,day13` replays days before serving, `--pace-ms 1500` slows each step).
 
+**Connect Ring.** The seller page links a Ring account with Ring's partner-initiated OAuth 2.0 flow (authorization code with PKCE S256): the button sends the seller to Ring's own sign-in, the callback checks the single-use `state`, exchanges the code with the verifier within Ring's window, and confirms the link with `PATCH /v1/accounts/me/app-integrations`. The refresh token is sealed with AES-256-GCM in `data/` and rotated on every exchange (`src/ring/oauth.ts`, `src/ring/token-store.ts`). **Your doorbells** then lists `GET /v1/devices`, and **Take a porch photo now** downloads a snapshot from Ring (`POST .../media/image/download`, 303 to the signed URL), shows it with its media time, origin and hash, and has the porch read run on it.
+
+`npm run ring:preflight` prints a one-screen report for auth, devices, history, snapshot and WHEP, each with its timing and Ring's own status on failure; it exits non-zero on any failed surface.
+
 `POST /days` validates the plan: a window that ends before it starts or runs past 24 h, an empty label list, a path-unsafe day name and malformed JSON are each a `400` that lists every reason; a repeated day name is `409`.
 
 Every scheduled check lives in the ledger, not in a timer: the window-open baseline, the window-close verdict and the 24 h tracking check survive a restart, and a restart mid-window still delivers the verdict and the alert. A failed job is retried with a backoff; a verdict and an alert are stored once.
@@ -56,6 +60,8 @@ Every scheduled check lives in the ledger, not in a timer: the window-open basel
 | `POST /v1/devices/{id}/media/image/download` (303 to the signed URL) | `RingClient.snapshotAt`, `RingSnapshotSource` (retries `RECORDING_NOT_READY`) |
 | `GET /v1/history/devices/{id}/events?event_types=` with `links.next` paging | `RingClient.history` |
 | WHEP live view: recvonly offer, `201` + SDP answer, `DELETE` the session, sharpest of N frames | `worker/whep_frame.py` (aiortc), `src/ring/whep.ts` |
+| Link: Connect Ring, partner-initiated OAuth with PKCE, token exchange, app-integration confirm | `src/ring/oauth.ts`, `src/ring/session.ts`, `src/ring/integration.ts` |
+| Preflight: `npm run ring:preflight` times auth, devices, history, snapshot and WHEP | `src/ring/preflight.ts`, `scripts/ring-preflight.ts` |
 | Probe: `npm run ring:probe` lists devices, reads history, downloads a snapshot (`--whep` adds a live frame) and prints the returned device and frame metadata | `src/ring/probe.ts`, `scripts/ring-probe.ts` |
 | v1.1 webhook: `X-Signature` HMAC-SHA256 over the raw bytes, 5 s ack, `meta.request_id` idempotency | `src/ring/webhook.ts`, `src/ring/signature.ts` |
 
@@ -129,9 +135,9 @@ Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3
 ## Run it
 
 ```
-npm test                  # 79 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
+npm test                  # 94 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
 npm run test:whep         # WHEP worker against a local WHEP server serving a real frame
-npm run mutation          # 38 mutations: signature, idempotency order, verdict logic, scheduler persistence, plan validation, probe, replay, alerts, evidence hashes, token store, scoring. Each must turn the suite red
+npm run mutation          # 46 mutations: signature, idempotency order, verdict logic, scheduler persistence, plan validation, probe, replay, alerts, evidence hashes, token store, scoring. Each must turn the suite red
 cp .env.example .env      # names only; fill values yourself
 npm run ring:probe         # one real device discovery and frame capture, once RING_* is set
 npm run serve:replay      # the seller page with Replay a pickup day over the 30 recorded days, no credentials

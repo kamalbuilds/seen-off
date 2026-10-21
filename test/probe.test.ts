@@ -77,6 +77,7 @@ test("npm run ring:probe with no RING_* env makes no call, names what to set, an
   assert.match(r.stderr, /No Ring call made/);
   assert.match(r.stderr, /RING_PLAYGROUND_TOKEN/);
   assert.match(r.stderr, /RING_REFRESH_TOKEN/);
+  assert.match(r.stderr, /Connect Ring/);
 });
 
 test("npm run ring:probe with a token prints the returned devices and frame metadata and writes the frame", async () => {

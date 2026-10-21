@@ -6,8 +6,7 @@
 //   npm run ring:probe -- demo <deviceId>   capture from one device
 //   npm run ring:probe -- devices | history <deviceId> | snapshot <deviceId> [epochMs] [out.jpg] | whep <deviceId> [out.jpg]
 import { writeFileSync } from "node:fs";
-import { RingClient, ringAuthFromEnv } from "../src/ring/client.ts";
-import { withPersistedRefreshToken } from "../src/ring/token-store.ts";
+import { RingSession } from "../src/ring/session.ts";
 import { runProbe } from "../src/ring/probe.ts";
 import { WhepFrameSource } from "../src/ring/whep.ts";
 import { visionFromEnv } from "../src/vision/index.ts";
@@ -19,12 +18,10 @@ const cmd = demo ? "demo" : first;
 const args = (demo ? argv.filter((a) => a !== "demo") : rest).filter((a) => !a.startsWith("--"));
 const whepFlag = argv.includes("--whep");
 
-let ring: RingClient;
-try {
-  ring = new RingClient({ auth: withPersistedRefreshToken(ringAuthFromEnv(), process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token"), apiBase: process.env.RING_API_BASE });
-} catch (e) {
-  console.error(`No Ring call made: ${(e as Error).message}`);
-  console.error("Set RING_PLAYGROUND_TOKEN (Ring Playground, 30 minute token) or RING_CLIENT_ID, RING_CLIENT_SECRET and RING_REFRESH_TOKEN in .env, then run this again.");
+const ring = new RingSession({ tokenFile: process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token" });
+if (!ring.connected) {
+  console.error("No Ring call made: Ring is not connected.");
+  console.error("Use Connect Ring on the seller page, or set RING_PLAYGROUND_TOKEN (Ring Playground, 30 minute token), or RING_CLIENT_ID, RING_CLIENT_SECRET and RING_REFRESH_TOKEN in .env, then run this again.");
   process.exit(2);
 }
 

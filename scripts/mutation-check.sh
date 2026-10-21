@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -69,10 +69,12 @@ src/ring/oauth.ts@@s/code_verifier: pending.verifier, //@@ring-link.test.ts@@the
 src/ring/oauth.ts@@s/if \(!pending\) throw new RingLinkError\("bad_state"[^;]*;/if (!pending) pending0();/@@ring-link.test.ts@@a forged state reaches Ring
 src/ring/token-store.ts@@s/writeAtomic\(path, `\$\{encrypt\(token, keyFor\(path\)\)\}\\n`\)/writeAtomic(path, `${token}\\n`)/@@token-store.test.ts@@the token is saved in the clear
 src/server.ts@@s/to = `\/\?ring=error&reason=/to = `\/?ring=connected\&x=/@@ring-link.test.ts@@a failed callback reports success
+src/ring/preflight.ts@@s/export const preflightOk = \(steps: PreflightStep\[\]\) => steps.every\(\(s\) => s.status !== "fail"\);/export const preflightOk = (steps: PreflightStep[]) => true;/@@preflight.test.ts@@a failed surface still exits ok
+src/ring/preflight.ts@@s/      blocked = `\$\{name\} failed`;//@@preflight.test.ts@@steps after a failure still run and can pass
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail
