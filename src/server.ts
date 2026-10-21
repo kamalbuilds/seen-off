@@ -1,7 +1,9 @@
-import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { readFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import { createWebhookReceiver } from "./ring/webhook.ts";
-import { validatePlan } from "./pickup/plan.ts";
+import { DAY_ID, validatePlan } from "./pickup/plan.ts";
 import type { Ledger } from "./store/ledger.ts";
 import type { PickupRunner } from "./pickup/runner.ts";
 import type { Provenance } from "./provenance.ts";
@@ -107,10 +109,20 @@ export function createApp(o: AppOptions): Server {
         const id = decodeURIComponent(frame[1]);
         const obs = o.ledger.hasDay(id) ? o.ledger.observations(id)[Number(frame[2])] : undefined;
         if (!obs?.framePath) return send(404, { error: "no stored frame" });
+        const bytes = readFileSync(obs.framePath);
+        // The file must still be the frame the vision stage read; a changed file is refused, never served as evidence.
+        if (createHash("sha256").update(bytes).digest("hex") !== obs.frameSha256) return send(409, { error: "frame does not match its recorded hash" });
         res.writeHead(200, { "content-type": "image/jpeg", "cache-control": "private, max-age=3600" });
-        return void res.end(readFileSync(obs.framePath));
+        return void res.end(bytes);
       }
       const m = url.pathname.match(/^\/days\/([^/]+)$/);
+      if (req.method === "DELETE" && m) {
+        const id = decodeURIComponent(m[1]);
+        if (!o.ledger.hasDay(id)) return send(404, { error: "no such day" });
+        o.ledger.deleteDay(id);
+        if (o.runner.d.evidenceDir && DAY_ID.test(id)) rmSync(join(o.runner.d.evidenceDir, id), { recursive: true, force: true });
+        return send(200, { deleted: id });
+      }
       if (req.method === "GET" && m) {
         const id = decodeURIComponent(m[1]);
         return o.ledger.hasDay(id) ? send(200, o.runner.packetOf(id)) : send(404, { error: "no such day" });

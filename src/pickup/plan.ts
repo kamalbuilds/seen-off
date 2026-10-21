@@ -2,7 +2,7 @@ import type { DayPlan } from "./runner.ts";
 
 export const MAX_WINDOW_MS = 24 * 3600_000;
 export const MAX_LABELS = 50;
-const DAY_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
+export const DAY_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const text = (v: unknown, max: number): v is string => typeof v === "string" && v.trim().length > 0 && v.length <= max && !/[\u0000-\u001f]/.test(v);
 

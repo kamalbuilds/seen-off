@@ -89,6 +89,14 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
     labels: day.labels.map((l) => ({ ...l, status: tracking.find((t) => t.trackingNumber === l.trackingNumber)?.status ?? null })),
     tracking: tracking.length === 0 ? null : tracking.map((t) => ({ trackingNumber: t.trackingNumber, status: t.status, readAtMs: t.readAtMs, provenance: t.provenance })),
     frames, timeline,
+    // Everything a third party needs to check the packet: the frame hashes the files are verified against when served,
+    // the webhook deliveries that triggered looks, and each tracking read with its time.
+    manifest: {
+      version: 1, deviceId: day.deviceId,
+      frames: frames.map((f) => ({ index: f.index, kind: f.kind, sha256: f.sha256, source: f.source, capturedMs: f.atMs })),
+      webhookRequestIds: events.map((e) => e.requestId),
+      trackingReads: tracking.map((t) => ({ trackingNumber: t.trackingNumber, status: t.status, readAtMs: t.readAtMs })),
+    },
     provenance: { frames: frameProvenance, tracking: trackingProvenance, verdict: day.windowVerdict === null ? null : weakest([...(frameProvenance ? [frameProvenance] : []), ...(tracking.length ? [trackingProvenance] : [])]) },
   };
 }

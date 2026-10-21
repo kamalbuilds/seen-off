@@ -182,6 +182,16 @@ export class Ledger implements IdempotencyStore {
       .run(error, retryAtMs, maxAttempts, id);
   }
 
+  /** Removes a pickup day and everything stored for it: observations, jobs, tracking reads, the saved packet. Webhook events stay, they belong to the doorbell. */
+  deleteDay(dayId: string): void {
+    this.db.exec("begin");
+    try {
+      for (const t of ["observations", "jobs", "tracking_readings", "packets"]) this.db.prepare(`delete from ${t} where day_id = ?`).run(dayId);
+      this.db.prepare("delete from days where day_id = ?").run(dayId);
+      this.db.exec("commit");
+    } catch (e) { this.db.exec("rollback"); throw e; }
+  }
+
   close(): void {
     this.db.close();
   }

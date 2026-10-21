@@ -123,6 +123,7 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 .tl.kind-window_verdict .mark, .tl.kind-final_verdict .mark { background: var(--accent); outline: 2px solid var(--ink); }
 .tl.kind-alert .mark { background: var(--accent); transform: rotate(45deg); outline: 2px solid var(--ink); }
 .tl.kind-window_open .mark, .tl.kind-label .mark { background: var(--paper); outline: 2px solid var(--ink); outline-offset: -2px; }
+.actions { display: inline-flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
 .tl .text { min-width: 0; overflow-wrap: anywhere; }
 .tl .text .kind { display: block; margin-bottom: 2px; }
 .thumb { display: block; width: 112px; height: 63px; background: var(--paper-3); overflow: hidden; }
@@ -451,7 +452,13 @@ function renderDetail() {
     plate(p),
     h("section", { class: "section" }, h("h2", {}, "porch frames"), frames(p), facts(p)),
     h("section", { class: "section" }, h("h2", {}, "day timeline"), timeline(p)),
-    h("section", { class: "section" }, h("h2", {}, "evidence packet", h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON")), packet(p)));
+    h("section", { class: "section" }, h("h2", {}, "evidence packet", h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));
+}
+
+async function removeDay(id) {
+  if (!confirm(`Delete ${id}, its stored frames and its evidence packet from this server? This cannot be undone.`)) return;
+  try { await api(`/days/${encodeURIComponent(id)}`, { method: "DELETE" }); state.selected = null; state.packet = null; location.hash = ""; await refresh(); }
+  catch (e) { $("#banner").hidden = false; $("#banner").textContent = `Could not delete ${id}: ${e.message}`; }
 }
 
 /* ---------- loop ---------- */
