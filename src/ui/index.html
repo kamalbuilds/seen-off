@@ -99,11 +99,27 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 
 .tracks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s6); margin-bottom: var(--s8); }
 .track { display: grid; gap: var(--s1); align-content: start; padding-top: var(--s3); border-top: 4px solid var(--rule); }
-.track[data-state="done"] { border-top-color: var(--ink); }
+.track[data-state="done"] { border-top-color: var(--control); }
 .track[data-state="problem"] { border-top-color: var(--accent); }
 .track .head { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
 .track .reason { font-size: 16px; color: var(--muted); max-width: 46ch; }
 .track[data-state="waiting"] .head, .track[data-state="na"] .head { color: var(--muted); }
+
+.demo { margin-bottom: var(--s6); padding-bottom: var(--s6); border-bottom: 1px solid var(--rule); }
+.demo-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s3); }
+.demo-head h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+.demo ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4); }
+.demo li button { width: 100%; text-align: left; background: transparent; border: 0; border-top: 4px solid var(--rule); padding: var(--s3) 0 0; cursor: pointer; display: grid; gap: var(--s1); }
+.demo li[data-state="current"] button { border-top-color: var(--accent); }
+.demo li[data-state="done"] button { border-top-color: var(--control); }
+.demo li[aria-current="true"] .t { text-decoration: underline; text-underline-offset: 4px; }
+.demo .n { font-size: 13px; font-weight: 600; color: var(--muted); }
+.demo .t { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.demo .b { font-size: 14px; color: var(--muted); }
+.demo li[data-state="upcoming"] .t { color: var(--muted); }
+.hero-empty { padding: var(--s8) 0; display: grid; gap: var(--s4); justify-items: start; }
+.hero-empty h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(32px, 3.6vw, 44px); letter-spacing: -0.04em; line-height: 1; text-transform: lowercase; max-width: 22ch; }
+.hero-empty p { font-size: 20px; max-width: 42ch; }
 
 /* sections */
 .section { margin-bottom: var(--s12); }
@@ -167,7 +183,7 @@ tbody tr:hover { background: var(--paper-2); }
   .detail { order: -1; }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 640px) { .tracks { grid-template-columns: minmax(0, 1fr); gap: var(--s4); } .track .head { font-size: 24px; } }
+@media (max-width: 640px) { .tracks { grid-template-columns: minmax(0, 1fr); gap: var(--s4); } .track .head { font-size: 24px; } .demo ol { grid-template-columns: minmax(0, 1fr); gap: var(--s2); } .demo .b { display: none; } .demo li[aria-current="true"] .b { display: block; } }
 @media (max-width: 640px) {
   .shell { padding-inline: var(--s4); }
   .banner { padding-inline: var(--s4); }
@@ -273,7 +289,7 @@ const when = (ms) => `${UTC.format(ms)} UTC`;
 const clock = (ms) => UTC_TIME.format(ms);
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
-const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [] };
+const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [], demo: null };
 
 async function api(path, init) {
   const res = await fetch(path, { ...init, signal: AbortSignal.timeout(15000) });
@@ -338,10 +354,31 @@ $("#form").addEventListener("submit", async (ev) => {
 });
 
 /* ---------- replay a pickup day ---------- */
-async function loadReplay() {
-  try { state.replay = (await api("/api/replay")).days; } catch { state.replay = []; }
+async function loadReplay(first = false) {
+  try { const r = await api("/api/replay"); state.replay = r.days; state.demo = r.demo; } catch { state.replay = []; state.demo = null; }
   $("#replay").hidden = state.replay.length === 0;
-  $("#replayDay").replaceChildren(...state.replay.map((d) => h("option", { value: d.dayId }, `${d.dayId}: ${plural(d.labels, "label")}, ${when(d.startMs)}`)));
+  if (first) $("#replayDay").replaceChildren(...state.replay.map((d) => h("option", { value: d.dayId }, `${d.dayId}: ${plural(d.labels, "label")}, ${when(d.startMs)}`)));
+  // While the demo plays, the page follows the day that is being played.
+  if (state.demo?.running && state.demo.current && state.selected !== state.demo.current) { state.selected = state.demo.current; location.hash = state.selected; state.packet = null; }
+}
+async function playDemo() {
+  try { await api("/api/demo", { method: "POST" }); await loadReplay(); await refresh(); } catch (e) { $("#banner").hidden = false; $("#banner").textContent = e.errors?.[0] ?? e.message; }
+}
+function demoBar() {
+  const d = state.demo;
+  if (!d) return null;
+  const started = d.steps.filter((x) => x.dayId).length;
+  if (started === 0 && !d.running) return null;
+  const current = d.steps.findIndex((x) => x.dayId === d.current);
+  return h("section", { class: "demo", "aria-label": "Three-day demo" },
+    h("div", { class: "demo-head" }, h("h2", {}, d.running ? "Playing the demo" : "The demo"),
+      d.running ? h("span", { class: "label" }, `Day ${Math.max(current, 0) + 1} of ${d.steps.length}`) : h("button", { type: "button", class: "btn primary", onclick: playDemo }, "Play it again")),
+    h("ol", {}, d.steps.map((x, i) => {
+      const st = !x.dayId ? "upcoming" : d.running && x.dayId === d.current ? "current" : "done";
+      return h("li", { "data-state": st, "aria-current": x.dayId && x.dayId === state.selected ? "true" : "false" },
+        h("button", { type: "button", disabled: !x.dayId, onclick: () => x.dayId && select(x.dayId) },
+          h("span", { class: "n" }, `Day ${i + 1}`), h("span", { class: "t" }, x.title), h("span", { class: "b" }, x.blurb)));
+    })));
 }
 $("#replayGo").addEventListener("click", async () => {
   const btn = $("#replayGo"); btn.disabled = true; $("#replayNote").textContent = "";
@@ -469,13 +506,17 @@ function packet(p) {
 function renderDetail() {
   const el = $("#detail");
   if (state.days !== null && state.days.length === 0) {
-    el.replaceChildren(h("h1", { class: "day-title" }, "pickup days"), h("div", { class: "state" }, h("strong", {}, "Nothing is being watched"), "Arm a pickup day and this page becomes its timeline, then its evidence packet."));
+    el.replaceChildren(state.demo
+      ? h("div", { class: "hero-empty" }, h("h1", {}, "three pickup days, one seller"), h("p", {}, "Three scheduled parcels each day. Watch Outbox call a missed pickup, a part-taken day and a handoff the carrier never scanned, each ending in its evidence packet."), h("button", { type: "button", class: "btn primary", onclick: playDemo }, "Play the demo"))
+      : h("div", {}, h("h1", { class: "day-title" }, "pickup days"), h("div", { class: "state" }, h("strong", {}, "Nothing is being watched"), "Arm a pickup day and this page becomes its timeline, then its evidence packet.")));
     return;
   }
+  if (state.days === null) { el.replaceChildren(h("div", { class: "skeleton" }), h("div", { class: "skeleton" })); return; }
   if (!state.selected) { el.replaceChildren(h("h1", { class: "day-title" }, "pickup days"), h("div", { class: "state" }, h("strong", {}, "Pick a pickup day"), "Choose one from the list to see its timeline and evidence packet.")); return; }
   const p = state.packet;
   if (!p || p.dayId !== state.selected) { el.replaceChildren(h("div", { class: "skeleton" }), h("div", { class: "skeleton" })); return; }
   el.replaceChildren(
+    demoBar(),
     h("div", { class: "crumb" }, h("h1", { class: "day-title" }, p.dayId), h("span", { class: "label" }, deviceName(p.deviceId))),
     plate(p),
     tracks(p),
@@ -500,8 +541,10 @@ async function loadPacket() {
 async function refresh() {
   try {
     state.days = (await api("/api/days")).days;
+    if (state.replay.length) await loadReplay();
     if (!state.selected && state.days.length) state.selected = state.days[0].dayId;
     await loadPacket();
+    renderIndex(); renderDetail();
     $("#banner").hidden = true;
   } catch (e) {
     $("#banner").hidden = false; $("#banner").textContent = `Cannot reach the Outbox server (${e.message}). Retrying.`;
@@ -520,8 +563,9 @@ async function loadDevices() {
 document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id && id !== state.selected) select(id); });
 resetForm(); renderIndex(); renderDetail();
-await loadDevices(); await loadReplay(); await refresh();
-$("#newday").open = (state.days?.length ?? 0) === 0;
+await loadDevices(); await loadReplay(true); await refresh();
+if (state.demo && !state.demo.running && (state.days?.length ?? 0) === 0 && new URLSearchParams(location.search).get("demo") !== "0") await playDemo();
+$("#newday").open = (state.days?.length ?? 0) === 0 && !state.demo;
 // Live updates: the server pushes a change after every frame, verdict and scan. The slow poll below is only the fallback if the stream drops.
 (function listen() {
   const es = new EventSource("/api/stream");

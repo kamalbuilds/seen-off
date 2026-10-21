@@ -13,20 +13,26 @@ function app(withReplay: boolean) {
   });
   const started: string[] = [];
   let busy = false;
+  let demoRunning = false;
+  let demoStarts = 0;
   const srv = createApp({
     signingKey: "k", ledger, runner,
     replay: withReplay ? {
+      demo: {
+        status: () => ({ running: demoRunning, current: null, steps: [{ title: "T", blurb: "B", dayId: null }] }),
+        start() { if (demoRunning) throw new Error("busy"); demoRunning = true; demoStarts++; },
+      },
       days: () => [{ dayId: "day01", labels: 3, startMs: 1_000 }],
       start(id) { if (busy) throw new Error("another pickup day is still replaying"); busy = true; started.push(id); return `${id}-replay-2`; },
     } : undefined,
   });
-  return new Promise<{ base: string; started: string[]; close: () => void }>((ok) => srv.listen(0, "127.0.0.1", () => ok({ base: `http://127.0.0.1:${(srv.address() as AddressInfo).port}`, started, close: () => srv.close() })));
+  return new Promise<{ base: string; started: string[]; demoStarts: () => number; close: () => void }>((ok) => srv.listen(0, "127.0.0.1", () => ok({ base: `http://127.0.0.1:${(srv.address() as AddressInfo).port}`, started, demoStarts: () => demoStarts, close: () => srv.close() })));
 }
 
 test("Replay a pickup day: listed, started under a fresh name, one at a time, only for recorded days", async () => {
   const a = await app(true);
   try {
-    assert.deepEqual(await (await fetch(`${a.base}/api/replay`)).json(), { days: [{ dayId: "day01", labels: 3, startMs: 1_000 }] });
+    assert.deepEqual(await (await fetch(`${a.base}/api/replay`)).json(), { days: [{ dayId: "day01", labels: 3, startMs: 1_000 }], demo: { running: false, current: null, steps: [{ title: "T", blurb: "B", dayId: null }] } });
     const post = (body: string) => fetch(`${a.base}/api/replay`, { method: "POST", body });
     const ok = await post(JSON.stringify({ dayId: "day01" }));
     assert.equal(ok.status, 202);
@@ -36,13 +42,20 @@ test("Replay a pickup day: listed, started under a fresh name, one at a time, on
     assert.equal((await post(JSON.stringify({ dayId: "../x" }))).status, 400);
     assert.equal((await post("nope")).status, 400);
     assert.deepEqual(a.started, ["day01"], "only the one valid request started anything");
+
+    const demo = await fetch(`${a.base}/api/demo`, { method: "POST" });
+    assert.equal(demo.status, 202);
+    assert.equal(((await demo.json()) as { running: boolean }).running, true);
+    assert.equal((await fetch(`${a.base}/api/demo`, { method: "POST" })).status, 409, "the demo cannot be started twice at once");
+    assert.equal(a.demoStarts(), 1);
   } finally { a.close(); }
 });
 
 test("a server without recorded days lists none and refuses a replay", async () => {
   const a = await app(false);
   try {
-    assert.deepEqual(await (await fetch(`${a.base}/api/replay`)).json(), { days: [] });
+    assert.deepEqual(await (await fetch(`${a.base}/api/replay`)).json(), { days: [], demo: null });
+    assert.equal((await fetch(`${a.base}/api/demo`, { method: "POST" })).status, 404);
     assert.equal((await fetch(`${a.base}/api/replay`, { method: "POST", body: "{}" })).status, 404);
   } finally { a.close(); }
 });

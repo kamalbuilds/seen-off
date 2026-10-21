@@ -36,6 +36,11 @@ export interface AppOptions {
     days(): { dayId: string; labels: number; startMs: number }[];
     /** Starts playing the recorded day under a fresh day name and returns that name; the day fills in while it plays. */
     start(dayId: string): string;
+    /** A scripted run of contrasting days, back to back, for a first-time viewer. */
+    demo?: {
+      start(): void;
+      status(): { running: boolean; current: string | null; steps: { title: string; blurb: string; dayId: string | null }[] };
+    };
   };
 }
 
@@ -101,7 +106,13 @@ export function createApp(o: AppOptions): Server {
         req.on("close", () => { clearInterval(beat); o.ledger.changes.off("change", onChange); });
         return;
       }
-      if (url.pathname === "/api/replay" && req.method === "GET") return send(200, { days: o.replay?.days() ?? [] });
+      if (url.pathname === "/api/replay" && req.method === "GET") return send(200, { days: o.replay?.days() ?? [], demo: o.replay?.demo?.status() ?? null });
+      if (url.pathname === "/api/demo" && req.method === "POST") {
+        if (!o.replay?.demo) return send(404, { error: "no demo on this server" });
+        if (o.replay.demo.status().running) return send(409, { error: "demo busy", errors: ["the demo is already playing"] });
+        try { o.replay.demo.start(); } catch (e) { return send(409, { error: "demo busy", errors: [(e as Error).message] }); }
+        return send(202, o.replay.demo.status());
+      }
       if (url.pathname === "/api/replay" && req.method === "POST") {
         if (!o.replay) return send(404, { error: "replay is not available on this server" });
         let body: { dayId?: unknown };

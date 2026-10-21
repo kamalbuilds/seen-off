@@ -1,9 +1,10 @@
 // Serves the seller page over the 30 recorded pickup days with no Ring credentials: "Replay a pickup day" plays one through the
 // production receiver (HMAC-signed v1.1 deliveries), runner, ledger, vision stage and evidence packet while the timeline fills in.
 //
-//   node scripts/replay-serve.ts                       plays day04,day05,day06,day02 then serves on :8788
-//   node scripts/replay-serve.ts --days day01,day13    pick the days played at start
-//   node scripts/replay-serve.ts --pace-ms 1500        pause between steps of a replay started from the page (900 ms minimum)
+//   node scripts/replay-serve.ts                       serves on :8788; the page plays the three-day demo on load
+//   node scripts/replay-serve.ts --days day01,day13    also replay these days before serving
+//   node scripts/replay-serve.ts --demo day05,day06,day15   the three demo days: a missed day, a part-taken day, an unscanned day
+//   node scripts/replay-serve.ts --pace-ms 1500        pause between steps of a replay started from the page (800 ms minimum)
 import { mkdirSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { Ledger } from "../src/store/ledger.ts";
@@ -14,12 +15,14 @@ import { REPLAY_DEVICE, SETTLE_MS, SIM_KEY, fixtureTracking, loadDays, playDay, 
 
 const args = process.argv.slice(2);
 const flag = (n: string, d: string) => (args.includes(n) ? args[args.indexOf(n) + 1] : d);
-const picked = flag("--days", "day04,day05,day06,day02").split(",");
+const picked = flag("--days", "").split(",").filter(Boolean);
+const demoIds = flag("--demo", "day05,day06,day15").split(",");
 const paceMs = Number(flag("--pace-ms", "0"));
 const port = Number(flag("--port", process.env.PORT ?? "8788"));
 
 const days = loadDays();
 const unknown = picked.filter((id) => !days.some((d) => d.dayId === id));
+for (const id of demoIds) if (!days.some((d) => d.dayId === id)) unknown.push(id);
 if (unknown.length) throw new Error(`unknown replay days: ${unknown.join(", ")}`);
 
 mkdirSync("data/replay-evidence", { recursive: true });
@@ -29,8 +32,16 @@ const alerter: Alerter = { async send(a) { alerts.push(`${a.dayId} ${a.kind}`); 
 const ledger = new Ledger(":memory:");
 const runner = new PickupRunner({ ledger, vision: visionFromEnv(), frames: [replayFrameSource(days)], tracking: fixtureTracking, alerter, clock: () => now, settleMs: SETTLE_MS, evidenceDir: "data/replay-evidence" });
 let playing = false;
+// One seller, three scheduled parcels, three days back to back: nobody collects them, one leaves, all leave and nothing is scanned.
+const DEMO_STEPS = [
+  { name: "demo-missed", title: "The carrier never comes", blurb: "Three parcels wait on the porch. The window closes with all three still there, and the alert goes out while there is time to drop them off." },
+  { name: "demo-partial", title: "One parcel leaves", blurb: "Motion at the door, then one parcel gone and two left behind. The alert counts them: 1 of 3 taken, 2 still on the porch." },
+  { name: "demo-unscanned", title: "Everything leaves, nothing is scanned", blurb: "The porch is empty at close, but 24 h later the labels still read label created. The evidence packet proves the handoff." },
+];
+const demo: { running: boolean; current: string | null; names: string[] } = { running: false, current: null, names: [] };
+if (demoIds.length !== DEMO_STEPS.length) throw new Error(`--demo needs ${DEMO_STEPS.length} recorded day ids`);
 let base = "";
-const pace = () => new Promise<void>((r) => setTimeout(r, Math.max(paceMs, 900)));
+const pace = () => new Promise<void>((r) => setTimeout(r, Math.max(paceMs, 800)));
 const server = createApp({
   signingKey: SIM_KEY, ledger, runner,
   devices: async () => [{ id: REPLAY_DEVICE, name: "Front door", provenance: "replay" }],
@@ -46,6 +57,23 @@ const server = createApp({
         .catch((e) => console.error(`replay ${name} failed`, e))
         .finally(() => { playing = false; });
       return name;
+    },
+    demo: {
+      status: () => ({ running: demo.running, current: demo.current, steps: DEMO_STEPS.map((s, i) => ({ title: s.title, blurb: s.blurb, dayId: demo.names[i] ?? null })) }),
+      start() {
+        if (playing) throw new Error("a pickup day is still replaying");
+        playing = true;
+        demo.running = true; demo.names = []; demo.current = null;
+        void (async () => {
+          for (const [i, id] of demoIds.entries()) {
+            const spec = days.find((x) => x.dayId === id)!;
+            let name = DEMO_STEPS[i].name, n = 1;
+            while (ledger.hasDay(name)) name = `${DEMO_STEPS[i].name}-${++n}`;
+            demo.names[i] = name; demo.current = name;
+            await playDay(base, runner, { ...spec, dayId: name }, (ms) => { now = ms; }, { pause: pace });
+          }
+        })().catch((e) => console.error("demo failed", e)).finally(() => { demo.running = false; playing = false; });
+      },
     },
   },
 });
