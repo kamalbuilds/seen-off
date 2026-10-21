@@ -97,6 +97,14 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 .plate .say { font-size: 20px; font-weight: 600; line-height: 1.3; max-width: 44ch; }
 .plate .meta { font-size: 14px; font-weight: 600; }
 
+.tracks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s6); margin-bottom: var(--s8); }
+.track { display: grid; gap: var(--s1); align-content: start; padding-top: var(--s3); border-top: 4px solid var(--rule); }
+.track[data-state="done"] { border-top-color: var(--ink); }
+.track[data-state="problem"] { border-top-color: var(--accent); }
+.track .head { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.track .reason { font-size: 16px; color: var(--muted); max-width: 46ch; }
+.track[data-state="waiting"] .head, .track[data-state="na"] .head { color: var(--muted); }
+
 /* sections */
 .section { margin-bottom: var(--s12); }
 .section > h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; text-transform: lowercase; margin-bottom: var(--s4); display: flex; justify-content: space-between; align-items: center; gap: var(--s4); flex-wrap: wrap; }
@@ -115,7 +123,8 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 
 /* timeline */
 .timeline { list-style: none; margin: 0; padding: 0; }
-.tl { display: grid; grid-template-columns: 72px 20px minmax(0, 1fr) auto; gap: var(--s3); align-items: start; padding: var(--s3) var(--s2); border-top: 1px solid var(--rule); transition: background-color 0.18s ease; }
+.lanes { display: grid; grid-template-columns: 72px 20px minmax(0, 1fr) minmax(0, 1fr); gap: 0 var(--s3); padding: 0 var(--s2) var(--s2); }
+.tl { display: grid; grid-template-columns: 72px 20px minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); align-items: start; padding: var(--s3) var(--s2); border-top: 1px solid var(--rule); transition: background-color 0.18s ease; }
 .tl:hover { background: var(--paper-2); }
 .tl time { font-size: 14px; color: var(--muted); font-weight: 600; padding-top: 2px; }
 .tl time .tday { display: block; font-size: 13px; color: var(--ink); }
@@ -126,8 +135,12 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 .section-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s4); }
 .section-head > h2 { margin-bottom: 0; }
 .actions { display: inline-flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
-.tl .text { min-width: 0; overflow-wrap: anywhere; }
+.tl .text { min-width: 0; overflow-wrap: anywhere; grid-column: 3 / span 2; }
+.tl[data-lane="porch"] .text { grid-column: 3; }
+.tl[data-lane="carrier"] .text { grid-column: 4; }
+.tl[data-lane="carrier"] .mark { background: var(--accent); outline: 2px solid var(--ink); }
 .tl .text .kind { display: block; margin-bottom: 2px; }
+.tl .thumb { margin-top: var(--s2); }
 .thumb { display: block; width: 112px; height: 63px; background: var(--paper-3); overflow: hidden; }
 .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .nothumb { font-size: 13px; color: var(--muted); }
@@ -154,6 +167,7 @@ tbody tr:hover { background: var(--paper-2); }
   .detail { order: -1; }
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+@media (max-width: 640px) { .tracks { grid-template-columns: minmax(0, 1fr); gap: var(--s4); } .track .head { font-size: 24px; } }
 @media (max-width: 640px) {
   .shell { padding-inline: var(--s4); }
   .banner { padding-inline: var(--s4); }
@@ -164,7 +178,9 @@ tbody tr:hover { background: var(--paper-2); }
   .plate .say { font-size: 18px; }
   .pair { grid-template-columns: minmax(0, 1fr); }
   .tl { grid-template-columns: 56px 16px minmax(0, 1fr); }
+  .tl .text, .tl[data-lane="porch"] .text, .tl[data-lane="carrier"] .text { grid-column: 3; }
   .tl .side { grid-column: 3; }
+  .lanes { display: none; }
   .tl time { font-size: 13px; }
   .label-row { grid-template-columns: 84px minmax(0, 1fr) 44px; }
   .section > h2 { font-size: 24px; }
@@ -391,6 +407,15 @@ function plate(p) {
     p.alert ? h("p", { class: "meta" }, alertLine(p.alert)) : null);
 }
 
+function tracks(p) {
+  const t = (key, label) => {
+    const x = p.tracks[key];
+    return h("div", { class: "track", "data-state": x.state, role: "group", "aria-label": label },
+      h("span", { class: "label" }, label), h("span", { class: "head" }, x.headline), h("span", { class: "reason" }, x.reason));
+  };
+  return h("div", { class: "tracks" }, t("porch", "Did the parcels leave the porch?"), t("carrier", "Did the carrier scan them?"));
+}
+
 function facts(p) {
   const motion = p.timeline.filter((t) => t.kind === "motion_event").length;
   const cell = (n, what) => h("div", {}, h("span", { class: "n" }, n), h("span", { class: "what" }, what));
@@ -403,16 +428,18 @@ function facts(p) {
 
 function timeline(p) {
   let lastDay = null;
-  return h("ol", { class: "timeline" }, p.timeline.map((t) => {
+  const rows = p.timeline.map((t) => {
     const f = t.frame != null ? p.frames[t.frame] : null;
     const day = DAY.format(t.atMs), showDay = day !== lastDay; lastDay = day;
-    return h("li", { class: `tl kind-${t.kind}` },
+    const thumb = f ? (f.image ? h("a", { class: "thumb", href: f.image, target: "_blank", rel: "noopener", "aria-label": `Open the full frame from ${clock(t.atMs)} UTC` }, h("img", { src: f.image, alt: "", loading: "lazy", width: 112, height: 63 })) : h("span", { class: "nothumb" }, "no frame stored")) : null;
+    return h("li", { class: `tl kind-${t.kind}`, "data-lane": t.lane ?? "day" },
       h("time", { datetime: new Date(t.atMs).toISOString() }, showDay ? h("span", { class: "tday" }, day) : null, clock(t.atMs)),
       h("span", { class: "mark", "aria-hidden": "true" }),
-      h("div", { class: "text" }, h("span", { class: "label kind" }, KIND_LABEL[t.kind]), t.text),
-      h("div", { class: "side" },
-        f ? (f.image ? h("a", { class: "thumb", href: f.image, target: "_blank", rel: "noopener", "aria-label": `Open the full frame from ${clock(t.atMs)} UTC` }, h("img", { src: f.image, alt: "", loading: "lazy", width: 112, height: 63 })) : h("span", { class: "nothumb" }, "no frame stored")) : null));
-  }));
+      h("div", { class: "text" }, h("span", { class: "label kind" }, KIND_LABEL[t.kind]), t.text, thumb));
+  });
+  return h("div", {},
+    h("div", { class: "lanes", "aria-hidden": "true" }, h("span", {}), h("span", {}), h("span", { class: "label" }, "On the porch"), h("span", { class: "label" }, "With the carrier")),
+    h("ol", { class: "timeline" }, rows));
 }
 
 function frames(p) {
@@ -436,8 +463,8 @@ function packet(p) {
   return h("div", {},
     h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Timestamp"), h("th", {}, "Value"))),
       h("tbody", {}, stamps.map(([a, b]) => h("tr", {}, h("td", {}, a), h("td", {}, b)))))),
-    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Carrier"), h("th", {}, "Tracking number"), h("th", {}, "Tracking state"))),
-      h("tbody", {}, p.labels.map((l) => h("tr", {}, h("td", {}, l.carrier.toUpperCase()), h("td", {}, l.trackingNumber), h("td", {}, l.status ?? "not read yet")))))));
+    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Carrier"), h("th", {}, "Tracking number"), h("th", {}, "Tracking state"), h("th", {}, "Carrier scan"))),
+      h("tbody", {}, p.labels.map((l) => h("tr", {}, h("td", {}, l.carrier.toUpperCase()), h("td", {}, l.trackingNumber), h("td", {}, l.status ?? "not read yet"), h("td", {}, l.scanned === null ? "pending" : l.scanned ? "scanned" : "not scanned")))))));
 }
 
 function renderDetail() {
@@ -452,6 +479,7 @@ function renderDetail() {
   el.replaceChildren(
     h("div", { class: "crumb" }, h("h1", { class: "day-title" }, p.dayId), h("span", { class: "label" }, deviceName(p.deviceId))),
     plate(p),
+    tracks(p),
     h("section", { class: "section" }, h("h2", {}, "porch frames"), frames(p), facts(p)),
     h("section", { class: "section" }, h("h2", {}, "day timeline"), timeline(p)),
     h("section", { class: "section" }, h("div", { class: "section-head" }, h("h2", {}, "evidence packet"), h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));

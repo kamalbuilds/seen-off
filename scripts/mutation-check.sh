@@ -60,6 +60,7 @@ src/server.ts@@s/if \(createHash\("sha256"\).update\(bytes\).digest\("hex"\) !==
 src/server.ts@@s/rmSync\(join\(o.runner.d.evidenceDir, id\), \{ recursive: true, force: true \}\);//@@evidence.test.ts@@delete leaves frames on disk
 src/store/ledger.ts@@s/for \(const t of \["observations", "jobs", "tracking_readings", "packets"\]\)/for (const t of ["observations"])/@@evidence.test.ts@@delete leaves jobs behind
 metric/score.ts@@s/ \|\| r.truth === "partial"//@@score.test.ts@@false reassurance ignores part-taken days
+src/pickup/packet.ts@@s/unscannedLabels === 0 \? \{ state: "done"/unscannedLabels >= 0 ? { state: "done"/@@packet.test.ts@@carrier track reads unscanned labels as scanned
 MUT
 
 fresh

@@ -136,3 +136,48 @@ test("ledger migrates a file created before provenance existed", async () => {
   ledger.addObservation({ dayId: "x", kind: "baseline", atMs: 1, count: 1, frameSha256: "s", framePath: null, error: null, source: "replay", provenance: "replay" });
   assert.equal(ledger.observations("x")[0].provenance, "replay");
 });
+
+test("two tracks: leaving the porch and the carrier scan are answered separately, each with a plain reason", async () => {
+  const run = async (close: number, statuses: ("TRANSIT" | "PRE_TRANSIT")[], stage: "watching" | "closed" | "settled") => {
+    let clock = T0;
+    const script: Record<number, number> = { [T0]: 2, [T0 + 7 * H]: close };
+    const ledger = new Ledger(":memory:");
+    const runner = new PickupRunner({
+      ledger, clock: () => clock, settleMs: 30_000,
+      frames: [{ name: "f", async frameAt(_d, atMs) { return { jpeg: new TextEncoder().encode(String(script[atMs])), mediaTimestampMs: atMs, origin: "t" }; } }],
+      vision: { name: "s", model: "s", readPorch: async (j) => ({ present: Number(new TextDecoder().decode(j)) > 0, count: Number(new TextDecoder().decode(j)), raw: "" }) },
+      tracking: { statusOf: async (l) => statuses[Number(l.trackingNumber)] }, alerter: { send: async () => {} },
+    });
+    await runner.arm({ ...plan, labels: statuses.map((_, i) => ({ trackingNumber: String(i), carrier: "usps" })) });
+    if (stage !== "watching") { clock = T0 + 7 * H; await runner.closeWindow("d1"); }
+    if (stage === "settled") { clock = T0 + 31 * H; await runner.checkTracking("d1"); }
+    return runner.packetOf("d1").tracks;
+  };
+
+  const watching = await run(0, ["TRANSIT", "TRANSIT"], "watching");
+  assert.deepEqual([watching.porch.state, watching.carrier.state], ["waiting", "waiting"]);
+
+  const pending = await run(0, ["TRANSIT", "TRANSIT"], "closed");
+  assert.deepEqual([pending.porch.state, pending.porch.headline, pending.carrier.state, pending.carrier.headline], ["done", "Left the porch", "waiting", "Pending"]);
+  assert.match(pending.carrier.reason, /24 h check at/);
+
+  const unscanned = await run(0, ["TRANSIT", "PRE_TRANSIT"], "settled");
+  assert.deepEqual([unscanned.porch.state, unscanned.carrier.state, unscanned.carrier.headline], ["done", "problem", "1 of 2 labels unscanned"]);
+  assert.match(unscanned.carrier.reason, /proof of the handoff/);
+
+  const scanned = await run(0, ["TRANSIT", "TRANSIT"], "settled");
+  assert.deepEqual([scanned.carrier.state, scanned.carrier.headline], ["done", "Scanned: 2 of 2 labels"]);
+
+  const missed = await run(2, ["PRE_TRANSIT", "PRE_TRANSIT"], "closed");
+  assert.deepEqual([missed.porch.state, missed.porch.headline, missed.carrier.state], ["problem", "Still on the porch", "na"]);
+  assert.match(missed.carrier.reason, /never left/);
+
+  const partial = await run(1, ["TRANSIT", "TRANSIT"], "closed");
+  assert.equal(partial.porch.headline, "1 of 2 left");
+
+  const partialScanned = await run(1, ["TRANSIT", "PRE_TRANSIT"], "settled");
+  assert.deepEqual([partialScanned.carrier.state, partialScanned.carrier.headline], ["done", "Scanned: the 1 parcel that left"]);
+  assert.match(partialScanned.carrier.reason, /still on the porch, so no scan is expected/);
+  const partialUnscanned = await run(1, ["PRE_TRANSIT", "PRE_TRANSIT"], "settled");
+  assert.deepEqual([partialUnscanned.carrier.state, partialUnscanned.carrier.headline], ["problem", "1 departed parcel unscanned"]);
+});
