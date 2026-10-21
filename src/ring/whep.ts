@@ -15,6 +15,7 @@ const LIVE_WINDOW_MS = 2 * 60_000;
  */
 export class WhepFrameSource implements FrameSource {
   readonly name = "ring-whep";
+  readonly provenance = "live" as const;
   readonly #client: RingClient;
   readonly #python: string;
   readonly #apiBase: string | undefined;

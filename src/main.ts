@@ -41,7 +41,10 @@ const schedule = (plan: DayPlan) => {
 };
 
 const port = Number(process.env.PORT ?? 8787);
-createApp({ signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner, onDayArmed: schedule }).listen(port, () => {
+createApp({
+  signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner, onDayArmed: schedule,
+  devices: async () => (await ring.listDevices()).map((d) => ({ id: d.id, name: d.name, provenance: "live" as const })),
+}).listen(port, () => {
   console.log(`outbox listening on :${port}`);
 });
 setInterval(() => void runner.drain().catch((e) => console.error("drain failed", e)), 10_000).unref();

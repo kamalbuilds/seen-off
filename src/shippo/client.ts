@@ -92,9 +92,12 @@ export class ShippoClient {
 
 export class ShippoTracking implements TrackingSource {
   readonly #client: ShippoClient;
+  /** A shippo_test_ key answers with Shippo's canned test-number statuses, so it is labelled simulated. Only a live key is live. */
+  readonly provenance: "live" | "simulated";
 
   constructor(apiKey: string) {
     this.#client = new ShippoClient(apiKey);
+    this.provenance = apiKey.startsWith("shippo_test_") ? "simulated" : "live";
   }
 
   statusOf(label: LabelRow): Promise<TrackingStatus> {

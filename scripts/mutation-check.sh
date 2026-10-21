@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -33,10 +33,13 @@ src/pickup/verdict.ts@@s/if \(c === b\) return \{ verdict: "missed"/if (c === b)
 src/pickup/verdict.ts@@s/if \(c === 0\) return \{ verdict: "taken"/if (c <= 1) return { verdict: "taken"/@@verdict.test.ts@@partial collapsed into taken
 src/pickup/verdict.ts@@s/b <= 0 \|\| c > b/c > b/@@verdict.test.ts@@empty baseline no longer unverified
 src/pickup/verdict.ts@@s/SCANNED.has\(t.status\)/true/@@verdict.test.ts@@unscanned never detected
+src/provenance.ts@@s/ORDER.indexOf\(p\) > ORDER.indexOf\(w\)/ORDER.indexOf(p) < ORDER.indexOf(w)/@@packet.test.ts@@verdict provenance no longer the weakest input
+src/provenance.ts@@s/SIMULATOR\|FIXTURE/NEVERMATCH/@@packet.test.ts@@simulated webhooks labelled live
+src/pickup/runner.ts@@s/src\.provenance \?\? "simulated"/src.provenance ?? "live"/g@@packet.test.ts@@unlabelled frame source reads as live
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail

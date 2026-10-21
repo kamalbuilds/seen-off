@@ -15,6 +15,7 @@
     "spike:porch": "node spikes/porch/run.ts main",
     "metric": "node metric/run.ts",
     "serve": "node src/main.ts",
+    "serve:replay": "node scripts/replay-serve.ts",
     "ring:probe": "node scripts/ring-probe.ts"
   }
 }

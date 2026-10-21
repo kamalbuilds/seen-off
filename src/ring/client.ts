@@ -168,6 +168,7 @@ async function toApiError(res: Response): Promise<RingApiError> {
 /** Snapshot with a short wait for RECORDING_NOT_READY, which Ring documents as a transient state right after an event. */
 export class RingSnapshotSource implements FrameSource {
   readonly name = "ring-snapshot";
+  readonly provenance = "live" as const;
   readonly #client: RingClient;
   readonly #attempts: number;
   readonly #waitMs: number;

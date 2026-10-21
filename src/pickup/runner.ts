@@ -2,8 +2,10 @@ import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { VisionProvider } from "../vision/types.ts";
-import type { DayRow, LabelRow, Ledger } from "../store/ledger.ts";
+import type { LabelRow, Ledger } from "../store/ledger.ts";
 import { decideDayVerdict, decideWindowVerdict, type DayVerdict, type TrackingReading, type TrackingStatus } from "./verdict.ts";
+import { buildPacket } from "./packet.ts";
+import type { Provenance } from "../provenance.ts";
 
 export interface Frame {
   jpeg: Uint8Array;
@@ -14,10 +16,14 @@ export interface Frame {
 /** Where porch frames come from: Ring snapshot download, a WHEP grab, or a labelled replay. Tried in order. */
 export interface FrameSource {
   readonly name: string;
+  /** live: the real Ring API. replay: labelled recorded frames. Unlabelled sources read as simulated. */
+  readonly provenance?: Provenance;
   frameAt(deviceId: string, atMs: number): Promise<Frame>;
 }
 
 export interface TrackingSource {
+  /** live: a carrier or Shippo call. Unlabelled sources read as simulated. */
+  readonly provenance?: Provenance;
   statusOf(label: LabelRow): Promise<TrackingStatus>;
 }
 
@@ -60,7 +66,7 @@ export class PickupRunner {
 
   /** Window opens: count the parcels on the porch. */
   async arm(plan: DayPlan): Promise<number | null> {
-    this.d.ledger.createDay(plan);
+    this.d.ledger.createDay(plan, this.d.clock());
     const count = await this.observe(plan.dayId, plan.deviceId, "baseline", plan.windowStartMs);
     this.d.ledger.setBaseline(plan.dayId, count);
     return count;
@@ -99,8 +105,6 @@ export class PickupRunner {
       : null;
     this.d.ledger.setWindowResult(dayId, closeCount, verdict, handoff === null ? null : handoff - this.settleMs);
     this.d.ledger.setFinal(dayId, verdict);
-    const after = this.d.ledger.getDay(dayId);
-    this.d.ledger.savePacket(dayId, this.packet(after, null, takenCount));
     if (verdict === "missed" || verdict === "partial" || verdict === "unverified") {
       const left = closeCount ?? 0;
       const text = verdict === "missed"
@@ -109,8 +113,9 @@ export class PickupRunner {
           ? `${takenCount} of ${day.baselineCount} parcels taken, ${left} still on the porch at ${hhmm(day.windowEndMs)}.`
           : `Could not read the porch at ${hhmm(day.windowEndMs)}. Check the Ring app before the carrier cut-off.`;
       await this.d.alerter.send({ dayId, kind: verdict, text });
-      this.d.ledger.setAlerted(dayId, this.d.clock());
+      this.d.ledger.setAlerted(dayId, this.d.clock(), verdict, text);
     }
+    this.d.ledger.savePacket(dayId, this.packetOf(dayId));
     return verdict;
   }
 
@@ -120,25 +125,24 @@ export class PickupRunner {
     if (day.windowVerdict === null) throw new Error(`day ${dayId} window not closed`);
     const tracking: TrackingReading[] = [];
     for (const l of day.labels) tracking.push({ trackingNumber: l.trackingNumber, status: await this.d.tracking.statusOf(l) });
+    const readAtMs = this.d.clock();
+    const provenance = this.d.tracking.provenance ?? "simulated";
+    for (const t of tracking) this.d.ledger.addTrackingReading(dayId, { ...t, readAtMs, provenance });
     const verdict = decideDayVerdict(day.windowVerdict, tracking);
     this.d.ledger.setFinal(dayId, verdict);
-    const takenCount = day.baselineCount !== null && day.closeCount !== null ? day.baselineCount - day.closeCount : 0;
-    this.d.ledger.savePacket(dayId, this.packet(this.d.ledger.getDay(dayId), tracking, takenCount));
+    this.d.ledger.savePacket(dayId, this.packetOf(dayId));
     if (verdict === "unscanned") {
-      await this.d.alerter.send({
-        dayId, kind: "unscanned",
-        text: `Parcels left the porch but ${tracking.filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length} of ${tracking.length} labels show no carrier scan after 24 h. Evidence packet ready.`,
-      });
+      const text = `Parcels left the porch but ${tracking.filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length} of ${tracking.length} labels show no carrier scan after 24 h. Evidence packet ready.`;
+      await this.d.alerter.send({ dayId, kind: "unscanned", text });
+      this.d.ledger.setAlerted(dayId, this.d.clock(), "unscanned", text);
+      this.d.ledger.savePacket(dayId, this.packetOf(dayId));
     }
     return verdict;
   }
 
-  private packet(day: DayRow, tracking: TrackingReading[] | null, takenCount: number) {
-    return {
-      dayId: day.dayId, deviceId: day.deviceId, window: { startMs: day.windowStartMs, endMs: day.windowEndMs },
-      verdict: day.finalVerdict, windowVerdict: day.windowVerdict, baselineCount: day.baselineCount, closeCount: day.closeCount,
-      takenCount, handoffMs: day.handoffMs, labels: day.labels, tracking, frames: this.d.ledger.observations(day.dayId),
-    };
+  /** The evidence packet as the ledger stands now: valid before the window closes, after it, and after the 24 h tracking check. */
+  packetOf(dayId: string) {
+    return buildPacket(this.d.ledger, dayId, this.d.tracking.provenance ?? "simulated");
   }
 
   /** One frame, one count. A failure is recorded as a null count, never guessed. */
@@ -157,14 +161,14 @@ export class PickupRunner {
       }
       try {
         const r = await this.d.vision.readPorch(frame.jpeg);
-        this.d.ledger.addObservation({ dayId, kind, atMs, count: r.count, frameSha256: sha, framePath: path, error: null });
+        this.d.ledger.addObservation({ dayId, kind, atMs, count: r.count, frameSha256: sha, framePath: path, error: null, source: src.name, provenance: src.provenance ?? "simulated" });
         return r.count;
       } catch (e) {
-        this.d.ledger.addObservation({ dayId, kind, atMs, count: null, frameSha256: sha, framePath: path, error: `vision: ${(e as Error).message}` });
+        this.d.ledger.addObservation({ dayId, kind, atMs, count: null, frameSha256: sha, framePath: path, error: `vision: ${(e as Error).message}`, source: src.name, provenance: src.provenance ?? "simulated" });
         return null;
       }
     }
-    this.d.ledger.addObservation({ dayId, kind, atMs, count: null, frameSha256: "", framePath: null, error: errors.join("; ") });
+    this.d.ledger.addObservation({ dayId, kind, atMs, count: null, frameSha256: "", framePath: null, error: errors.join("; "), source: null, provenance: "simulated" });
     return null;
   }
 }

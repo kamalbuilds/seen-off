@@ -8,3 +8,5 @@ spikes/porch/_work/
 data/
 !.env.example
 .progress/
+.uicraft-read.json
+design-research/
