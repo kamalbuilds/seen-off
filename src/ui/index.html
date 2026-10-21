@@ -123,6 +123,8 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 .tl.kind-window_verdict .mark, .tl.kind-final_verdict .mark { background: var(--accent); outline: 2px solid var(--ink); }
 .tl.kind-alert .mark { background: var(--accent); transform: rotate(45deg); outline: 2px solid var(--ink); }
 .tl.kind-window_open .mark, .tl.kind-label .mark { background: var(--paper); outline: 2px solid var(--ink); outline-offset: -2px; }
+.section-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s4); }
+.section-head > h2 { margin-bottom: 0; }
 .actions { display: inline-flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
 .tl .text { min-width: 0; overflow-wrap: anywhere; }
 .tl .text .kind { display: block; margin-bottom: 2px; }
@@ -452,7 +454,7 @@ function renderDetail() {
     plate(p),
     h("section", { class: "section" }, h("h2", {}, "porch frames"), frames(p), facts(p)),
     h("section", { class: "section" }, h("h2", {}, "day timeline"), timeline(p)),
-    h("section", { class: "section" }, h("h2", {}, "evidence packet", h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));
+    h("section", { class: "section" }, h("div", { class: "section-head" }, h("h2", {}, "evidence packet"), h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));
 }
 
 async function removeDay(id) {
