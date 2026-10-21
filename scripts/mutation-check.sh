@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -40,10 +40,14 @@ src/pickup/plan.ts@@s/\(end as number\) <= \(start as number\)/false/@@plan.test
 src/pickup/plan.ts@@s/\|\| labels.length === 0//@@plan.test.ts@@empty labels accepted
 src/pickup/plan.ts@@s/\[A-Za-z0-9\._-\]/[A-Za-z0-9._\/-]/@@plan.test.ts@@dayId may contain a slash
 src/pickup/verdict.ts@@s/n < 0\)/false)/@@plan.test.ts@@negative count read as a verdict
+src/store/ledger.ts@@s/job.run\(d.dayId, "close", d.windowEndMs\);//@@scheduler.test.ts@@close job is not persisted
+src/pickup/runner.ts@@s/if \(day.windowVerdict !== null\) return this.settleAlert\(day\);//@@scheduler.test.ts@@close re-entry repeats the observation
+src/pickup/scheduler.ts@@s/await runner.drain\(\); //@@scheduler.test.ts@@close job skips the webhook drain
+src/pickup/scheduler.ts@@s/ledger.completeJob\(job.id, clock\(\)\);//@@scheduler.test.ts@@finished job never marked done
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail

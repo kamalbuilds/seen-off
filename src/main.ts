@@ -1,10 +1,11 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { Ledger } from "./store/ledger.ts";
-import { PickupRunner, type Alerter, type DayPlan } from "./pickup/runner.ts";
+import { PickupRunner, type Alerter } from "./pickup/runner.ts";
 import { RingClient, RingSnapshotSource, ringAuthFromEnv } from "./ring/client.ts";
 import { WhepFrameSource } from "./ring/whep.ts";
 import { ShippoTracking } from "./shippo/client.ts";
 import { visionFromEnv } from "./vision/index.ts";
+import { Scheduler } from "./pickup/scheduler.ts";
 import { createApp } from "./server.ts";
 
 const need = (k: string) => {
@@ -33,18 +34,14 @@ const runner = new PickupRunner({
   evidenceDir: "data/evidence",
 });
 
-const schedule = (plan: DayPlan) => {
-  const at = (ms: number, fn: () => Promise<unknown>) =>
-    setTimeout(() => fn().catch((e) => console.error(`${plan.dayId}`, e)), Math.max(0, ms - Date.now()));
-  at(plan.windowEndMs, async () => { await runner.drain(); await runner.closeWindow(plan.dayId); });
-  at(plan.windowEndMs + 24 * 3600_000, () => runner.checkTracking(plan.dayId));
-};
+const scheduler = new Scheduler({ ledger, runner, onError: (job, e) => console.error(`job ${job.kind} ${job.dayId} failed (attempt ${job.attempts + 1}): ${e.message}`) });
 
 const port = Number(process.env.PORT ?? 8787);
 createApp({
-  signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner, onDayArmed: schedule,
+  signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner,
   devices: async () => (await ring.listDevices()).map((d) => ({ id: d.id, name: d.name, provenance: "live" as const })),
 }).listen(port, () => {
   console.log(`outbox listening on :${port}`);
+  scheduler.start();
 });
 setInterval(() => void runner.drain().catch((e) => console.error("drain failed", e)), 10_000).unref();

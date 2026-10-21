@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { VisionProvider } from "../vision/types.ts";
-import type { LabelRow, Ledger } from "../store/ledger.ts";
+import type { DayRow, LabelRow, Ledger } from "../store/ledger.ts";
 import { decideDayVerdict, decideWindowVerdict, type DayVerdict, type TrackingReading, type TrackingStatus } from "./verdict.ts";
 import { buildPacket } from "./packet.ts";
 import type { Provenance } from "../provenance.ts";
@@ -64,11 +64,20 @@ export class PickupRunner {
     this.settleMs = deps.settleMs ?? 30_000;
   }
 
-  /** Window opens: count the parcels on the porch. */
+  /**
+   * Stores the day with its scheduled checks. When the window is already open the baseline is read now;
+   * otherwise a stored job reads it when the window opens.
+   */
   async arm(plan: DayPlan): Promise<number | null> {
-    this.d.ledger.createDay(plan, this.d.clock());
-    const count = await this.observe(plan.dayId, plan.deviceId, "baseline", plan.windowStartMs);
-    this.d.ledger.setBaseline(plan.dayId, count);
+    const { baselineDeferred } = this.d.ledger.createDay(plan, this.d.clock());
+    return baselineDeferred ? null : this.takeBaseline(plan.dayId);
+  }
+
+  /** Window opens: count the parcels on the porch. */
+  async takeBaseline(dayId: string): Promise<number | null> {
+    const day = this.d.ledger.getDay(dayId);
+    const count = await this.observe(dayId, day.deviceId, "baseline", day.windowStartMs);
+    this.d.ledger.setBaseline(dayId, count);
     return count;
   }
 
@@ -98,6 +107,8 @@ export class PickupRunner {
   /** Window closes: final count, verdict, alert if the parcels did not all leave. */
   async closeWindow(dayId: string): Promise<DayVerdict> {
     const day = this.d.ledger.getDay(dayId);
+    // Re-entry after a crash or a failed alert: the verdict is already stored, so only a missing alert is still owed.
+    if (day.windowVerdict !== null) return this.settleAlert(day);
     const closeCount = await this.observe(dayId, day.deviceId, "close", day.windowEndMs);
     const { verdict, takenCount } = decideWindowVerdict({ baselineCount: day.baselineCount, closeCount });
     const handoff = verdict === "taken" || verdict === "partial"
@@ -105,17 +116,24 @@ export class PickupRunner {
       : null;
     this.d.ledger.setWindowResult(dayId, closeCount, verdict, handoff === null ? null : handoff - this.settleMs);
     this.d.ledger.setFinal(dayId, verdict);
-    if (verdict === "missed" || verdict === "partial" || verdict === "unverified") {
-      const left = closeCount ?? 0;
+    return this.settleAlert(this.d.ledger.getDay(dayId));
+  }
+
+  /** Sends the window-close alert once: only for a verdict that needs one, and only if none was recorded yet. */
+  private async settleAlert(day: DayRow): Promise<DayVerdict> {
+    const verdict = day.windowVerdict!;
+    if ((verdict === "missed" || verdict === "partial" || verdict === "unverified") && day.alertedAtMs === null) {
+      const left = day.closeCount ?? 0;
+      const taken = day.baselineCount !== null ? Math.max(0, day.baselineCount - left) : 0;
       const text = verdict === "missed"
         ? `${left} parcel${left === 1 ? "" : "s"} still on the porch at ${hhmm(day.windowEndMs)}: the carrier did not take them.`
         : verdict === "partial"
-          ? `${takenCount} of ${day.baselineCount} parcels taken, ${left} still on the porch at ${hhmm(day.windowEndMs)}.`
+          ? `${taken} of ${day.baselineCount} parcels taken, ${left} still on the porch at ${hhmm(day.windowEndMs)}.`
           : `Could not read the porch at ${hhmm(day.windowEndMs)}. Check the Ring app before the carrier cut-off.`;
-      await this.d.alerter.send({ dayId, kind: verdict, text });
-      this.d.ledger.setAlerted(dayId, this.d.clock(), verdict, text);
+      await this.d.alerter.send({ dayId: day.dayId, kind: verdict, text });
+      this.d.ledger.setAlerted(day.dayId, this.d.clock(), verdict, text);
     }
-    this.d.ledger.savePacket(dayId, this.packetOf(dayId));
+    this.d.ledger.savePacket(day.dayId, this.packetOf(day.dayId));
     return verdict;
   }
 
@@ -131,7 +149,7 @@ export class PickupRunner {
     const verdict = decideDayVerdict(day.windowVerdict, tracking);
     this.d.ledger.setFinal(dayId, verdict);
     this.d.ledger.savePacket(dayId, this.packetOf(dayId));
-    if (verdict === "unscanned") {
+    if (verdict === "unscanned" && day.alertKind !== "unscanned") {
       const text = `Parcels left the porch but ${tracking.filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length} of ${tracking.length} labels show no carrier scan after 24 h. Evidence packet ready.`;
       await this.d.alerter.send({ dayId, kind: "unscanned", text });
       this.d.ledger.setAlerted(dayId, this.d.clock(), "unscanned", text);

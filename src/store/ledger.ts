@@ -39,6 +39,18 @@ export interface Observation {
   provenance: Provenance;
 }
 
+export type JobKind = "baseline" | "close" | "tracking";
+
+export interface JobRow {
+  id: number;
+  dayId: string;
+  kind: JobKind;
+  dueMs: number;
+  state: "pending" | "done" | "dead";
+  attempts: number;
+  lastError: string | null;
+}
+
 export interface TrackingRow {
   trackingNumber: string;
   status: TrackingStatus;
@@ -68,6 +80,10 @@ create table if not exists observations (
   id integer primary key autoincrement, day_id text not null, kind text not null, at_ms integer not null,
   count integer, frame_sha256 text not null, frame_path text, error text);
 create table if not exists packets (day_id text primary key, json text not null);
+create table if not exists jobs (
+  id integer primary key autoincrement, day_id text not null, kind text not null, due_ms integer not null,
+  state text not null default 'pending', attempts integer not null default 0, last_error text, done_at integer,
+  unique (day_id, kind));
 create table if not exists tracking_readings (
   id integer primary key autoincrement, day_id text not null, tracking_number text not null, status text not null,
   read_at integer not null, provenance text not null);
@@ -121,9 +137,50 @@ export class Ledger implements IdempotencyStore {
     this.db.prepare("update events set handled_at = ? where request_id = ?").run(Date.now(), requestId);
   }
 
-  createDay(d: Pick<DayRow, "dayId" | "deviceId" | "windowStartMs" | "windowEndMs" | "labels">, createdAtMs: number): void {
-    this.db.prepare("insert into days (day_id, device_id, window_start, window_end, labels, created_at) values (?, ?, ?, ?, ?, ?)")
-      .run(d.dayId, d.deviceId, d.windowStartMs, d.windowEndMs, JSON.stringify(d.labels), createdAtMs);
+  /**
+   * Stores the day and its scheduled work in one transaction: the window-close check, the 24 h tracking check, and the baseline
+   * read when the window opens in the future. A restart finds them here, so an armed day cannot be lost with the process.
+   */
+  createDay(d: Pick<DayRow, "dayId" | "deviceId" | "windowStartMs" | "windowEndMs" | "labels">, createdAtMs: number): { baselineDeferred: boolean } {
+    const baselineDeferred = d.windowStartMs > createdAtMs;
+    this.db.exec("begin");
+    try {
+      this.db.prepare("insert into days (day_id, device_id, window_start, window_end, labels, created_at) values (?, ?, ?, ?, ?, ?)")
+        .run(d.dayId, d.deviceId, d.windowStartMs, d.windowEndMs, JSON.stringify(d.labels), createdAtMs);
+      const job = this.db.prepare("insert into jobs (day_id, kind, due_ms) values (?, ?, ?)");
+      if (baselineDeferred) job.run(d.dayId, "baseline", d.windowStartMs);
+      job.run(d.dayId, "close", d.windowEndMs);
+      job.run(d.dayId, "tracking", d.windowEndMs + 24 * 3600_000);
+      this.db.exec("commit");
+    } catch (e) {
+      this.db.exec("rollback");
+      throw e;
+    }
+    return { baselineDeferred };
+  }
+
+  /** Pending jobs whose time has come, oldest due first. */
+  dueJobs(nowMs: number): JobRow[] {
+    return (this.db.prepare("select id, day_id, kind, due_ms, state, attempts, last_error from jobs where state = 'pending' and due_ms <= ? order by due_ms, id").all(nowMs) as Record<string, unknown>[])
+      .map(toJob);
+  }
+
+  jobsFor(dayId: string): JobRow[] {
+    return (this.db.prepare("select id, day_id, kind, due_ms, state, attempts, last_error from jobs where day_id = ? order by due_ms, id").all(dayId) as Record<string, unknown>[]).map(toJob);
+  }
+
+  completeJob(id: number, atMs: number): void {
+    this.db.prepare("update jobs set state = 'done', done_at = ?, last_error = null where id = ?").run(atMs, id);
+  }
+
+  /** A failed job is retried at retryAtMs; after maxAttempts it is parked as dead with its error kept. */
+  failJob(id: number, error: string, retryAtMs: number, maxAttempts: number): void {
+    this.db.prepare("update jobs set attempts = attempts + 1, last_error = ?, due_ms = ?, state = case when attempts + 1 >= ? then 'dead' else 'pending' end where id = ?")
+      .run(error, retryAtMs, maxAttempts, id);
+  }
+
+  close(): void {
+    this.db.close();
   }
 
   hasDay(dayId: string): boolean {
@@ -219,4 +276,8 @@ export class Ledger implements IdempotencyStore {
     const r = this.db.prepare("select json from packets where day_id = ?").get(dayId) as { json: string } | undefined;
     return r ? JSON.parse(r.json) : null;
   }
+}
+
+function toJob(r: Record<string, unknown>): JobRow {
+  return { id: r.id as number, dayId: r.day_id as string, kind: r.kind as JobKind, dueMs: r.due_ms as number, state: r.state as JobRow["state"], attempts: r.attempts as number, lastError: r.last_error as string | null };
 }

@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type Server } from "node:http";
 import { createWebhookReceiver } from "./ring/webhook.ts";
 import { validatePlan } from "./pickup/plan.ts";
 import type { Ledger } from "./store/ledger.ts";
-import type { PickupRunner, DayPlan } from "./pickup/runner.ts";
+import type { PickupRunner } from "./pickup/runner.ts";
 import type { Provenance } from "./provenance.ts";
 
 const UI_HTML = readFileSync(new URL("./ui/index.html", import.meta.url), "utf8");
@@ -27,8 +27,6 @@ export interface AppOptions {
   signingKey: string;
   ledger: Ledger;
   runner: PickupRunner;
-  /** Called after a day is armed so the caller can schedule closeWindow and the 24 h tracking check. */
-  onDayArmed?: (plan: DayPlan) => void;
   /** Devices the seller can pick in the form, each labelled with where the list came from. */
   devices?: () => Promise<{ id: string; name: string; provenance: Provenance }[]>;
 }
@@ -71,7 +69,6 @@ export function createApp(o: AppOptions): Server {
         if (!check.ok) return send(400, { error: "invalid pickup day", errors: check.errors });
         if (o.ledger.hasDay(check.plan.dayId)) return send(409, { error: "pickup day exists", errors: [`dayId ${check.plan.dayId} is already armed`] });
         const baseline = await o.runner.arm(check.plan);
-        o.onDayArmed?.(check.plan);
         return send(201, { dayId: check.plan.dayId, baselineCount: baseline });
       }
       if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/index.html")) {
