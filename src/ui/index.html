@@ -405,7 +405,7 @@ async function loadRing() {
       $("#ringNote").textContent = st.steps; $("#ringNote").hidden = false;
       const timer = setInterval(async () => { try { if ((await api("/api/ring")).connected) { clearInterval(timer); await loadRing(); $("#ringNote").textContent = "Ring is connected."; } } catch { /* keep waiting */ } }, 3000);
     };
-    body.replaceChildren(h("button", { type: "button", class: "btn primary", onclick: go }, "Connect Ring"), consoleBox);
+    body.replaceChildren(...[h("button", { type: "button", class: "btn primary", onclick: go }, "Connect Ring"), consoleBox].filter(Boolean));
     return;
   }
   try {
