@@ -43,7 +43,7 @@ export class RingLink {
   constructor(c: RingLinkConfig) {
     this.#c = {
       clientId: c.clientId, clientSecret: c.clientSecret, redirectUri: c.redirectUri, tokenFile: c.tokenFile,
-      accountLabel: c.accountLabel ?? "outbox",
+      accountLabel: c.accountLabel ?? "seen-off",
       authorizeUrl: c.authorizeUrl ?? "https://account.ring.com/account/integrations/partner-link/authorize",
       oauthBase: c.oauthBase ?? "https://oauth.ring.com", apiBase: c.apiBase ?? "https://api.amazonvision.com",
       fetchImpl: c.fetchImpl ?? fetch, now: c.now ?? Date.now,

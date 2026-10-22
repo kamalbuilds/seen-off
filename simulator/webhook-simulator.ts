@@ -23,7 +23,7 @@ export interface Delivery {
 }
 
 export async function deliver(url: string, signingKey: string, rawBody: string, opts: { signature?: string | null } = {}): Promise<Delivery> {
-  const headers: Record<string, string> = { "content-type": "application/json", "user-agent": "outbox-simulator/0.1" };
+  const headers: Record<string, string> = { "content-type": "application/json", "user-agent": "seenoff-simulator/0.1" };
   const sig = opts.signature === undefined ? signBody(signingKey, rawBody) : opts.signature;
   if (sig !== null) headers["x-signature"] = sig;
   const t0 = performance.now();

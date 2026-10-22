@@ -126,7 +126,7 @@ test("a motion event from another doorbell, even inside the window, triggers no 
   r.ledger.insertEvent(parseEnvelope(JSON.parse(motionBody({ requestId: "other-door", deviceId: "ava1.ring.device.NEIGHBOUR", timestamp: T0 + 3 * HOUR }))));
   r.setClock(T0 + 4 * HOUR);
   assert.equal(await r.runner.drain(), 1, "the event is consumed");
-  assert.equal(r.ledger.observations("d1").filter((o) => o.kind === "motion").length, 0, "but it did not make Outbox look at this porch");
+  assert.equal(r.ledger.observations("d1").filter((o) => o.kind === "motion").length, 0, "but it did not make Seen Off look at this porch");
   assert.equal(r.ledger.getDay("d1").windowVerdict, null);
   assert.equal(r.alerts.length, 0);
 });

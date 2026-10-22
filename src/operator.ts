@@ -22,8 +22,8 @@ export interface OperatorOptions {
  */
 export function createOperatorAuth(o: OperatorOptions) {
   const now = o.now ?? Date.now;
-  const key = sha(`outbox-operator-session:${o.code}`);
-  const name = o.secure ? "__Host-outbox_operator" : "outbox_operator";
+  const key = sha(`seenoff-operator-session:${o.code}`);
+  const name = o.secure ? "__Host-seenoff_operator" : "seenoff_operator";
   const sign = (exp: string) => createHmac("sha256", key).update(exp).digest("base64url");
   let failures: number[] = [];
   const attrs = (maxAge: number) => `Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${o.secure ? "; Secure" : ""}`;

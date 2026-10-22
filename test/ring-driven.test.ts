@@ -76,7 +76,7 @@ async function ring(o: { hmac?: string } = {}) {
 async function app(r: { base: string }, env: Record<string, string> = {}) {
   const dir = mkdtempSync(join(tmpdir(), "driven-"));
   const tokenFile = join(dir, "tok");
-  const full = { RING_CLIENT_ID: APP.id, RING_CLIENT_SECRET: APP.secret, RING_WEBHOOK_SIGNING_KEY: APP.hmac, OUTBOX_SIGN_IN_CODE: APP.signIn, RING_API_BASE: r.base, RING_OAUTH_BASE: r.base, OUTBOX_PUBLIC_URL: "https://outbox.example.com", ...env };
+  const full = { RING_CLIENT_ID: APP.id, RING_CLIENT_SECRET: APP.secret, RING_WEBHOOK_SIGNING_KEY: APP.hmac, OUTBOX_SIGN_IN_CODE: APP.signIn, RING_API_BASE: r.base, RING_OAUTH_BASE: r.base, OUTBOX_PUBLIC_URL: "https://seenoff.example.com", ...env };
   const vision = { name: "v", model: "m", readPorch: async () => ({ present: true, count: 1, raw: "" }) };
   const session = new RingSession({ env: full, tokenFile });
   const ledger = new Ledger(":memory:");
@@ -97,7 +97,7 @@ test("Ring-driven link end to end: Ring pushes the code, the user lands on the A
   try {
     const st0 = await (await fetch(`${a.base}/api/ring`)).json() as Record<string, unknown>;
     assert.deepEqual([st0.configured, st0.connected, st0.method, st0.waiting], [true, false, "ring-driven", 0]);
-    assert.match(st0.steps as string, /Ring app, go to Appstore, choose Outbox and tap Connect/);
+    assert.match(st0.steps as string, /Ring app, go to Appstore, choose Seen Off and tap Connect/);
 
     const { push, linkUrl } = await r.confirmInRingApp(a.base, ACCOUNT);
     assert.equal(push.status, 200);
@@ -276,9 +276,9 @@ test("Ring answering 400 Invalid Nonce at confirmation is explained and stores n
 });
 
 test("console settings: exactly the URLs to enter in the Ring Developer Portal, built from the public HTTPS address, and nothing for an http address", () => {
-  assert.deepEqual(consoleSettings("https://outbox.example.com/"), {
-    accountLinkUrl: "https://outbox.example.com/ring/link", tokenExchangeUrl: "https://outbox.example.com/ring/oauth/token",
-    webhookUrl: "https://outbox.example.com/ring/webhook", appHomepageUrl: "https://outbox.example.com/", oauthRedirectUri: "https://outbox.example.com/ring/callback", scopes: "Cameras and Doorbells",
+  assert.deepEqual(consoleSettings("https://seenoff.example.com/"), {
+    accountLinkUrl: "https://seenoff.example.com/ring/link", tokenExchangeUrl: "https://seenoff.example.com/ring/oauth/token",
+    webhookUrl: "https://seenoff.example.com/ring/webhook", appHomepageUrl: "https://seenoff.example.com/", oauthRedirectUri: "https://seenoff.example.com/ring/callback", scopes: "Cameras and Doorbells",
   });
   assert.equal(consoleSettings("http://localhost:8787"), null);
   assert.equal(consoleSettings(undefined), null);
@@ -286,8 +286,8 @@ test("console settings: exactly the URLs to enter in the Ring Developer Portal, 
 
 test("npm run ring:setup prints the portal settings from the public address, and refuses without one", async () => {
   const script = join(import.meta.dirname, "..", "scripts", "ring-setup.ts");
-  const ok = await promisify(execFile)(process.execPath, [script], { env: { PATH: process.env.PATH ?? "", OUTBOX_PUBLIC_URL: "https://outbox.example.com" }, encoding: "utf8" });
-  for (const line of ["Account Link URL     https://outbox.example.com/ring/link", "Token Exchange URL   https://outbox.example.com/ring/oauth/token", "Webhook URL          https://outbox.example.com/ring/webhook", "Cameras and Doorbells"]) assert.ok(ok.stdout.includes(line), line);
+  const ok = await promisify(execFile)(process.execPath, [script], { env: { PATH: process.env.PATH ?? "", OUTBOX_PUBLIC_URL: "https://seenoff.example.com" }, encoding: "utf8" });
+  for (const line of ["Account Link URL     https://seenoff.example.com/ring/link", "Token Exchange URL   https://seenoff.example.com/ring/oauth/token", "Webhook URL          https://seenoff.example.com/ring/webhook", "Cameras and Doorbells"]) assert.ok(ok.stdout.includes(line), line);
   const none = await promisify(execFile)(process.execPath, [script], { env: { PATH: process.env.PATH ?? "" }, encoding: "utf8" }).then(() => 0, (e: { code: number }) => e.code);
   assert.equal(none, 2);
 });

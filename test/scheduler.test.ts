@@ -31,7 +31,7 @@ function boot(path: string, nowMs: number, opts: { alerter?: Alerter; script?: R
   const scheduler = new Scheduler({ ledger, runner, clock: () => now, retryBaseMs: 1_000 });
   return { ledger, runner, scheduler, alerts, setNow: (t: number) => { now = t; } };
 }
-const tmpDb = () => join(mkdtempSync(join(tmpdir(), "outbox-")), "ledger.sqlite");
+const tmpDb = () => join(mkdtempSync(join(tmpdir(), "seenoff-")), "ledger.sqlite");
 
 test("restart mid-window: the verdict still fires at window close, with the motion event that arrived before the crash", async () => {
   const db = tmpDb();

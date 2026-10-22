@@ -93,7 +93,7 @@ test("callback: state checked, code exchanged with the verifier and client crede
     const f = r.calls.token[0];
     assert.deepEqual([f.get("grant_type"), f.get("code"), f.get("client_id"), f.get("client_secret")], ["authorization_code", code, CLIENT.id, CLIENT.secret]);
     assert.ok((f.get("code_verifier") ?? "").length >= 43, "the PKCE verifier was sent");
-    assert.deepEqual(r.calls.patch, [{ auth: "Bearer access-1", body: { status: "completed", account_identifier: maskIdentifier("outbox") } }]);
+    assert.deepEqual(r.calls.patch, [{ auth: "Bearer access-1", body: { status: "completed", account_identifier: maskIdentifier("seen-off") } }]);
     assert.equal(loadRefreshToken(tokenFile), "refresh-1");
     assert.ok(!readFileSync(tokenFile, "utf8").includes("refresh-1"), "sealed on disk");
   } finally { r.close(); }

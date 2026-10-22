@@ -1,10 +1,10 @@
-# Outbox
+# Seen Off
 
 Carrier-pickup proof for people who ship from home, built on the Ring Partner API.
 
 **29 of 30 pickup days called correctly, and a parcel on the porch read correctly in 59 of 60 frames (98.3%).** Across 60 recorded pickup days, no day with parcels still on the porch was reported as taken.
 
-A seller leaves parcels on the porch for a scheduled USPS or UPS pickup. Outbox watches the porch through the Ring doorbell, reconciles it against that day's Shippo labels and the carrier's tracking, and gives one verdict per pickup day:
+A seller leaves parcels on the porch for a scheduled USPS or UPS pickup. Seen Off watches the porch through the Ring doorbell, reconciles it against that day's Shippo labels and the carrier's tracking, and gives one verdict per pickup day:
 
 | Verdict | Meaning | What the seller gets |
 |---|---|---|
@@ -13,7 +13,7 @@ A seller leaves parcels on the porch for a scheduled USPS or UPS pickup. Outbox 
 | part-taken | some parcels left, some did not | an alert: "1 of 3 parcels taken, 2 still on the porch" |
 | unscanned | the parcels left the porch but a label still shows no carrier scan 24 h later | an evidence packet: Ring-watermarked frames, handoff time, label list, tracking status |
 
-When a frame cannot be read, the seller is alerted to check the Ring app. Outbox never reports a pickup it did not see.
+When a frame cannot be read, the seller is alerted to check the Ring app. Seen Off never reports a pickup it did not see.
 
 ## Impact
 
@@ -31,7 +31,7 @@ Sellers already use the doorbell as their receipt for outgoing parcels, by hand,
 
 [@Violetsvanity7, Dec 18 2025](https://x.com/Violetsvanity7/status/2001482225116754149)
 
-Each post is one verdict: a pickup the seller can prove, a handoff with no carrier scan, a part-taken day. Outbox produces that proof and the alert while there is still time to act.
+Each post is one verdict: a pickup the seller can prove, a handoff with no carrier scan, a part-taken day. Seen Off produces that proof and the alert while there is still time to act.
 
 ## Seller page
 
@@ -43,7 +43,7 @@ Each post is one verdict: a pickup the seller can prove, a handoff with no carri
 
 **Replay a pickup day.** The Replay control plays any one of 30 recorded pickup days on the production receiver, runner, ledger and vision stage. The day arrives as HMAC-signed Ring v1.1 motion deliveries, each porch frame is read by Qwen3-VL on Bedrock, the verdict lands, the alert fires and the evidence packet fills in. It runs with no credentials (`--demo day05,day06,day15` picks the three demo days, `--days day01,day13` replays days before serving, `--pace-ms 1500` slows each step).
 
-**Connect Ring.** The seller page links a real Ring account the way a registered Ring app does, Ring-driven one-way account linking: the seller taps Connect for Outbox in the Ring Appstore, Ring pushes a single-use authorization code to the Token Exchange URL (exchanged at `oauth.ring.com` within Ring's 60 s, held with the Ring account id from `GET /v1/users/me`), then sends the seller to the Account Link URL with `nonce` and `time`. The link is refused past Ring's 600 s window; the seller signs in; the nonce, `HMAC-SHA256(key, "<time>:<account_id>")` in URL-safe Base64, is recomputed for every waiting token and matched in constant time; the link is confirmed with `POST` then `PATCH` on `/v1/accounts/me/app-integrations`. Apps allowlisted for partner-initiated OAuth 2.0 (`RING_LINK_METHOD=partner-initiated`) get the "Connect Ring" button that starts the flow itself with PKCE S256 (authorize, `state`-checked callback, code exchange, `PATCH`). Either way the refresh token is sealed with AES-256-GCM in `data/` and rotated on every exchange (`src/ring/oneway.ts`, `src/ring/oauth.ts`, `src/ring/token-store.ts`). **Your doorbells** then lists `GET /v1/devices`, and **Take a porch photo now** downloads a snapshot from Ring (`POST .../media/image/download`, 303 to the signed URL), shows it with its media time, origin and hash, and has the porch read run on it.
+**Connect Ring.** The seller page links a real Ring account the way a registered Ring app does, Ring-driven one-way account linking: the seller taps Connect for Seen Off in the Ring Appstore, Ring pushes a single-use authorization code to the Token Exchange URL (exchanged at `oauth.ring.com` within Ring's 60 s, held with the Ring account id from `GET /v1/users/me`), then sends the seller to the Account Link URL with `nonce` and `time`. The link is refused past Ring's 600 s window; the seller signs in; the nonce, `HMAC-SHA256(key, "<time>:<account_id>")` in URL-safe Base64, is recomputed for every waiting token and matched in constant time; the link is confirmed with `POST` then `PATCH` on `/v1/accounts/me/app-integrations`. Apps allowlisted for partner-initiated OAuth 2.0 (`RING_LINK_METHOD=partner-initiated`) get the "Connect Ring" button that starts the flow itself with PKCE S256 (authorize, `state`-checked callback, code exchange, `PATCH`). Either way the refresh token is sealed with AES-256-GCM in `data/` and rotated on every exchange (`src/ring/oneway.ts`, `src/ring/oauth.ts`, `src/ring/token-store.ts`). **Your doorbells** then lists `GET /v1/devices`, and **Take a porch photo now** downloads a snapshot from Ring (`POST .../media/image/download`, 303 to the signed URL), shows it with its media time, origin and hash, and has the porch read run on it.
 
 `npm run ring:setup` prints the values to enter in the Ring Developer Portal for this server: Account Link URL `/ring/link`, Token Exchange URL `/ring/oauth/token`, Webhook URL `/ring/webhook`, App Homepage URL `/`, and the Cameras and Doorbells scope.
 
@@ -130,7 +130,7 @@ Every empty porch is called empty, every real-footage frame is read exactly, and
 | Must-fail: vision always answers "1 parcel present" | 10/30 (every day becomes "missed") |
 | Must-fail: verdict logic mutated so a missed day reads as taken | 22/30 (missed 3/10) |
 
-The verdict reads the whole window, not two frames. A departure needs positive evidence, a count below the baseline, because a wrong "taken" silences the alert. A close count above the baseline is a counting error: with no frame ever showing fewer parcels it is a missed pickup, and with a frame that did show the parcels leave it is a contradiction, so Outbox claims nothing and asks the seller to check the Ring app. An empty porch at window open on a day with labels is read again before it is accepted. Each day the earlier logic got wrong has a named regression in `test/replay-regressions.test.ts`.
+The verdict reads the whole window, not two frames. A departure needs positive evidence, a count below the baseline, because a wrong "taken" silences the alert. A close count above the baseline is a counting error: with no frame ever showing fewer parcels it is a missed pickup, and with a frame that did show the parcels leave it is a contradiction, so Seen Off claims nothing and asks the seller to check the Ring app. An empty porch at window open on a day with labels is read again before it is accepted. Each day the earlier logic got wrong has a named regression in `test/replay-regressions.test.ts`.
 
 Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3 s. Webhook ack over 100 signed deliveries: p95 1 ms, max 2 ms, 100/100 duplicates acknowledged without reprocessing, 10/10 forged bodies answered `401`.
 
@@ -139,7 +139,7 @@ Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3
 ## Run it
 
 ```
-npm test                  # 105 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
+npm test                  # 113 tests, one of them a live Bedrock read of a porch frame: signature, receiver, verdicts, replay regressions, runner, scheduler restart, plan validation, packet and provenance, Ring client, probe, Shippo, HTTP server
 npm run test:whep         # WHEP worker against a local WHEP server serving a real frame
 npm run mutation          # 52 mutations: signature, idempotency order, verdict logic, scheduler persistence, plan validation, probe, replay, alerts, evidence hashes, token store, scoring. Each must turn the suite red
 cp .env.example .env      # names only; fill values yourself

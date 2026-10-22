@@ -1,6 +1,6 @@
 # Friction log: Ring Partner API, Playground and sample app
 
-Task context: Outbox, a carrier-pickup proof app built on the Ring Partner API and Amazon Bedrock. Sources: the Ring API documentation (`developer.amazon.com/docs/ring/api-documentation.html`), Devpost forum topics 45309 and 45511, `AmazonAppDev/ring-api-helloworld` at `76100aa`, and this repo's history. The webhook-path entries for the sample app are also kept in `oss-ring-api-helloworld/FRICTION.md`.
+Task context: Seen Off, a carrier-pickup proof app built on the Ring Partner API and Amazon Bedrock. Sources: the Ring API documentation (`developer.amazon.com/docs/ring/api-documentation.html`), Devpost forum topics 45309 and 45511, `AmazonAppDev/ring-api-helloworld` at `76100aa`, and this repo's history. The webhook-path entries for the sample app are also kept in `oss-ring-api-helloworld/FRICTION.md`.
 
 ### 1. The Playground emits no webhooks, and every live-view scenario writes the same record
 
@@ -59,7 +59,7 @@ Task context: Outbox, a carrier-pickup proof app built on the Ring Partner API a
 - Expected: `X-Signature: sha256=<hex>`, HMAC-SHA256 of the raw body bytes with the signing key, constant-time compare, 401 on failure, verified before parsing.
 - Actual: the sample checks `Authorization: Bearer $RING_WEBHOOK_SECRET`, which Ring never sends, skips auth entirely when the variable is unset, and `request.json()` discards the raw bytes the signature covers. Real Ring deliveries cannot authenticate against it.
 - Severity: High (a spoofable endpoint in the sample partners copy).
-- Workaround: Outbox verifies over the raw bytes before parsing (`src/ring/signature.ts`); forged bodies answer `401` (10 of 10 in `metric/run.ts`).
+- Workaround: Seen Off verifies over the raw bytes before parsing (`src/ring/signature.ts`); forged bodies answer `401` (10 of 10 in `metric/run.ts`).
 - Suggestion: merge the open upstream signature PR (#31) and make the sample fail closed when the secret is unset.
 
 ### 7. The sample's schema is v1.0 and invents fields Ring never sends
@@ -69,7 +69,7 @@ Task context: Outbox, a carrier-pickup proof app built on the Ring Partner API a
 - Expected: `meta.version` `1.1` with `meta.account_id`; `motion_detected`, `button_press`, `device_added`, `device_removed`, `device_online`, `device_offline`, `app_integration_added`, `app_integration_removed`, `subscription_activated`, `subscription_deactivated`; motion attributes `sub_type`, `timestamp_readable`, optional `component_ids`; no snapshot, confidence or bounding box.
 - Actual: four event types including `person_detected`, which Ring does not send; `confidence`, `bounding_box` and `thumbnail_url` that Ring never sends; `button_press` and `device_offline` fall to the generic normalizer and show as `unknown`. The UI Person filter keys on `person_detected`, so it never matches real traffic (person detection in v1.1 is `motion_detected` with `sub_type: "human"`).
 - Severity: Medium.
-- Workaround: Outbox reads `sub_type` and the documented fields only (`src/ring/webhook.ts`).
+- Workaround: Seen Off reads `sub_type` and the documented fields only (`src/ring/webhook.ts`).
 - Suggestion: model all ten types, drop the invented fields, key the Person filter on `sub_type`.
 
 ### 8. The sample records `request_id` before handling, so a retried failure is acknowledged and lost
@@ -79,7 +79,7 @@ Task context: Outbox, a carrier-pickup proof app built on the Ring Partner API a
 - Expected: the docs say a 5xx is retried with backoff and the handler must be idempotent, so the retry runs the handler again.
 - Actual: `processedRequests.add(requestId)` runs before normalizing and broadcasting, so the retry returns 200 `already_processed`. Ring marks it delivered and the event is never broadcast. Any transient failure loses the event the same way.
 - Severity: High (silent data loss on the documented retry path).
-- Workaround: Outbox marks the id only after the handler succeeds, and 50 concurrent copies run the handler once (`src/ring/webhook.ts`, `docs/ring-contract.md`).
+- Workaround: Seen Off marks the id only after the handler succeeds, and 50 concurrent copies run the handler once (`src/ring/webhook.ts`, `docs/ring-contract.md`).
 - Suggestion: fixed on branch `fix/webhook-idempotency` of the sample (duplicate check up front, id recorded after `broadcastEvent`). The repo's first test file, `tests/webhook-idempotency.test.cjs`, has 4 cases: 2 fail on unmodified `main`, all 4 pass on the branch, and moving the `add` back above the handler turns the same 2 red again.
 
 ### 9. Bedrock Nova answers "Operation not allowed" while the mantle endpoint serves Qwen3-VL

@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Outbox: pickup days</title>
+<title>Seen Off: pickup days</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* Outbox seller console. Tokens from DESIGN.md: Archivo, cool paper, one signal yellow spent on the verdict and the primary action. */
+/* Seen Off seller console. Tokens from DESIGN.md: Archivo, cool paper, one signal yellow spent on the verdict and the primary action. */
 :root {
   --paper: oklch(99% 0.003 255);
   --paper-2: oklch(97.2% 0.004 255);
@@ -227,7 +227,7 @@ tbody tr:hover { background: var(--paper-2); }
 <header class="mast">
   <div class="shell">
     <div>
-      <div class="wordmark">outbox<span class="period"></span></div>
+      <div class="wordmark">seen off<span class="period"></span></div>
       <p class="tagline">Proof that the carrier took the parcels you left on the porch.</p>
     </div>
     <button type="button" class="btn primary" id="openForm">New pickup day</button>
@@ -272,7 +272,7 @@ tbody tr:hover { background: var(--paper-2); }
 
       <section class="block" id="replay" aria-label="Replay a pickup day" hidden>
         <h2>Replay a pickup day</h2>
-        <p class="hint">Pick a recorded day and watch Outbox work through it: the window opens, motion arrives, the verdict lands.</p>
+        <p class="hint">Pick a recorded day and watch Seen Off work through it: the window opens, motion arrives, the verdict lands.</p>
         <div class="replay-row">
           <select id="replayDay" aria-label="Recorded pickup day"></select>
           <button type="button" class="btn primary" id="replayGo">Replay</button>
@@ -473,7 +473,7 @@ function renderIndex() {
   if (state.days === null) { ul.replaceChildren(h("li", { class: "skeleton" }), h("li", { class: "skeleton" }), h("li", { class: "skeleton" })); return; }
   $("#count").textContent = plural(state.days.length, "day");
   if (state.days.length === 0) {
-    ul.replaceChildren(h("li", { class: "state" }, h("strong", {}, "No pickup days yet"), "Arm one above. Outbox opens a window, reads the porch after every motion event, and settles the day when the carrier has had 24 h."));
+    ul.replaceChildren(h("li", { class: "state" }, h("strong", {}, "No pickup days yet"), "Arm one above. Seen Off opens a window, reads the porch after every motion event, and settles the day when the carrier has had 24 h."));
     return;
   }
   ul.replaceChildren(...state.days.map((d) => h("li", {},
@@ -487,11 +487,11 @@ function renderIndex() {
 const deviceName = (id) => state.devices.find((d) => d.id === id)?.name ?? `doorbell ${id.split(".").pop()}`;
 function say(p) {
   const left = p.closeCount ?? 0;
-  if (p.status === "watching") return `Window open until ${when(p.window.endMs)}. Outbox reads the porch after each Ring motion event and again at close.`;
+  if (p.status === "watching") return `Window open until ${when(p.window.endMs)}. Seen Off reads the porch after each Ring motion event and again at close.`;
   const w = p.windowVerdict;
   if (w === "missed") return `${plural(left, "parcel")} still on the porch when the window closed. The alert went out while there was time to drop them off.`;
   if (w === "partial") return `${p.takenCount} of ${p.baselineCount} parcels taken, ${left} still on the porch.`;
-  if (w === "unverified") return "The porch could not be read well enough to call the pickup, so Outbox calls nothing. Check the Ring app.";
+  if (w === "unverified") return "The porch could not be read well enough to call the pickup, so Seen Off calls nothing. Check the Ring app.";
   if (p.status === "awaiting_tracking") return "Every parcel left the porch. Carrier scans are read 24 h after close.";
   if (p.verdict === "unscanned") {
     const bad = (p.tracking ?? []).filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length;
@@ -580,7 +580,7 @@ function renderDetail() {
   const el = $("#detail");
   if (state.days !== null && state.days.length === 0) {
     el.replaceChildren(state.demo
-      ? h("div", { class: "hero-empty" }, h("h1", {}, "three pickup days, one seller"), h("p", {}, "Three scheduled parcels each day. Watch Outbox call a missed pickup, a part-taken day and a handoff the carrier never scanned, each ending in its evidence packet."), h("button", { type: "button", class: "btn primary", onclick: playDemo }, "Play the demo"))
+      ? h("div", { class: "hero-empty" }, h("h1", {}, "three pickup days, one seller"), h("p", {}, "Three scheduled parcels each day. Watch Seen Off call a missed pickup, a part-taken day and a handoff the carrier never scanned, each ending in its evidence packet."), h("button", { type: "button", class: "btn primary", onclick: playDemo }, "Play the demo"))
       : h("div", {}, h("h1", { class: "day-title" }, "pickup days"), h("div", { class: "state" }, h("strong", {}, "Nothing is being watched"), "Arm a pickup day and this page becomes its timeline, then its evidence packet.")));
     return;
   }
@@ -620,7 +620,7 @@ async function refresh() {
     renderIndex(); renderDetail();
     $("#banner").hidden = true;
   } catch (e) {
-    $("#banner").hidden = false; $("#banner").textContent = `Cannot reach the Outbox server (${e.message}). Retrying.`;
+    $("#banner").hidden = false; $("#banner").textContent = `Cannot reach the Seen Off server (${e.message}). Retrying.`;
   }
 }
 async function loadDevices() {

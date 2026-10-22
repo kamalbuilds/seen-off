@@ -61,7 +61,7 @@ createApp({
   devices: async () => (ring.connected ? (await ring.listDevices()).map((d) => ({ id: d.id, name: d.name, provenance: "live" as const })) : []),
   ring: ringIntegrationFromEnv(process.env, { session: ring, vision, port, tokenFile, photoDir: "data/ring-photos" }),
 }).listen(port, signInCode ? "0.0.0.0" : "127.0.0.1", () => {
-  console.log(`outbox listening on :${port}`);
+  console.log(`seen off listening on :${port}`);
   scheduler.start();
 });
 setInterval(() => void runner.drain().catch((e) => console.error("drain failed", e)), 10_000).unref();

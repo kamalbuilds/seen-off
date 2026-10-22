@@ -1,8 +1,8 @@
 # Ring contract: webhook budget, retries and media
 
-How Outbox meets the Ring Partner API's delivery contract. Every row names the code that enforces it and the test that fails if it stops.
+How Seen Off meets the Ring Partner API's delivery contract. Every row names the code that enforces it and the test that fails if it stops.
 
-| Ring requirement | Outbox behaviour | Code | Test |
+| Ring requirement | Seen Off behaviour | Code | Test |
 |---|---|---|---|
 | Acknowledge a delivery within 5 s | The receiver answers inside a 4 s internal budget. Past it, `503 ack_budget_exceeded` so Ring retries. | `src/ring/webhook.ts` | `webhook: a handler slower than the ack budget gets 503` |
 | `X-Signature` is HMAC-SHA256 over the raw bytes | Verified over the bytes as received, before parsing, in constant time. Missing, malformed, re-serialised and wrong-key signatures are `401`. | `src/ring/signature.ts` | `signature: valid, tampered, wrong key, missing, malformed header` |

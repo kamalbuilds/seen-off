@@ -41,7 +41,7 @@ test("a missed pickup reaches the phone webhook and the file, and the day packet
     assert.deepEqual(packet.alert?.delivery?.channels.map((c) => [c.name, c.ok]), [["file", true], ["phone", true]]);
     assert.equal(p.got.length, 1);
     assert.equal(p.got[0].method, "POST");
-    assert.match((p.got[0].body as { text: string }).text, /^Outbox missed: 3 parcels still on the porch/);
+    assert.match((p.got[0].body as { text: string }).text, /^Seen Off missed: 3 parcels still on the porch/);
     assert.equal(JSON.parse(readFileSync(file, "utf8").trim()).dayId, "d1");
   } finally { p.close(); }
 });

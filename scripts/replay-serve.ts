@@ -83,7 +83,7 @@ const server = createApp({
 });
 await new Promise<void>((r) => server.listen(port, "127.0.0.1", r));
 base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-console.log(`outbox replay console on ${base}`);
+console.log(`seen off replay console on ${base}`);
 
 const pause = paceMs > 0 ? () => new Promise<void>((r) => setTimeout(r, paceMs)) : undefined;
 for (const id of picked) {

@@ -1,4 +1,4 @@
-# Outbox design system
+# Seen Off design system
 
 Theme: Hallmark catalog theme Grid, app-screen variant (Swiss neo-grotesque, one grotesk, one signal ink, no exposed rails, whisper rules).
 Signal ink: yellow, logistics register. Yellow is surface-only: it floods fills and bars and always carries ink text.

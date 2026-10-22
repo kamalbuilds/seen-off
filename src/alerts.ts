@@ -22,7 +22,7 @@ export function fileAlerter(path: string): Alerter {
 export function webhookAlerter(url: string, name = "webhook", fetchImpl: typeof fetch = fetch): Alerter {
   return {
     async send(a: Alert) {
-      const res = await fetchImpl(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: `Outbox ${a.kind}: ${a.text}`, dayId: a.dayId, kind: a.kind }), signal: AbortSignal.timeout(10_000) });
+      const res = await fetchImpl(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text: `Seen Off ${a.kind}: ${a.text}`, dayId: a.dayId, kind: a.kind }), signal: AbortSignal.timeout(10_000) });
       if (!res.ok) throw new Error(`${name} answered ${res.status}`);
       return { channels: [{ name, ok: true, status: res.status }] };
     },

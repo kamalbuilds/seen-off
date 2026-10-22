@@ -10,7 +10,7 @@ import type { RingSession } from "./session.ts";
 
 export const SETUP_NOTE = "Connect Ring needs one setup step: add this app's Ring client ID, client secret and HMAC key as RING_CLIENT_ID, RING_CLIENT_SECRET and RING_WEBHOOK_SIGNING_KEY, plus a sign-in code as OUTBOX_SIGN_IN_CODE and this server's public https address as OUTBOX_PUBLIC_URL, in .env, then restart.";
 export const SETUP_NOTE_PARTNER = "Connect Ring signs you in on Ring's own page. One step first: add this app's Ring client ID and secret as RING_CLIENT_ID and RING_CLIENT_SECRET in .env, then restart.";
-export const RING_DRIVEN_STEPS = "Open the Ring app, go to Appstore, choose Outbox and tap Connect. Ring brings you back here for a quick sign-in, and this panel updates when the link is done.";
+export const RING_DRIVEN_STEPS = "Open the Ring app, go to Appstore, choose Seen Off and tap Connect. Ring brings you back here for a quick sign-in, and this panel updates when the link is done.";
 
 /** The values to enter under Account linking, Webhook and scopes in the Ring Developer Portal, from the public HTTPS address of this server. */
 export interface ConsoleSettings {

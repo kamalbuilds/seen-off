@@ -7,7 +7,7 @@ export interface TimelineEntry {
   atMs: number;
   kind: TimelineKind;
   text: string;
-  /** Null for entries Outbox computes itself (window open, alert). */
+  /** Null for entries Seen Off computes itself (window open, alert). */
   provenance: Provenance | null;
   /** porch: what the doorbell saw. carrier: what the carrier recorded. null: the day itself (labels, window, alert). */
   lane: "porch" | "carrier" | null;
@@ -55,7 +55,7 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
       text: `${plural(day.labels.length, "label")} registered: ${day.labels.map((l) => `${l.carrier} ${l.trackingNumber}`).join(", ")}`,
     });
   }
-  timeline.push({ atMs: day.windowStartMs, kind: "window_open", provenance: null, text: "Pickup window opens. Outbox watches the porch." });
+  timeline.push({ atMs: day.windowStartMs, kind: "window_open", provenance: null, text: "Pickup window opens. Seen Off watches the porch." });
   for (const e of events) {
     timeline.push({ atMs: e.tsMs!, kind: "motion_event", provenance: e.provenance, text: `${e.type === "button_press" ? "Doorbell button pressed" : "Motion at the door"}${e.subType ? ` (${e.subType})` : ""}` });
   }
@@ -98,11 +98,11 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
   const w = day.windowVerdict;
   const unscannedLabels = tracking.filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length;
   const porch: Track =
-    w === null ? { state: "waiting", headline: "Watching the porch", reason: `The window closes at ${hhmm(day.windowEndMs)}. Outbox reads the porch after each motion event and again at close.`, atMs: null }
+    w === null ? { state: "waiting", headline: "Watching the porch", reason: `The window closes at ${hhmm(day.windowEndMs)}. Seen Off reads the porch after each motion event and again at close.`, atMs: null }
     : w === "taken" ? { state: "done", headline: "Left the porch", reason: `All ${plural(day.baselineCount ?? n, "parcel")} gone by ${hhmm(day.windowEndMs)}${day.handoffMs ? `, handoff seen at ${hhmm(day.handoffMs)}` : ""}.`, atMs: day.handoffMs ?? day.windowEndMs }
     : w === "partial" ? { state: "problem", headline: `${takenCount} of ${day.baselineCount} left`, reason: `${plural(day.closeCount ?? 0, "parcel")} still on the porch at ${hhmm(day.windowEndMs)}. The alert asks the seller to drop them off.`, atMs: day.windowEndMs }
     : w === "missed" ? { state: "problem", headline: "Still on the porch", reason: `The carrier did not take the parcels. They were still there at ${hhmm(day.windowEndMs)}, and the alert went out while there was time to drop them off.`, atMs: day.windowEndMs }
-    : { state: "problem", headline: "Could not read the porch", reason: "The frames were not clear enough to call a pickup, so Outbox claims nothing. Check the Ring app.", atMs: day.windowEndMs };
+    : { state: "problem", headline: "Could not read the porch", reason: "The frames were not clear enough to call a pickup, so Seen Off claims nothing. Check the Ring app.", atMs: day.windowEndMs };
   const scanDueMs = day.windowEndMs + 24 * 3600_000;
   const carrier: Track =
     w === null ? { state: "waiting", headline: "Not started", reason: `Carrier scans are read 24 h after the window closes, at ${hhmm(scanDueMs)}.`, atMs: null }

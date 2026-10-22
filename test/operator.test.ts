@@ -25,7 +25,7 @@ async function console_(o: { secure?: boolean; now?: () => number } = {}) {
     tracking: { statusOf: async () => "TRANSIT" }, alerter: { send: async () => {} },
   });
   let demoRunning = false;
-  const env = { RING_CLIENT_ID: "id", RING_CLIENT_SECRET: "secret", RING_WEBHOOK_SIGNING_KEY: KEY, OUTBOX_SIGN_IN_CODE: CODE, OUTBOX_PUBLIC_URL: "https://outbox.example.com" } as NodeJS.ProcessEnv;
+  const env = { RING_CLIENT_ID: "id", RING_CLIENT_SECRET: "secret", RING_WEBHOOK_SIGNING_KEY: KEY, OUTBOX_SIGN_IN_CODE: CODE, OUTBOX_PUBLIC_URL: "https://seenoff.example.com" } as NodeJS.ProcessEnv;
   const srv = createApp({
     signingKey: KEY, ledger, runner,
     operator: createOperatorAuth({ code: CODE, secure: o.secure ?? false, now: o.now }),
@@ -75,7 +75,7 @@ test("every seller and operator route is 401 without a session, and the one-clic
       assert.equal(r.status, 401, `${method} ${path}`);
       assert.deepEqual(await r.json(), { error: "sign in required" }, `${method} ${path}`);
     }
-    const demo = await fetch(`${c.base}/api/demo`, { method: "POST", headers: { cookie: "outbox_operator=1.forged" } });
+    const demo = await fetch(`${c.base}/api/demo`, { method: "POST", headers: { cookie: "seenoff_operator=1.forged" } });
     assert.equal(demo.status, 401, "a forged cookie is not a session");
   } finally { c.close(); }
 });
@@ -155,7 +155,7 @@ test("on an https deployment the cookie is Secure and __Host- prefixed", async (
   const c = await console_({ secure: true });
   try {
     const sc = (await c.login(CODE)).headers.get("set-cookie")!;
-    assert.match(sc, /^__Host-outbox_operator=/);
+    assert.match(sc, /^__Host-seenoff_operator=/);
     assert.match(sc, /; Secure/);
     assert.match(sc, /HttpOnly/);
     assert.doesNotMatch(sc, /Domain=/);
