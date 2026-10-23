@@ -205,6 +205,13 @@ tbody tr { transition: background-color 0.18s ease; }
 tbody tr:hover { background: var(--paper-2); }
 .table-wrap { overflow-x: auto; }
 
+/* claim */
+.claim { margin-top: var(--s6); background: var(--paper-2); padding: var(--s4) var(--s6); display: grid; gap: var(--s4); }
+.claim-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s4); flex-wrap: wrap; }
+.claim-head p { max-width: 56ch; }
+.claim-body { display: grid; gap: var(--s3); justify-items: start; }
+.claim pre { margin: 0; white-space: pre-wrap; font: inherit; font-size: 15px; line-height: 1.55; background: var(--paper); padding: var(--s4); width: 100%; max-height: 420px; overflow: auto; }
+
 /* states */
 .state { padding: var(--s6) var(--s2); color: var(--muted); border-top: 1px solid var(--rule); }
 .state strong { display: block; color: var(--ink); font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--s1); }
@@ -346,7 +353,7 @@ const CARRIER = { usps: "USPS", ups: "UPS", fedex: "FedEx", dhl_express: "DHL", 
 const SCAN_STATE = { PRE_TRANSIT: "Label created, no scan", TRANSIT: "In transit", DELIVERED: "Delivered", RETURNED: "Returned", FAILURE: "Carrier exception", UNKNOWN: "No tracking yet" };
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
-const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [], demo: null, public: false };
+const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [], demo: null, public: false, features: {}, claim: null };
 
 async function api(path, init) {
   const res = await fetch(path, { ...init, signal: AbortSignal.timeout(15000) });
@@ -628,7 +635,39 @@ function renderDetail() {
     plate(p),
     tracks(p),
     h("section", { class: "section" }, h("h2", {}, "day timeline"), timeline(p)),
-    h("section", { class: "section" }, h("div", { class: "section-head" }, h("h2", {}, "evidence packet"), h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), state.public ? null : h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));
+    h("section", { class: "section" }, h("div", { class: "section-head" }, h("h2", {}, "evidence packet"), h("span", { class: "actions" },
+      h("a", { class: "btn primary", href: `/days/${encodeURIComponent(p.dayId)}/export`, download: `${p.dayId}-evidence.html` }, "Download the evidence kit"),
+      h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Packet JSON"),
+      state.public ? null : h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))),
+      claimBox(p), packet(p)));
+}
+
+/* ---------- claim: Qwen3-VL on Bedrock drafts it, the server refuses any fact the packet does not hold ---------- */
+const claimKindOf = (p) => p.verdict === "unscanned" ? "carrier" : ["missed", "partial"].includes(p.windowVerdict) && p.status !== "watching" ? "marketplace" : null;
+function claimBox(p) {
+  const kind = claimKindOf(p);
+  if (!state.features.claims || !kind) return null;
+  const c = state.claim?.dayId === p.dayId ? state.claim : null;
+  const label = kind === "carrier" ? "Draft the carrier trace request" : "Draft the late-shipment appeal";
+  const box = h("div", { class: "claim" },
+    h("div", { class: "claim-head" },
+      h("p", {}, kind === "carrier" ? "A Missing Mail request built from this packet: the frames, the handoff time and the unscanned labels." : "An appeal to the marketplace: the carrier missed the scheduled pickup, so the late scan is not on you."),
+      h("button", { type: "button", class: "btn", disabled: c?.loading, onclick: () => draft(p.dayId) }, c?.loading ? "Drafting" : c?.draft ? "Draft again" : label)),
+    c?.draft ? h("div", { class: "claim-body" }, h("pre", {}, c.draft),
+      h("p", { class: "hint" }, `Written by ${/qwen3-vl/i.test(c.model) ? "Qwen3-VL" : c.model} on Amazon Bedrock. Every time, tracking number and parcel count is checked against this packet before it is shown.`),
+      h("button", { type: "button", class: "btn ghost", onclick: (e) => navigator.clipboard?.writeText(c.draft).then(() => { e.target.textContent = "Copied"; }) }, "Copy the claim")) : null,
+    c?.error ? h("p", { class: "hint", role: "alert" }, c.error) : null);
+  return box;
+}
+async function draft(dayId) {
+  state.claim = { dayId, loading: true }; renderDetail();
+  try {
+    const r = await fetch(`/days/${encodeURIComponent(dayId)}/claim`, { method: "POST", signal: AbortSignal.timeout(150000) });
+    const body = await r.json().catch(() => ({}));
+    state.claim = r.ok ? { dayId, draft: body.draft, model: body.model }
+      : { dayId, error: body.grounding?.problems?.length ? `The draft cited facts this packet does not hold (${body.grounding.problems.join("; ")}), so it was refused. Draft again.` : body.errors?.[0] ?? body.error ?? `HTTP ${r.status}` };
+  } catch (e) { state.claim = { dayId, error: e.message }; }
+  renderDetail();
 }
 
 async function removeDay(id) {
@@ -669,6 +708,7 @@ async function loadDevices() {
 document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id && id !== state.selected) select(id); });
 resetForm(); renderIndex(); renderDetail();
+try { state.features = await api("/api/features"); } catch { state.features = {}; }
 await loadRing(); await loadDevices(); await loadReplay(true); await refresh();
 if (state.demo && !state.demo.running && (state.days?.length ?? 0) === 0 && new URLSearchParams(location.search).get("demo") !== "0") await playDemo();
 $("#newday").open = (state.days?.length ?? 0) === 0 && !state.demo;

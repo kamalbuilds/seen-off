@@ -13,6 +13,8 @@ import { linkPage, linkProblemPage } from "./ring/link-page.ts";
 import { RingNotConnected } from "./ring/session.ts";
 import { RingApiError } from "./ring/client.ts";
 import { isPublicRoute, type OperatorAuth } from "./operator.ts";
+import { exportKit } from "./pickup/export.ts";
+import { draftClaim, type ClaimWriter } from "./pickup/claim.ts";
 
 const UI_HTML = readFileSync(new URL("./ui/index.html", import.meta.url), "utf8");
 
@@ -46,6 +48,8 @@ export interface AppOptions {
    * The replay itself drives a second, loopback-only app over the same ledger, so its own POSTs never pass through this one.
    */
   readOnly?: boolean;
+  /** Drafts carrier and marketplace claims from a packet (Qwen3-VL on Bedrock). Unset hides the claim button. */
+  claims?: ClaimWriter;
   /** Recorded pickup days the seller can play through the pipeline from the page. */
   replay?: {
     days(): { dayId: string; labels: number; startMs: number; title?: string; timeZone?: string }[];
@@ -222,16 +226,40 @@ export function createApp(o: AppOptions): Server {
       if (req.method === "GET" && url.pathname === "/api/devices") {
         return send(200, { devices: o.devices ? await o.devices() : [] });
       }
+      // The file must still be the frame the vision stage read; a changed file is refused, never served or exported as evidence.
+      const storedFrame = (id: string, n: number): Buffer | "missing" | "changed" => {
+        const obs = o.ledger.hasDay(id) ? o.ledger.observations(id)[n] : undefined;
+        if (!obs?.framePath) return "missing";
+        const bytes = readFileSync(obs.framePath);
+        return createHash("sha256").update(bytes).digest("hex") === obs.frameSha256 ? bytes : "changed";
+      };
       const frame = url.pathname.match(/^\/days\/([^/]+)\/frames\/(\d+)$/);
       if (req.method === "GET" && frame) {
-        const id = decodeURIComponent(frame[1]);
-        const obs = o.ledger.hasDay(id) ? o.ledger.observations(id)[Number(frame[2])] : undefined;
-        if (!obs?.framePath) return send(404, { error: "no stored frame" });
-        const bytes = readFileSync(obs.framePath);
-        // The file must still be the frame the vision stage read; a changed file is refused, never served as evidence.
-        if (createHash("sha256").update(bytes).digest("hex") !== obs.frameSha256) return send(409, { error: "frame does not match its recorded hash" });
+        const bytes = storedFrame(decodeURIComponent(frame[1]), Number(frame[2]));
+        if (bytes === "missing") return send(404, { error: "no stored frame" });
+        if (bytes === "changed") return send(409, { error: "frame does not match its recorded hash" });
         res.writeHead(200, { "content-type": "image/jpeg", "cache-control": "private, max-age=3600" });
         return void res.end(bytes);
+      }
+      if (req.method === "GET" && url.pathname === "/api/features") return send(200, { claims: Boolean(o.claims) });
+      const kit = url.pathname.match(/^\/days\/([^/]+)\/(export|claim)$/);
+      if (kit) {
+        const id = decodeURIComponent(kit[1]);
+        if (!o.ledger.hasDay(id)) return send(404, { error: "no such day" });
+        const p = o.runner.packetOf(id);
+        if (req.method === "GET" && kit[2] === "export") {
+          const frames = new Map<number, Uint8Array>();
+          for (const f of p.frames) { const b = storedFrame(id, f.index); if (typeof b !== "string") frames.set(f.index, b); }
+          res.writeHead(200, { "content-type": "text/html; charset=utf-8", "content-disposition": `attachment; filename="${DAY_ID.test(id) ? id : "day"}-evidence.html"`, "cache-control": "no-store" });
+          return void res.end(exportKit(p, frames, Date.now()));
+        }
+        if (req.method === "POST" && kit[2] === "claim") {
+          if (!o.claims) return send(404, { error: "claims are not configured on this server" });
+          let r;
+          try { r = await draftClaim(p, o.claims); } catch (e) { return send(502, { error: "claim writer failed", errors: [(e as Error).message] }); }
+          if (!r) return send(422, { error: "nothing to dispute", errors: ["This day has no missed pickup or unscanned handoff to claim."] });
+          return send(r.draft ? 200 : 422, r);
+        }
       }
       const m = url.pathname.match(/^\/days\/([^/]+)$/);
       if (req.method === "DELETE" && m) {

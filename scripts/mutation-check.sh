@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts recorded.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts recorded.test.ts claim.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -27,6 +27,7 @@ while IFS= read -r line; do
 done <<'MUT'
 src/vision/recorded.ts@@s/if \(!r \|\| r.replies.length === 0\) throw new Error\(.*\);/if (!r) return { present: false, count: 0, raw: "" };/@@recorded.test.ts@@missing recorded frame read as an empty porch
 src/server.ts@@s/if \(o\.readOnly \&\& \(/if (false \&\& (/@@replay-api.test.ts@@public demo accepts arm, delete and Ring routes
+src/pickup/claim.ts@@s/if \(h > 23 \|\| min > 59 \|\| !minutes.has\(h \* 60 \+ min\)\) problems.push/if (false) problems.push/@@claim.test.ts@@claim grounding ignores invented times
 src/ring/signature.ts@@s/return timingSafeEqual\(expected, Buffer.from\(received, "hex"\)\);/return true;/@@webhook.test.ts@@signature check always accepts
 src/ring/signature.ts@@s/if \(!signingKey \|\| !header\) return false;//@@webhook.test.ts@@missing header no longer rejected
 src/ring/webhook.ts@@s/\.then\(\(\) => opts\.handle\(event\)\)\s*$/.then(() => { opts.store.markDone(event.requestId); return opts.handle(event); })/@@webhook.test.ts@@idempotency marked before handling
@@ -58,7 +59,7 @@ src/ring/token-store.ts@@s/onRefreshToken: \(t\) => \{ saveRefreshToken\(path, t
 src/store/ledger.ts@@s/where device_id = \? and window_start <= \?/where ? is not null and window_start <= ?/@@runner.test.ts@@another doorbell triggers this porch
 src/alerts.ts@@s/if \(!res.ok\) throw new Error/if (false) throw new Error/@@alerts.test.ts@@a 500 from the phone webhook counts as delivered
 src/alerts.ts@@s/out.every\(\(c\) => !c.ok\)/false/@@alerts.test.ts@@all channels failing does not retry the alert
-src/server.ts@@s/if \(createHash\("sha256"\).update\(bytes\).digest\("hex"\) !== obs.frameSha256\)/if (false)/@@evidence.test.ts@@tampered frame served as evidence
+src/server.ts@@s/digest\("hex"\) === obs.frameSha256 \? bytes : "changed"/digest("hex") ? bytes : "changed"/@@evidence.test.ts@@tampered frame served as evidence
 src/server.ts@@s/rmSync\(join\(o.runner.d.evidenceDir, id\), \{ recursive: true, force: true \}\);//@@evidence.test.ts@@delete leaves frames on disk
 src/store/ledger.ts@@s/for \(const t of \["observations", "jobs", "tracking_readings", "packets"\]\)/for (const t of ["observations"])/@@evidence.test.ts@@delete leaves jobs behind
 metric/score.ts@@s/ \|\| r.truth === "partial"//@@score.test.ts@@false reassurance ignores part-taken days
@@ -82,7 +83,7 @@ src/ring/oneway.ts@@s/const MAX_FAILURES = 5;/const MAX_FAILURES = 5000;/@@ring-
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts recorded.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts recorded.test.ts claim.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail

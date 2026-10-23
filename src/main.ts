@@ -12,6 +12,7 @@ import type { TrackingSource } from "./pickup/runner.ts";
 import { createOperatorAuth } from "./operator.ts";
 import { Scheduler } from "./pickup/scheduler.ts";
 import { createApp } from "./server.ts";
+import { claimWriterFromEnv } from "./pickup/claim.ts";
 
 const need = (k: string) => {
   const v = process.env[k];
@@ -57,7 +58,7 @@ if (!signInCode) console.warn("OUTBOX_SIGN_IN_CODE is not set: the console is op
 const operator = signInCode ? createOperatorAuth({ code: signInCode, secure: process.env.OUTBOX_PUBLIC_URL?.startsWith("https://") ?? false }) : undefined;
 
 createApp({
-  signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner, operator,
+  signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner, operator, claims: claimWriterFromEnv(),
   devices: async () => (ring.connected ? (await ring.listDevices()).map((d) => ({ id: d.id, name: d.name, provenance: "live" as const })) : []),
   ring: ringIntegrationFromEnv(process.env, { session: ring, vision, port, tokenFile, photoDir: "data/ring-photos" }),
 }).listen(port, signInCode ? "0.0.0.0" : "127.0.0.1", () => {

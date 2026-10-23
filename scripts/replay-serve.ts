@@ -15,6 +15,7 @@ import { createApp } from "../src/server.ts";
 import { RingSession } from "../src/ring/session.ts";
 import { ringIntegrationFromEnv } from "../src/ring/integration.ts";
 import { visionFromEnv } from "../src/vision/index.ts";
+import { claimWriterFromEnv } from "../src/pickup/claim.ts";
 import { DEFAULT_TIME_ZONE, dayTitle } from "../src/pickup/time.ts";
 import { REPLAY_DEVICE, SETTLE_MS, SIM_KEY, fixtureTracking, loadDays, playDay, replayFrameSource, root } from "../simulator/replay.ts";
 
@@ -56,7 +57,7 @@ if (demoIds.length !== DEMO_STEPS.length) throw new Error(`--demo needs ${DEMO_S
 let base = "";
 const pace = () => new Promise<void>((r) => setTimeout(r, Math.max(paceMs, 800)));
 const options: Parameters<typeof createApp>[0] = {
-  signingKey: SIM_KEY, ledger, runner,
+  signingKey: SIM_KEY, ledger, runner, claims: claimWriterFromEnv(),
   ring: isPublic ? undefined : ringIntegrationFromEnv(process.env, { session: new RingSession({ tokenFile: "data/ring-refresh-token" }), vision, port, tokenFile: "data/ring-refresh-token", photoDir: "data/ring-photos" }),
   devices: async () => [{ id: REPLAY_DEVICE, name: "Front door", provenance: "replay" }],
   replay: {
