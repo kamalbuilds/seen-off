@@ -6,6 +6,7 @@ import type { DayRow, LabelRow, Ledger } from "../store/ledger.ts";
 import { decideDayVerdict, decideWindowVerdict, type DayVerdict, type TrackingReading, type TrackingStatus } from "./verdict.ts";
 import { buildPacket } from "./packet.ts";
 import type { Provenance } from "../provenance.ts";
+import { clockTime } from "./time.ts";
 
 export interface Frame {
   jpeg: Uint8Array;
@@ -56,10 +57,11 @@ export interface DayPlan {
   windowStartMs: number;
   windowEndMs: number;
   labels: LabelRow[];
+  /** IANA zone for every time the seller reads about this day; Pacific when absent. */
+  timeZone?: string;
 }
 
 const ZERO_REREADS = 2;
-const hhmm = (ms: number) => new Date(ms).toISOString().slice(11, 16) + " UTC";
 
 export class PickupRunner {
   readonly d: RunnerDeps;
@@ -134,11 +136,12 @@ export class PickupRunner {
       // When the close count exceeds the baseline the two readings disagree; the lower one is the claim the evidence supports.
       const left = day.closeCount !== null && day.baselineCount !== null ? Math.min(day.closeCount, day.baselineCount) : day.closeCount ?? 0;
       const taken = day.baselineCount !== null ? Math.max(0, day.baselineCount - left) : 0;
+      const at = clockTime(day.windowEndMs, day.timeZone);
       const text = verdict === "missed"
-        ? `${left} parcel${left === 1 ? "" : "s"} still on the porch at ${hhmm(day.windowEndMs)}: the carrier did not take them.`
+        ? `${left} parcel${left === 1 ? "" : "s"} still on the porch at ${at}: the carrier did not take them.`
         : verdict === "partial"
-          ? `${taken} of ${day.baselineCount} parcels taken, ${left} still on the porch at ${hhmm(day.windowEndMs)}.`
-          : `Could not read the porch at ${hhmm(day.windowEndMs)}. Check the Ring app before the carrier cut-off.`;
+          ? `${taken} of ${day.baselineCount} parcels taken, ${left} still on the porch at ${at}.`
+          : `Could not read the porch at ${at}. Check the Ring app before the carrier cut-off.`;
       const delivery = await this.d.alerter.send({ dayId: day.dayId, kind: verdict, text });
       this.d.ledger.setAlerted(day.dayId, this.d.clock(), verdict, text, delivery ?? null);
     }

@@ -40,6 +40,9 @@ test("the recorded readings replay the three demo days to their true verdicts, a
   const day05 = await replay("day05", rec);
   assert.equal(day05.verdict, "missed");
   assert.equal(day05.packet.provenance.vision?.model, "qwen.qwen3-vl-235b-a22b-instruct");
+  // Read in the seller's zone (Pacific when the plan names none): the window closes at 00:00 UTC, which is 5:00 PM on 30 Oct.
+  assert.equal(day05.packet.alert?.text, "3 parcels still on the porch at 5:00 PM: the carrier did not take them.");
+  assert.equal(day05.packet.title, "Fri 30 Oct pickup, 10:00 AM to 5:00 PM");
   assert.equal((await replay("day06", rec)).verdict, "partial");
   assert.equal((await replay("day15", rec)).verdict, "unscanned");
 

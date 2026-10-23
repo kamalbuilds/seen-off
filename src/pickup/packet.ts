@@ -1,5 +1,6 @@
 import type { Ledger, Observation } from "../store/ledger.ts";
 import { weakest, type Provenance } from "../provenance.ts";
+import { clockTime, dayTitle } from "./time.ts";
 
 export type TimelineKind = "label" | "window_open" | "motion_event" | "frame" | "window_verdict" | "alert" | "tracking" | "final_verdict";
 
@@ -28,6 +29,7 @@ export type DayStatus = "watching" | "awaiting_tracking" | "settled";
 
 const LANE: Record<TimelineKind, TimelineEntry["lane"]> = { label: null, window_open: null, alert: null, motion_event: "porch", frame: "porch", window_verdict: "porch", tracking: "carrier", final_verdict: "carrier" };
 const KIND_TEXT: Record<Observation["kind"], string> = { baseline: "Window open frame", motion: "Frame after motion", close: "Window close frame" };
+const SCAN_TEXT: Record<string, string> = { PRE_TRANSIT: "label created, no carrier scan", TRANSIT: "in transit", DELIVERED: "delivered", RETURNED: "returned to sender", FAILURE: "carrier exception", UNKNOWN: "no tracking found" };
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
 /**
@@ -52,7 +54,7 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
   if (day.createdAtMs !== null) {
     timeline.push({
       atMs: day.createdAtMs, kind: "label", provenance: trackingProvenance,
-      text: `${plural(day.labels.length, "label")} registered: ${day.labels.map((l) => `${l.carrier} ${l.trackingNumber}`).join(", ")}`,
+      text: `${plural(day.labels.length, "label")} registered: ${day.labels.map((l) => l.name ?? `${l.carrier} ${l.trackingNumber}`).join(day.labels.some((l) => l.name) ? "; " : ", ")}`,
     });
   }
   timeline.push({ atMs: day.windowStartMs, kind: "window_open", provenance: null, text: "Pickup window opens. Seen Off watches the porch." });
@@ -77,9 +79,10 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
   if (day.alertedAtMs !== null && day.windowVerdict !== null && day.alertKind !== "unscanned") {
     timeline.push({ atMs: day.alertedAtMs, kind: "alert", provenance: null, text: `Alert sent: ${day.alertText}` });
   }
-  for (const t of tracking) {
-    timeline.push({ atMs: t.readAtMs, kind: "tracking", provenance: t.provenance, text: `${t.trackingNumber}: ${t.status}` });
-  }
+  tracking.forEach((t, i) => {
+    const name = day.labels[i]?.trackingNumber === t.trackingNumber ? day.labels[i].name : undefined;
+    timeline.push({ atMs: t.readAtMs, kind: "tracking", provenance: t.provenance, text: `${name ?? t.trackingNumber}: ${SCAN_TEXT[t.status]}` });
+  });
   if (status === "settled") {
     timeline.push({
       atMs: tracking[0].readAtMs, kind: "final_verdict", provenance: weakest([...(frameProvenance ? [frameProvenance] : []), ...tracking.map((t) => t.provenance)]),
@@ -93,7 +96,7 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
   const timelineOut: TimelineEntry[] = timeline.map((t) => ({ ...t, lane: LANE[t.kind] }));
 
   // Two separate questions: did the parcels leave the porch, and did the carrier scan them. "Unscanned" is the second answer disagreeing with the first.
-  const hhmm = (ms: number) => `${new Date(ms).toISOString().slice(11, 16)} UTC`;
+  const hhmm = (ms: number) => clockTime(ms, day.timeZone);
   const n = day.labels.length;
   const w = day.windowVerdict;
   const unscannedLabels = tracking.filter((t) => t.status === "PRE_TRANSIT" || t.status === "UNKNOWN").length;
@@ -116,6 +119,7 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
 
   return {
     dayId: day.dayId, deviceId: day.deviceId, status,
+    title: dayTitle(day.windowStartMs, day.windowEndMs, day.timeZone), timeZone: day.timeZone,
     tracks: { porch, carrier },
     window: { startMs: day.windowStartMs, endMs: day.windowEndMs },
     createdAtMs: day.createdAtMs,

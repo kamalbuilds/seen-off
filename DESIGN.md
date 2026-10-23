@@ -17,14 +17,23 @@ Screen kind: one app screen, a seller console. Macrostructure: index rail plus d
 | --control | oklch(62% 0.010 255) |
 | --accent | oklch(82% 0.17 95) |
 | --accent-ink | var(--ink) |
-| --danger | none: verdicts are carried by words, never by a second colour |
+| --v-watching | var(--accent) |
+| --v-taken | oklch(80% 0.14 152) |
+| --v-missed | oklch(56% 0.2 28), paper text |
+| --v-part | oklch(77% 0.15 62) |
+| --v-unscanned | var(--ink), accent word |
+| --v-check | var(--paper-3) |
+
+Each verdict owns one fill, always paired with its word and a drawn glyph (check, cross, half disc, struck barcode, open circle), so colour is never the only signal. The plate floods with the verdict fill and holds the window-open and window-close frames.
 | radius | 0 everywhere |
 | shadow | none |
 | font | Archivo 400 500 600 700 800, one family. Display is 800 lowercase, tracking -0.045em, line-height 0.9 |
 
 ## Type scale
 
-13 label (600, sentence case) / 14 small / 16 body / 20 row title / 24 block / 28 section / clamp(48px, 7.4vw, 100px) verdict.
+13 label (600, sentence case) / 14 small / 16 body / 20 row title / 24 block / 28 section / clamp(44px, 5.6vw, 84px) verdict.
+
+Times are shown in the zone the day was armed in (plan.timeZone, Pacific by default), never UTC.
 
 ## Spacing
 

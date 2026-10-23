@@ -19,6 +19,13 @@
   --control: oklch(62% 0.010 255);
   --accent: oklch(82% 0.17 95);
   --accent-ink: var(--ink);
+  /* verdict states: each verdict owns one fill, always paired with its word and glyph */
+  --v-watching: var(--accent);
+  --v-taken: oklch(80% 0.14 152);
+  --v-missed: oklch(56% 0.2 28);
+  --v-part: oklch(77% 0.15 62);
+  --v-unscanned: var(--ink);
+  --v-check: var(--paper-3);
   --font-display: "Archivo", ui-sans-serif, sans-serif;
   --font-body: "Archivo", ui-sans-serif, sans-serif;
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s6: 24px; --s8: 32px; --s12: 48px; --s16: 64px;
@@ -100,15 +107,29 @@ fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: var(--s2); min-
 .day-row[aria-current="true"] { background: var(--paper-2); border-left-color: var(--accent); }
 .day-row .name { font-weight: 700; overflow-wrap: anywhere; }
 .day-row .sub { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
-.day-row .verdict { font-weight: 800; letter-spacing: -0.02em; text-transform: lowercase; text-align: right; }
+.day-row .verdict { font-weight: 800; letter-spacing: -0.02em; text-transform: lowercase; text-align: right; display: inline-flex; align-items: center; gap: var(--s2); justify-self: end; }
+.day-row .verdict::before { content: ""; width: 12px; height: 12px; background: var(--v, var(--rule)); outline: 1px solid color-mix(in oklab, var(--ink) 25%, transparent); }
 
 /* detail head and verdict */
 .crumb { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); align-items: baseline; }
-h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28px; letter-spacing: -0.03em; text-transform: lowercase; overflow-wrap: anywhere; }
-.plate { background: var(--accent); color: var(--accent-ink); margin-block: var(--s3) var(--s6); padding: var(--s4) var(--s8) var(--s6); display: grid; gap: var(--s3); }
-.plate .word { font-family: var(--font-display); font-weight: 800; font-size: clamp(48px, 7.4vw, 100px); letter-spacing: -0.045em; line-height: 0.92; text-transform: lowercase; overflow-wrap: anywhere; min-width: 0; }
-.plate .word .period { background: var(--ink); }
-.plate .say { font-size: 20px; font-weight: 600; line-height: 1.3; max-width: 44ch; }
+h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: 1.15; letter-spacing: -0.03em; overflow-wrap: anywhere; }
+[data-verdict="watching"] { --v: var(--v-watching); --v-ink: var(--ink); }
+[data-verdict="taken"] { --v: var(--v-taken); --v-ink: var(--ink); }
+[data-verdict="missed"] { --v: var(--v-missed); --v-ink: var(--paper); }
+[data-verdict="partial"] { --v: var(--v-part); --v-ink: var(--ink); }
+[data-verdict="unscanned"] { --v: var(--v-unscanned); --v-ink: var(--paper); }
+[data-verdict="unverified"] { --v: var(--v-check); --v-ink: var(--ink); }
+.plate { background: var(--v, var(--accent)); color: var(--v-ink, var(--ink)); margin-block: var(--s3) var(--s6); padding: var(--s4) var(--s6) var(--s6); display: grid; gap: var(--s3); }
+.plate .word { font-family: var(--font-display); font-weight: 800; font-size: clamp(44px, 5.6vw, 84px); letter-spacing: -0.045em; line-height: 0.92; text-transform: lowercase; overflow-wrap: anywhere; min-width: 0; display: flex; align-items: center; gap: 0.16em; }
+.plate .word .period { background: currentColor; }
+.plate[data-verdict="unscanned"] .word { color: var(--accent); }
+.glyph { width: 0.6em; height: 0.6em; flex: none; }
+.plate .pair { margin-top: var(--s2); gap: var(--s4); }
+.plate .frame figcaption { color: inherit; padding-top: var(--s2); grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; }
+.plate .frame .big { color: inherit; font-size: 22px; }
+.plate .frame .label { color: inherit; opacity: 0.85; }
+.plate .frame .sha { grid-column: 1 / -1; font-size: 12px; opacity: 0.8; }
+.plate .say { font-size: 20px; font-weight: 600; line-height: 1.3; max-width: 52ch; }
 .plate .meta { font-size: 14px; font-weight: 600; }
 
 .tracks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s6); margin-bottom: var(--s8); }
@@ -130,6 +151,10 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 .demo .n { font-size: 13px; font-weight: 600; color: var(--muted); }
 .demo .t { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
 .demo .b { font-size: 14px; color: var(--muted); }
+.demo li[data-verdict] button { border-top-color: var(--v); }
+.demo .q { font-size: 14px; line-height: 1.4; color: var(--ink); margin: 0; }
+.demo .q cite { display: block; font-style: normal; font-size: 13px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+.demo .q a { color: inherit; text-underline-offset: 2px; }
 .demo li[data-state="upcoming"] .t { color: var(--muted); }
 .hero-empty { padding: var(--s8) 0; display: grid; gap: var(--s4); justify-items: start; }
 .hero-empty h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(32px, 3.6vw, 44px); letter-spacing: -0.04em; line-height: 1; text-transform: lowercase; max-width: 22ch; }
@@ -138,10 +163,6 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 /* sections */
 .section { margin-bottom: var(--s12); }
 .section > h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; text-transform: lowercase; margin-bottom: var(--s4); display: flex; justify-content: space-between; align-items: center; gap: var(--s4); flex-wrap: wrap; }
-.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s6); margin-top: var(--s6); }
-.facts > div { display: grid; gap: var(--s1); align-content: start; }
-.facts .n { font-size: 40px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
-.facts .what { font-size: 14px; color: var(--muted); }
 
 /* evidence */
 .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s6); }
@@ -153,8 +174,8 @@ h1.day-title { font-family: var(--font-display); font-weight: 800; font-size: 28
 
 /* timeline */
 .timeline { list-style: none; margin: 0; padding: 0; }
-.lanes { display: grid; grid-template-columns: 72px 20px minmax(0, 1fr) minmax(0, 1fr); gap: 0 var(--s3); padding: 0 var(--s2) var(--s2); }
-.tl { display: grid; grid-template-columns: 72px 20px minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); align-items: start; padding: var(--s3) var(--s2); border-top: 1px solid var(--rule); transition: background-color 0.18s ease; }
+.lanes { display: grid; grid-template-columns: 92px 20px minmax(0, 1fr) minmax(0, 1fr); gap: 0 var(--s3); padding: 0 var(--s2) var(--s2); }
+.tl { display: grid; grid-template-columns: 92px 20px minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); align-items: start; padding: var(--s3) var(--s2); border-top: 1px solid var(--rule); transition: background-color 0.18s ease; }
 .tl:hover { background: var(--paper-2); }
 .tl time { font-size: 14px; color: var(--muted); font-weight: 600; padding-top: 2px; }
 .tl time .tday { display: block; font-size: 13px; color: var(--ink); }
@@ -195,9 +216,8 @@ tbody tr:hover { background: var(--paper-2); }
 @media (max-width: 960px) {
   .main { grid-template-columns: minmax(0, 1fr); gap: var(--s8); }
   .detail { order: -1; }
-  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 640px) { .tracks { grid-template-columns: minmax(0, 1fr); gap: var(--s4); } .track .head { font-size: 24px; } .demo ol { grid-template-columns: minmax(0, 1fr); gap: var(--s2); } .demo .b { display: none; } .demo li[aria-current="true"] .b { display: block; } }
+@media (max-width: 640px) { .tracks { grid-template-columns: minmax(0, 1fr); gap: var(--s4); } .track .head { font-size: 24px; } .demo ol { grid-template-columns: minmax(0, 1fr); gap: var(--s2); } .demo .b, .demo .q { display: none; } .demo li[aria-current="true"] .b, .demo li[aria-current="true"] .q { display: block; } h1.day-title { font-size: 22px; } }
 @media (max-width: 640px) {
   .shell { padding-inline: var(--s4); }
   .banner { padding-inline: var(--s4); }
@@ -206,15 +226,16 @@ tbody tr:hover { background: var(--paper-2); }
   .tagline { display: none; }
   .plate { padding: var(--s4) var(--s4) var(--s6); }
   .plate .say { font-size: 18px; }
-  .pair { grid-template-columns: minmax(0, 1fr); }
-  .tl { grid-template-columns: 56px 16px minmax(0, 1fr); }
+  .plate .pair { gap: var(--s2); }
+  .plate .frame .big { font-size: 18px; }
+  .plate .frame .sha { display: none; }
+  .tl { grid-template-columns: 76px 16px minmax(0, 1fr); }
   .tl .text, .tl[data-lane="porch"] .text, .tl[data-lane="carrier"] .text { grid-column: 3; }
   .tl .side { grid-column: 3; }
   .lanes { display: none; }
   .tl time { font-size: 13px; }
   .label-row { grid-template-columns: 84px minmax(0, 1fr) 44px; }
   .section > h2 { font-size: 24px; }
-  .facts .n { font-size: 32px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -303,11 +324,26 @@ const h = (tag, attrs = {}, ...kids) => {
   return el;
 };
 
-const UTC = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
-const UTC_TIME = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
-const DAY = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", day: "numeric", month: "short" });
-const when = (ms) => `${UTC.format(ms)} UTC`;
-const clock = (ms) => UTC_TIME.format(ms);
+// Every time is shown in the zone the day was armed in (the packet carries it); browser-local where no day applies.
+const plainSp = (x) => x.replace(/[\u202f\u00a0]/g, " ");
+const fmt = (opts, tz) => new Intl.DateTimeFormat("en-GB", { ...opts, timeZone: tz || undefined });
+const time12 = (ms, tz, seconds = false) => plainSp(new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", ...(seconds ? { second: "2-digit" } : {}), timeZone: tz || undefined }).format(ms));
+const dateShort = (ms, tz) => fmt({ weekday: "short", day: "numeric", month: "short" }, tz).format(ms).replace(",", "");
+const when = (ms, tz) => `${dateShort(ms, tz)}, ${time12(ms, tz)}`;
+const clock = (ms, tz) => time12(ms, tz, ms % 60000 !== 0);
+const DAY = { format: (ms, tz) => fmt({ day: "numeric", month: "short" }, tz).format(ms) };
+const myZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const GLYPH = {
+  watching: '<circle cx="12" cy="12" r="8" fill="none"/><circle cx="12" cy="12" r="3" stroke="none" fill="currentColor"/>',
+  taken: '<path d="M4 12.5l5 5L20 6.5" fill="none"/>',
+  missed: '<path d="M5.5 5.5l13 13M18.5 5.5l-13 13" fill="none"/>',
+  partial: '<circle cx="12" cy="12" r="8" fill="none"/><path d="M12 4a8 8 0 0 1 0 16z" stroke="none" fill="currentColor"/>',
+  unscanned: '<path d="M5 6v12M8.5 6v12M12 6v12M15.5 6v12M19 6v12" fill="none" stroke-width="2"/><path d="M3 21L21 3" fill="none"/>',
+  unverified: '<circle cx="12" cy="12" r="8" fill="none"/><path d="M12 7.5v5.5M12 16v.5" fill="none"/>',
+};
+const glyph = (v) => { const el = document.createElementNS("http://www.w3.org/2000/svg", "svg"); el.setAttribute("viewBox", "0 0 24 24"); el.setAttribute("class", "glyph"); el.setAttribute("aria-hidden", "true"); el.setAttribute("stroke", "currentColor"); el.setAttribute("stroke-width", "3"); el.setAttribute("stroke-linecap", "square"); el.innerHTML = GLYPH[v] ?? GLYPH.watching; return el; };
+const CARRIER = { usps: "USPS", ups: "UPS", fedex: "FedEx", dhl_express: "DHL", shippo: "Shippo" };
+const SCAN_STATE = { PRE_TRANSIT: "Label created, no scan", TRANSIT: "In transit", DELIVERED: "Delivered", RETURNED: "Returned", FAILURE: "Carrier exception", UNKNOWN: "No tracking yet" };
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
 const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [], demo: null, public: false };
@@ -334,7 +370,7 @@ function labelRow(carrier = "usps", tracking = "") {
 }
 function utcPreview() {
   const a = instant($("#start")), b = instant($("#end"));
-  $("#utc").textContent = a !== null && b !== null ? `Read in UTC as ${when(a)} to ${when(b)}.` : "";
+  $("#utc").textContent = a !== null && b !== null ? `${dateShort(a, myZone)}, ${time12(a, myZone)} to ${time12(b, myZone)}, read in ${myZone.replace(/_/g, " ")} time.` : "";
 }
 function resetForm() {
   const start = new Date(); start.setMinutes(Math.ceil(start.getMinutes() / 15) * 15, 0, 0);
@@ -359,7 +395,7 @@ $("#form").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const body = {
     dayId: $("#dayId").value.trim(), deviceId: $("#deviceId").value.trim(),
-    windowStartMs: instant($("#start")), windowEndMs: instant($("#end")),
+    windowStartMs: instant($("#start")), windowEndMs: instant($("#end")), timeZone: myZone,
     labels: [...$("#labels").children].map((r) => ({ carrier: r.querySelector("select").value, trackingNumber: r.querySelector("input").value.trim() })),
   };
   const btn = $("#submit"); btn.disabled = true; btn.textContent = "Arming";
@@ -433,7 +469,7 @@ async function loadReplay(first = false) {
   // The public demo only plays recorded days: no arming, no doorbells, no delete.
   for (const id of ["openForm", "newday", "ring"]) $(`#${id}`).hidden = state.public;
   $("#replay").hidden = state.replay.length === 0;
-  if (first) $("#replayDay").replaceChildren(...state.replay.map((d) => h("option", { value: d.dayId }, `${d.dayId}: ${plural(d.labels, "label")}, ${when(d.startMs)}`)));
+  if (first) $("#replayDay").replaceChildren(...state.replay.map((d) => h("option", { value: d.dayId }, `${dateShort(d.startMs, d.timeZone)}, ${plural(d.labels, "parcel")}`)));
   // While the demo plays, the page follows the day that is being played.
   if (state.demo?.running && state.demo.current && state.selected !== state.demo.current) { state.selected = state.demo.current; location.hash = state.selected; state.packet = null; }
 }
@@ -451,9 +487,12 @@ function demoBar() {
       d.running ? h("span", { class: "label" }, `Day ${Math.max(current, 0) + 1} of ${d.steps.length}`) : h("button", { type: "button", class: "btn primary", onclick: playDemo }, "Play it again")),
     h("ol", {}, d.steps.map((x, i) => {
       const st = !x.dayId ? "upcoming" : d.running && x.dayId === d.current ? "current" : "done";
-      return h("li", { "data-state": st, "aria-current": x.dayId && x.dayId === state.selected ? "true" : "false" },
+      const settled = x.dayId ? state.days?.find((d) => d.dayId === x.dayId) : null;
+      const verdict = settled && settled.status !== "watching" ? settled.verdict : null;
+      return h("li", { "data-state": st, "data-verdict": verdict, "aria-current": x.dayId && x.dayId === state.selected ? "true" : "false" },
         h("button", { type: "button", disabled: !x.dayId, onclick: () => x.dayId && select(x.dayId) },
-          h("span", { class: "n" }, `Day ${i + 1}`), h("span", { class: "t" }, x.title), h("span", { class: "b" }, x.blurb)));
+          h("span", { class: "n" }, `Day ${i + 1}${verdict ? `: ${VERDICT_WORD[verdict]}` : ""}`), h("span", { class: "t" }, x.title)),
+        x.quote ? h("blockquote", { class: "q" }, `\u201c${x.quote.text}\u201d`, h("cite", {}, h("a", { href: x.quote.url, target: "_blank", rel: "noopener" }, `@${x.quote.by} on X`))) : h("p", { class: "b" }, x.blurb));
     })));
 }
 $("#replayGo").addEventListener("click", async () => {
@@ -481,16 +520,16 @@ function renderIndex() {
   }
   ul.replaceChildren(...state.days.map((d) => h("li", {},
     h("button", { class: "day-row", "aria-current": d.dayId === state.selected ? "true" : "false", onclick: () => select(d.dayId) },
-      h("span", { class: "name" }, d.dayId),
-      h("span", { class: "verdict" }, dayWord(d)),
-      h("span", { class: "sub" }, `${when(d.window.startMs)}, ${plural(d.labels, "label")}`)))));
+      h("span", { class: "name" }, d.timeZone ? dateShort(d.window.startMs, d.timeZone) : d.dayId),
+      h("span", { class: "verdict", "data-verdict": d.status === "watching" ? "watching" : d.verdict }, dayWord(d)),
+      h("span", { class: "sub" }, `${d.timeZone ? `${time12(d.window.startMs, d.timeZone)} to ${time12(d.window.endMs, d.timeZone)}, ` : ""}${plural(d.labels, "parcel")}`)))));
 }
 
 /* ---------- detail ---------- */
 const deviceName = (id) => state.devices.find((d) => d.id === id)?.name ?? `doorbell ${id.split(".").pop()}`;
 function say(p) {
   const left = p.closeCount ?? 0;
-  if (p.status === "watching") return `Window open until ${when(p.window.endMs)}. Seen Off reads the porch after each Ring motion event and again at close.`;
+  if (p.status === "watching") return `Window open until ${time12(p.window.endMs, p.timeZone)}. Seen Off reads the porch after each Ring motion event and again at close.`;
   const w = p.windowVerdict;
   if (w === "missed") return `${plural(left, "parcel")} still on the porch when the window closed. The alert went out while there was time to drop them off.`;
   if (w === "partial") return `${p.takenCount} of ${p.baselineCount} parcels taken, ${left} still on the porch.`;
@@ -505,18 +544,19 @@ function say(p) {
 
 const KIND_LABEL = { label: "Labels", window_open: "Window", motion_event: "Ring motion", frame: "Porch frame", window_verdict: "Window verdict", alert: "Alert", tracking: "Carrier tracking", final_verdict: "Final verdict" };
 
-function alertLine(a) {
+function alertLine(a, tz) {
   const ok = (a.delivery?.channels ?? []).filter((c) => c.ok).map((c) => c.name);
   const failed = (a.delivery?.channels ?? []).filter((c) => !c.ok).map((c) => c.name);
-  return `Alert sent ${when(a.atMs)}${ok.length ? ` to ${ok.join(", ")}` : ""}${failed.length ? `. Not delivered to ${failed.join(", ")}` : ""}`;
+  return `Alert sent ${when(a.atMs, tz)}${ok.length ? ` to ${ok.join(", ")}` : ""}${failed.length ? `. Not delivered to ${failed.join(", ")}` : ""}`;
 }
 
 function plate(p) {
-  const word = p.status === "watching" ? "watching" : VERDICT_WORD[p.verdict] ?? p.verdict;
-  return h("section", { class: "plate", "aria-label": "Verdict" },
-    h("div", { class: "word" }, word, h("span", { class: "period" })),
+  const v = p.status === "watching" ? "watching" : p.verdict;
+  return h("section", { class: "plate", "data-verdict": v, "aria-label": "Verdict" },
+    h("div", { class: "word" }, glyph(v), h("span", {}, VERDICT_WORD[v] ?? v, h("span", { class: "period" }))),
     h("p", { class: "say" }, say(p)),
-    p.alert ? h("p", { class: "meta" }, alertLine(p.alert)) : null);
+    p.alert ? h("p", { class: "meta" }, alertLine(p.alert, p.timeZone)) : null,
+    frames(p));
 }
 
 function tracks(p) {
@@ -528,24 +568,14 @@ function tracks(p) {
   return h("div", { class: "tracks" }, t("porch", "Did the parcels leave the porch?"), t("carrier", "Did the carrier scan them?"));
 }
 
-function facts(p) {
-  const motion = p.timeline.filter((t) => t.kind === "motion_event").length;
-  const cell = (n, what) => h("div", {}, h("span", { class: "n" }, n), h("span", { class: "what" }, what));
-  return h("div", { class: "facts" },
-    cell(p.frames.length, "porch frames read"),
-    cell(motion, "motion events"),
-    cell(p.labels.length, plural(p.labels.length, "label").replace(/^\d+ /, "") + " registered"),
-    cell(p.tracking ? p.tracking.length : 0, "carrier scans checked"));
-}
-
 function timeline(p) {
   let lastDay = null;
   const rows = p.timeline.map((t) => {
     const f = t.frame != null ? p.frames[t.frame] : null;
-    const day = DAY.format(t.atMs), showDay = day !== lastDay; lastDay = day;
-    const thumb = f ? (f.image ? h("a", { class: "thumb", href: f.image, target: "_blank", rel: "noopener", "aria-label": `Open the full frame from ${clock(t.atMs)} UTC` }, h("img", { src: f.image, alt: "", loading: "lazy", width: 112, height: 63 })) : h("span", { class: "nothumb" }, "no frame stored")) : null;
+    const day = DAY.format(t.atMs, p.timeZone), showDay = day !== lastDay; lastDay = day;
+    const thumb = f ? (f.image ? h("a", { class: "thumb", href: f.image, target: "_blank", rel: "noopener", "aria-label": `Open the full frame from ${clock(t.atMs, p.timeZone)}` }, h("img", { src: f.image, alt: "", loading: "lazy", width: 112, height: 63 })) : h("span", { class: "nothumb" }, "no frame stored")) : null;
     return h("li", { class: `tl kind-${t.kind}`, "data-lane": t.lane ?? "day" },
-      h("time", { datetime: new Date(t.atMs).toISOString() }, showDay ? h("span", { class: "tday" }, day) : null, clock(t.atMs)),
+      h("time", { datetime: new Date(t.atMs).toISOString() }, showDay ? h("span", { class: "tday" }, day) : null, clock(t.atMs, p.timeZone)),
       h("span", { class: "mark", "aria-hidden": "true" }),
       h("div", { class: "text" }, h("span", { class: "label kind" }, KIND_LABEL[t.kind]), t.text, thumb));
   });
@@ -558,25 +588,26 @@ function frames(p) {
   const base = p.frames.find((f) => f.kind === "baseline" && f.image);
   const close = [...p.frames].reverse().find((f) => f.kind === "close" && f.image);
   const frame = (f, title) => h("div", { class: "frame" }, f
-    ? h("figure", {}, h("a", { href: f.image, target: "_blank", rel: "noopener" }, h("img", { src: f.image, alt: `${title}: ${f.count === null ? "unreadable" : plural(f.count, "parcel")} on the porch at ${when(f.atMs)}` })),
-        h("figcaption", {}, h("span", { class: "label" }, `${title}, ${when(f.atMs)}`), h("span", { class: "big" }, f.count === null ? "unreadable" : plural(f.count, "parcel")),
+    ? h("figure", {}, h("a", { href: f.image, target: "_blank", rel: "noopener" }, h("img", { src: f.image, alt: `${title}: ${f.count === null ? "unreadable" : plural(f.count, "parcel")} on the porch at ${time12(f.atMs, p.timeZone)}` })),
+        h("figcaption", {}, h("span", { class: "big" }, f.count === null ? "unreadable" : plural(f.count, "parcel")), h("span", { class: "label" }, `${title}, ${time12(f.atMs, p.timeZone)}`),
           h("span", { class: "sha" }, `sha256 ${f.sha256.slice(0, 16)}`)))
     : h("div", { class: "state" }, h("strong", {}, title), "No frame stored for this moment yet."));
   return h("div", { class: "pair" }, frame(base, "Window open"), frame(close, "Window close"));
 }
 
 function packet(p) {
+  const tz = p.timeZone;
   const stamps = [
-    ["Pickup window", `${when(p.window.startMs)} to ${when(p.window.endMs)}`],
-    ["Handoff seen", p.handoffMs ? when(p.handoffMs) : "no handoff observed"],
-    ["Alert", p.alert ? `${p.alert.kind}, ${when(p.alert.atMs)}` : "none raised"],
-    ["Carrier scans read", p.tracking ? when(p.tracking[0].readAtMs) : "24 h after the window closes"],
+    ["Pickup window", `${when(p.window.startMs, tz)} to ${time12(p.window.endMs, tz)}`],
+    ["Handoff seen", p.handoffMs ? when(p.handoffMs, tz) : "no handoff observed"],
+    ["Alert", p.alert ? `${VERDICT_WORD[p.alert.kind] ?? p.alert.kind}, ${when(p.alert.atMs, tz)}` : "none raised"],
+    ["Carrier scans read", p.tracking ? when(p.tracking[0].readAtMs, tz) : "24 h after the window closes"],
   ];
   return h("div", {},
     h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Timestamp"), h("th", {}, "Value"))),
       h("tbody", {}, stamps.map(([a, b]) => h("tr", {}, h("td", {}, a), h("td", {}, b)))))),
-    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Carrier"), h("th", {}, "Tracking number"), h("th", {}, "Tracking state"), h("th", {}, "Carrier scan"))),
-      h("tbody", {}, p.labels.map((l) => h("tr", {}, h("td", {}, l.carrier.toUpperCase()), h("td", {}, l.trackingNumber), h("td", {}, l.status ?? "not read yet"), h("td", {}, l.scanned === null ? "pending" : l.scanned ? "scanned" : "not scanned")))))));
+    h("div", { class: "table-wrap" }, h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Parcel"), h("th", {}, "Carrier"), h("th", {}, "Tracking"), h("th", {}, "Carrier scan"))),
+      h("tbody", {}, p.labels.map((l) => h("tr", {}, h("td", {}, l.name ?? l.trackingNumber), h("td", {}, CARRIER[l.carrier] ?? l.carrier), h("td", {}, l.status ? SCAN_STATE[l.status] ?? l.status : "read 24 h after close"), h("td", {}, l.scanned === null ? "pending" : l.scanned ? "scanned" : "not scanned")))))));
 }
 
 function renderDetail() {
@@ -593,10 +624,9 @@ function renderDetail() {
   if (!p || p.dayId !== state.selected) { el.replaceChildren(h("div", { class: "skeleton" }), h("div", { class: "skeleton" })); return; }
   el.replaceChildren(
     demoBar(),
-    h("div", { class: "crumb" }, h("h1", { class: "day-title" }, p.dayId), h("span", { class: "label" }, deviceName(p.deviceId))),
+    h("div", { class: "crumb" }, h("h1", { class: "day-title" }, p.title ?? p.dayId), h("span", { class: "label" }, deviceName(p.deviceId))),
     plate(p),
     tracks(p),
-    h("section", { class: "section" }, h("h2", {}, "porch frames"), frames(p), facts(p)),
     h("section", { class: "section" }, h("h2", {}, "day timeline"), timeline(p)),
     h("section", { class: "section" }, h("div", { class: "section-head" }, h("h2", {}, "evidence packet"), h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), state.public ? null : h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));
 }

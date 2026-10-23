@@ -48,13 +48,13 @@ export interface AppOptions {
   readOnly?: boolean;
   /** Recorded pickup days the seller can play through the pipeline from the page. */
   replay?: {
-    days(): { dayId: string; labels: number; startMs: number }[];
+    days(): { dayId: string; labels: number; startMs: number; title?: string; timeZone?: string }[];
     /** Starts playing the recorded day under a fresh day name and returns that name; the day fills in while it plays. */
     start(dayId: string): string;
     /** A scripted run of contrasting days, back to back, for a first-time viewer. */
     demo?: {
       start(): void;
-      status(): { running: boolean; current: string | null; steps: { title: string; blurb: string; dayId: string | null }[] };
+      status(): { running: boolean; current: string | null; steps: { title: string; blurb: string; dayId: string | null; quote?: { text: string; by: string; url: string } }[] };
     };
   };
 }
@@ -124,7 +124,7 @@ export function createApp(o: AppOptions): Server {
       if (req.method === "GET" && url.pathname === "/api/days") {
         return send(200, { days: o.ledger.listDays().map((d) => {
           const p = o.runner.packetOf(d.dayId);
-          return { dayId: p.dayId, status: p.status, verdict: p.verdict, window: p.window, labels: p.labels.length, baselineCount: p.baselineCount, closeCount: p.closeCount, alert: p.alert?.kind ?? null, provenance: p.provenance.verdict ?? p.provenance.frames };
+          return { dayId: p.dayId, title: p.title, timeZone: p.timeZone, status: p.status, verdict: p.verdict, window: p.window, labels: p.labels.length, baselineCount: p.baselineCount, closeCount: p.closeCount, alert: p.alert?.kind ?? null, provenance: p.provenance.verdict ?? p.provenance.frames };
         }) });
       }
       if (url.pathname.startsWith("/ring/") || url.pathname === "/api/ring" || url.pathname.startsWith("/api/ring/")) {

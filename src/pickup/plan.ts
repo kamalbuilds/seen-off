@@ -1,4 +1,5 @@
 import type { DayPlan } from "./runner.ts";
+import { isTimeZone } from "./time.ts";
 
 export const MAX_WINDOW_MS = 24 * 3600_000;
 export const MAX_LABELS = 50;
@@ -15,10 +16,12 @@ export type PlanCheck = { ok: true; plan: DayPlan } | { ok: false; errors: strin
 export function validatePlan(body: unknown): PlanCheck {
   if (!isObj(body)) return { ok: false, errors: ["body must be a JSON object"] };
   const errors: string[] = [];
-  const { dayId, deviceId, windowStartMs: start, windowEndMs: end, labels } = body;
+  const { dayId, deviceId, windowStartMs: start, windowEndMs: end, labels, timeZone } = body;
 
   if (typeof dayId !== "string" || !DAY_ID.test(dayId)) errors.push("dayId must be 1 to 64 characters: letters, digits, dot, dash or underscore, starting with a letter or digit");
   if (!text(deviceId, 128)) errors.push("deviceId must be a non-empty string of at most 128 characters");
+
+  if (timeZone !== undefined && !(typeof timeZone === "string" && timeZone.length <= 64 && isTimeZone(timeZone))) errors.push("timeZone must be an IANA time zone such as America/Los_Angeles when present");
 
   const okStart = Number.isSafeInteger(start) && (start as number) > 0;
   const okEnd = Number.isSafeInteger(end) && (end as number) > 0;
@@ -37,11 +40,12 @@ export function validatePlan(body: unknown): PlanCheck {
     if (!text(l.trackingNumber, 64)) errors.push(`labels[${i}].trackingNumber must be a non-empty string of at most 64 characters`);
     if (!text(l.carrier, 32)) errors.push(`labels[${i}].carrier must be a non-empty string of at most 32 characters`);
     if (l.labelUrl !== undefined && !text(l.labelUrl, 2048)) errors.push(`labels[${i}].labelUrl must be a string of at most 2048 characters when present`);
+    if (l.name !== undefined && !text(l.name, 80)) errors.push(`labels[${i}].name must be a string of at most 80 characters when present`);
     if (text(l.trackingNumber, 64) && text(l.carrier, 32)) {
-      checked.push({ trackingNumber: l.trackingNumber.trim(), carrier: l.carrier.trim(), ...(typeof l.labelUrl === "string" ? { labelUrl: l.labelUrl } : {}) });
+      checked.push({ trackingNumber: l.trackingNumber.trim(), carrier: l.carrier.trim(), ...(typeof l.labelUrl === "string" ? { labelUrl: l.labelUrl } : {}), ...(typeof l.name === "string" ? { name: l.name.trim() } : {}) });
     }
   });
 
   if (errors.length) return { ok: false, errors };
-  return { ok: true, plan: { dayId: dayId as string, deviceId: (deviceId as string).trim(), windowStartMs: start as number, windowEndMs: end as number, labels: checked } };
+  return { ok: true, plan: { dayId: dayId as string, deviceId: (deviceId as string).trim(), windowStartMs: start as number, windowEndMs: end as number, labels: checked, ...(typeof timeZone === "string" ? { timeZone } : {}) } };
 }

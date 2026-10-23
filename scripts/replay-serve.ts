@@ -15,6 +15,7 @@ import { createApp } from "../src/server.ts";
 import { RingSession } from "../src/ring/session.ts";
 import { ringIntegrationFromEnv } from "../src/ring/integration.ts";
 import { visionFromEnv } from "../src/vision/index.ts";
+import { DEFAULT_TIME_ZONE, dayTitle } from "../src/pickup/time.ts";
 import { REPLAY_DEVICE, SETTLE_MS, SIM_KEY, fixtureTracking, loadDays, playDay, replayFrameSource, root } from "../simulator/replay.ts";
 
 const args = process.argv.slice(2);
@@ -41,10 +42,14 @@ console.log(`vision: ${vision.name}/${vision.model}`);
 const runner = new PickupRunner({ ledger, vision, frames: [replayFrameSource(days)], tracking: fixtureTracking, alerter, clock: () => now, settleMs: SETTLE_MS, evidenceDir: "data/replay-evidence" });
 let playing = false;
 // One seller, three scheduled parcels, three days back to back: nobody collects them, one leaves, all leave and nothing is scanned.
+// Each step carries the seller post it answers (docs/xsignals-ring/signals.md), quoted verbatim.
 const DEMO_STEPS = [
-  { name: "demo-missed", title: "The carrier never comes", blurb: "Three parcels wait on the porch. The window closes with all three still there, and the alert goes out while there is time to drop them off." },
-  { name: "demo-partial", title: "One parcel leaves", blurb: "Motion at the door, then one parcel gone and two left behind. The alert counts them: 1 of 3 taken, 2 still on the porch." },
-  { name: "demo-unscanned", title: "Everything leaves, nothing is scanned", blurb: "The porch is empty at close, but 24 h later the labels still read label created. The evidence packet proves the handoff." },
+  { name: "demo-missed", title: "The carrier never comes", blurb: "Three parcels wait on the porch. The window closes with all three still there, and the alert goes out while there is time to drop them off.",
+    quote: { text: "Why am I still looking at the package by my door ???", by: "Nydollxo__", url: "https://x.com/Nydollxo__/status/2104719305418084376" } },
+  { name: "demo-partial", title: "One parcel leaves", blurb: "Motion at the door, then one parcel gone and two left behind. The alert counts them: 1 of 3 taken, 2 still on the porch.",
+    quote: { text: "it shows the UPS man picking up one of the three packages and then leaving", by: "Violetsvanity7", url: "https://x.com/Violetsvanity7/status/2001482225116754149" } },
+  { name: "demo-unscanned", title: "Everything leaves, nothing is scanned", blurb: "The porch is empty at close, but 24 h later the labels still read label created. The evidence packet proves the handoff.",
+    quote: { text: "I literally have ring camera footage of the mailman taking them and they never arrived", by: "AQualityMess", url: "https://x.com/AQualityMess/status/2018955222945832974" } },
 ];
 const demo: { running: boolean; current: string | null; names: string[] } = { running: false, current: null, names: [] };
 if (demoIds.length !== DEMO_STEPS.length) throw new Error(`--demo needs ${DEMO_STEPS.length} recorded day ids`);
@@ -55,7 +60,7 @@ const options: Parameters<typeof createApp>[0] = {
   ring: isPublic ? undefined : ringIntegrationFromEnv(process.env, { session: new RingSession({ tokenFile: "data/ring-refresh-token" }), vision, port, tokenFile: "data/ring-refresh-token", photoDir: "data/ring-photos" }),
   devices: async () => [{ id: REPLAY_DEVICE, name: "Front door", provenance: "replay" }],
   replay: {
-    days: () => days.map((d) => ({ dayId: d.dayId, labels: d.labels.length, startMs: d.windowStartMs })),
+    days: () => days.map((d) => ({ dayId: d.dayId, labels: d.labels.length, startMs: d.windowStartMs, title: dayTitle(d.windowStartMs, d.windowEndMs, DEFAULT_TIME_ZONE), timeZone: DEFAULT_TIME_ZONE })),
     start(dayId) {
       if (playing) throw new Error("another pickup day is still replaying");
       const spec = days.find((x) => x.dayId === dayId)!;
@@ -68,7 +73,7 @@ const options: Parameters<typeof createApp>[0] = {
       return name;
     },
     demo: {
-      status: () => ({ running: demo.running, current: demo.current, steps: DEMO_STEPS.map((s, i) => ({ title: s.title, blurb: s.blurb, dayId: demo.names[i] ?? null })) }),
+      status: () => ({ running: demo.running, current: demo.current, steps: DEMO_STEPS.map((s, i) => ({ title: s.title, blurb: s.blurb, quote: s.quote, dayId: demo.names[i] ?? null })) }),
       start() {
         if (playing) throw new Error("a pickup day is still replaying");
         playing = true;

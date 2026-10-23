@@ -4,11 +4,14 @@ import type { IdempotencyStore, RingEvent } from "../ring/webhook.ts";
 import type { DayVerdict, TrackingStatus, WindowVerdict } from "../pickup/verdict.ts";
 import type { AlertDelivery } from "../pickup/runner.ts";
 import { eventProvenance, type Provenance } from "../provenance.ts";
+import { DEFAULT_TIME_ZONE } from "../pickup/time.ts";
 
 export interface LabelRow {
   trackingNumber: string;
   carrier: string;
   labelUrl?: string;
+  /** What the seller calls this parcel ("Order 1042, ceramic mug set"). Tracking still keys on the tracking number. */
+  name?: string;
 }
 
 export interface DayRow {
@@ -17,6 +20,8 @@ export interface DayRow {
   windowStartMs: number;
   windowEndMs: number;
   labels: LabelRow[];
+  /** IANA zone the seller reads this window in. */
+  timeZone: string;
   baselineCount: number | null;
   closeCount: number | null;
   windowVerdict: WindowVerdict | null;
@@ -101,6 +106,7 @@ const ADDED_COLUMNS: [table: string, column: string, decl: string][] = [
   ["observations", "source", "text"],
   ["observations", "provenance", "text not null default 'simulated'"],
   ["events", "provenance", "text not null default 'simulated'"],
+  ["days", "time_zone", "text"],
 ];
 
 /** One SQLite file holds idempotency marks, received events, pickup days and evidence. ":memory:" for tests. */
@@ -148,12 +154,12 @@ export class Ledger implements IdempotencyStore {
    * Stores the day and its scheduled work in one transaction: the window-close check, the 24 h tracking check, and the baseline
    * read when the window opens in the future. A restart finds them here, so an armed day cannot be lost with the process.
    */
-  createDay(d: Pick<DayRow, "dayId" | "deviceId" | "windowStartMs" | "windowEndMs" | "labels">, createdAtMs: number): { baselineDeferred: boolean } {
+  createDay(d: Pick<DayRow, "dayId" | "deviceId" | "windowStartMs" | "windowEndMs" | "labels"> & { timeZone?: string }, createdAtMs: number): { baselineDeferred: boolean } {
     const baselineDeferred = d.windowStartMs > createdAtMs;
     this.db.exec("begin");
     try {
-      this.db.prepare("insert into days (day_id, device_id, window_start, window_end, labels, created_at) values (?, ?, ?, ?, ?, ?)")
-        .run(d.dayId, d.deviceId, d.windowStartMs, d.windowEndMs, JSON.stringify(d.labels), createdAtMs);
+      this.db.prepare("insert into days (day_id, device_id, window_start, window_end, labels, created_at, time_zone) values (?, ?, ?, ?, ?, ?, ?)")
+        .run(d.dayId, d.deviceId, d.windowStartMs, d.windowEndMs, JSON.stringify(d.labels), createdAtMs, d.timeZone ?? null);
       const job = this.db.prepare("insert into jobs (day_id, kind, due_ms) values (?, ?, ?)");
       if (baselineDeferred) job.run(d.dayId, "baseline", d.windowStartMs);
       job.run(d.dayId, "close", d.windowEndMs);
@@ -217,7 +223,7 @@ export class Ledger implements IdempotencyStore {
     if (!r) throw new Error(`unknown day ${dayId}`);
     return {
       dayId: r.day_id as string, deviceId: r.device_id as string, windowStartMs: r.window_start as number,
-      windowEndMs: r.window_end as number, labels: JSON.parse(r.labels as string) as LabelRow[],
+      windowEndMs: r.window_end as number, labels: JSON.parse(r.labels as string) as LabelRow[], timeZone: (r.time_zone as string | null) ?? DEFAULT_TIME_ZONE,
       baselineCount: r.baseline_count as number | null, closeCount: r.close_count as number | null,
       windowVerdict: r.window_verdict as WindowVerdict | null, handoffMs: r.handoff_ms as number | null,
       finalVerdict: r.final_verdict as DayVerdict | null, alertedAtMs: r.alerted_at as number | null,
