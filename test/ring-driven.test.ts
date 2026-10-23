@@ -9,7 +9,7 @@ import { promisify } from "node:util";
 import type { AddressInfo } from "node:net";
 import { computeNonce, maskEmail } from "../src/ring/oneway.ts";
 import { RingSession } from "../src/ring/session.ts";
-import { consoleSettings, ringIntegrationFromEnv, SETUP_NOTE } from "../src/ring/integration.ts";
+import { consoleSettings, ringIntegrationFromEnv, seenOffEnv, SETUP_NOTE } from "../src/ring/integration.ts";
 import { loadRefreshToken } from "../src/ring/token-store.ts";
 import { formatPreflight, preflightOk, runPreflight } from "../src/ring/preflight.ts";
 import { Ledger } from "../src/store/ledger.ts";
@@ -76,7 +76,7 @@ async function ring(o: { hmac?: string } = {}) {
 async function app(r: { base: string }, env: Record<string, string> = {}) {
   const dir = mkdtempSync(join(tmpdir(), "driven-"));
   const tokenFile = join(dir, "tok");
-  const full = { RING_CLIENT_ID: APP.id, RING_CLIENT_SECRET: APP.secret, RING_WEBHOOK_SIGNING_KEY: APP.hmac, OUTBOX_SIGN_IN_CODE: APP.signIn, RING_API_BASE: r.base, RING_OAUTH_BASE: r.base, OUTBOX_PUBLIC_URL: "https://seenoff.example.com", ...env };
+  const full = { RING_CLIENT_ID: APP.id, RING_CLIENT_SECRET: APP.secret, RING_WEBHOOK_SIGNING_KEY: APP.hmac, SEEN_OFF_SIGN_IN_CODE: APP.signIn, RING_API_BASE: r.base, RING_OAUTH_BASE: r.base, SEEN_OFF_PUBLIC_URL: "https://seenoff.example.com", ...env };
   const vision = { name: "v", model: "m", readPorch: async () => ({ present: true, count: 1, raw: "" }) };
   const session = new RingSession({ env: full, tokenFile });
   const ledger = new Ledger(":memory:");
@@ -264,12 +264,12 @@ test("Ring answering 400 Invalid Nonce at confirmation is explained and stores n
   } finally { a.close(); r.close(); }
 
   const none = await ring();
-  const bare = await app(none, { RING_WEBHOOK_SIGNING_KEY: "", OUTBOX_SIGN_IN_CODE: "" });
+  const bare = await app(none, { RING_WEBHOOK_SIGNING_KEY: "", SEEN_OFF_SIGN_IN_CODE: "" });
   try {
     const st = await (await fetch(`${bare.base}/api/ring`)).json() as { configured: boolean; setup: string };
     assert.equal(st.configured, false);
     assert.equal(st.setup, SETUP_NOTE);
-    assert.match(SETUP_NOTE, /OUTBOX_SIGN_IN_CODE/);
+    assert.match(SETUP_NOTE, /SEEN_OFF_SIGN_IN_CODE/);
     assert.equal((await fetch(`${bare.base}/ring/link?nonce=${"A".repeat(43)}&time=${Date.now()}`)).status, 400);
     assert.equal((await fetch(`${bare.base}/ring/oauth/token`, { method: "POST", body: "code=x" })).status, 400);
   } finally { bare.close(); none.close(); }
@@ -284,9 +284,15 @@ test("console settings: exactly the URLs to enter in the Ring Developer Portal, 
   assert.equal(consoleSettings(undefined), null);
 });
 
+test("SEEN_OFF_* settings win, and a server still configured with the OUTBOX_* names keeps working", () => {
+  assert.equal(seenOffEnv({ SEEN_OFF_SIGN_IN_CODE: "new", OUTBOX_SIGN_IN_CODE: "old" }, "SIGN_IN_CODE"), "new");
+  assert.equal(seenOffEnv({ OUTBOX_PUBLIC_URL: "https://old.example.com" }, "PUBLIC_URL"), "https://old.example.com");
+  assert.equal(seenOffEnv({ SEEN_OFF_PUBLIC_URL: "", OUTBOX_PUBLIC_URL: "" }, "PUBLIC_URL"), undefined);
+});
+
 test("npm run ring:setup prints the portal settings from the public address, and refuses without one", async () => {
   const script = join(import.meta.dirname, "..", "scripts", "ring-setup.ts");
-  const ok = await promisify(execFile)(process.execPath, [script], { env: { PATH: process.env.PATH ?? "", OUTBOX_PUBLIC_URL: "https://seenoff.example.com" }, encoding: "utf8" });
+  const ok = await promisify(execFile)(process.execPath, [script], { env: { PATH: process.env.PATH ?? "", SEEN_OFF_PUBLIC_URL: "https://seenoff.example.com" }, encoding: "utf8" });
   for (const line of ["Account Link URL     https://seenoff.example.com/ring/link", "Token Exchange URL   https://seenoff.example.com/ring/oauth/token", "Webhook URL          https://seenoff.example.com/ring/webhook", "Cameras and Doorbells"]) assert.ok(ok.stdout.includes(line), line);
   const none = await promisify(execFile)(process.execPath, [script], { env: { PATH: process.env.PATH ?? "" }, encoding: "utf8" }).then(() => 0, (e: { code: number }) => e.code);
   assert.equal(none, 2);

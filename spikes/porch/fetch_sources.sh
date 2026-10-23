@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 mkdir -p src
-UA="outbox-spike/0.1 (github.com/kamalbuilds)"
+UA="seen-off-spike/0.1 (github.com/kamalbuilds)"
 get() { # name url
   [ -s "src/$1" ] || curl -sfL -A "$UA" -o "src/$1" "$2"
 }

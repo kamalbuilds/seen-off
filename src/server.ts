@@ -14,7 +14,7 @@ import { RingNotConnected } from "./ring/session.ts";
 import { RingApiError } from "./ring/client.ts";
 import { isPublicRoute, type OperatorAuth } from "./operator.ts";
 import { exportKit } from "./pickup/export.ts";
-import { draftClaim, type ClaimWriter } from "./pickup/claim.ts";
+import { claimFacts, draftClaim, type ClaimWriter } from "./pickup/claim.ts";
 
 const UI_HTML = readFileSync(new URL("./ui/index.html", import.meta.url), "utf8");
 
@@ -71,6 +71,8 @@ export interface AppOptions {
  * GET  /                the seller page; GET /api/days lists pickup days, GET /api/devices lists doorbells
  */
 export function createApp(o: AppOptions): Server {
+  // A grounded draft is kept per packet, so pressing "Draft the claim" again (or many visitors on the public demo) costs one model call.
+  const drafts = new Map<string, ReturnType<typeof draftClaim>>();
   const receive = createWebhookReceiver({
     signingKey: o.signingKey,
     store: o.ledger,
@@ -256,7 +258,15 @@ export function createApp(o: AppOptions): Server {
         if (req.method === "POST" && kit[2] === "claim") {
           if (!o.claims) return send(404, { error: "claims are not configured on this server" });
           let r;
-          try { r = await draftClaim(p, o.claims); } catch (e) { return send(502, { error: "claim writer failed", errors: [(e as Error).message] }); }
+          const key = JSON.stringify([id, p.verdict, p.windowVerdict, claimFacts(p)]);
+          let pending = drafts.get(key);
+          if (!pending) {
+            pending = draftClaim(p, o.claims);
+            drafts.set(key, pending);
+            pending.then((d) => { if (!d?.draft) drafts.delete(key); }, () => drafts.delete(key));
+            if (drafts.size > 200) drafts.delete(drafts.keys().next().value!);
+          }
+          try { r = await pending; } catch (e) { return send(502, { error: "claim writer failed", errors: [(e as Error).message] }); }
           if (!r) return send(422, { error: "nothing to dispute", errors: ["This day has no missed pickup or unscanned handoff to claim."] });
           return send(r.draft ? 200 : 422, r);
         }

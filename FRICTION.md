@@ -1,6 +1,6 @@
 # Friction log: Ring Partner API, Playground and sample app
 
-Task context: Seen Off, a carrier-pickup proof app built on the Ring Partner API and Amazon Bedrock. Sources: the Ring API documentation (`developer.amazon.com/docs/ring/api-documentation.html`), Devpost forum topics 45309 and 45511, `AmazonAppDev/ring-api-helloworld` at `76100aa`, and this repo's history. The webhook-path entries for the sample app are also kept in `oss-ring-api-helloworld/FRICTION.md`.
+Task context: Seen Off, a carrier-pickup proof app built on the Ring Partner API and Amazon Bedrock. Sources: the Ring API documentation (`developer.amazon.com/docs/ring/api-documentation.html`), the Ring Developer Playground release notes (May 28 2026), Devpost forum topics 45309, 45511 and 45541, `AmazonAppDev/ring-api-helloworld` at `76100aa`, and this repo's history.
 
 ### 1. The Playground emits no webhooks, and every live-view scenario writes the same record
 
@@ -15,9 +15,9 @@ Task context: Seen Off, a carrier-pickup proof app built on the Ring Partner API
 ### 2. The Playground token lasts 30 minutes and carries no refresh token
 
 - Task: run a capture or a long test cycle against the Playground API (`GET /v1/devices`, image download, WHEP live view).
-- Steps: take the one-click token from the Playground, use it as a bearer, keep working past 30 minutes.
+- Steps: read the Playground release notes and Devpost forum topic 45541 on the token, then design the client's credentials for a session that runs past 30 minutes.
 - Expected: either a refresh token to renew it, or a visible expiry on the token screen.
-- Actual: the token is valid for 30 minutes. There is no refresh token, so a new session needs a trip back to the Amazon sign-in for a fresh token. The OAuth refresh-token grant (about 30 day refresh token, about 4 h access token) exists only for a registered app with a linked account.
+- Actual: per the release notes and topic 45541 ("30-minute tokens, no refresh"), the token is valid for 30 minutes. There is no refresh token, so a new session needs a trip back to the Amazon sign-in for a fresh token. The OAuth refresh-token grant (about 30 day refresh token, about 4 h access token) exists only for a registered app with a linked account.
 - Severity: Medium for short spikes, High for any scripted or CI test of the client.
 - Workaround: the client treats the Playground token and the refresh-token grant as two credential modes (`src/ring/client.ts`), and `npm run ring:preflight` reports each failing surface with Ring's own status.
 - Suggestion: issue a refresh token with the Playground token, or allow a longer Playground token for CLI use. Show the expiry time next to the token.
@@ -35,9 +35,9 @@ Task context: Seen Off, a carrier-pickup proof app built on the Ring Partner API
 ### 4. Chimes and sensors are Early Access
 
 - Task: add an audible nudge on the doorbell chime when a pickup is missed.
-- Steps: read the Chimes section (scope "Chime Controls"), then read `audio.customizable_slots` on the Playground DoorbellPro from `GET /v1/devices?include=capabilities,configurations`.
+- Steps: read the Chimes section (scope "Chime Controls"), then Devpost forum topic 45309, which reports `audio.customizable_slots` for the Playground DoorbellPro from `GET /v1/devices?include=capabilities,configurations`.
 - Expected: the only write action in the API (`POST /v1/devices/{id}/media/audio/playback`) can be requested like the other scopes.
-- Actual: Chimes and sensors sit behind the Ring Developer Early Access Program. The Playground DoorbellPro reports `audio.customizable_slots: null`, which leaves nothing to play.
+- Actual: Chimes and sensors sit behind the Ring Developer Early Access Program. Per topic 45309, the Playground DoorbellPro reports `audio.customizable_slots: null` (a real chime reports 2 slots and `chime.play`), which leaves nothing to play.
 - Severity: Medium. The one output channel a notification app wants is not reachable.
 - Workaround: alerts leave through an alert webhook and a file channel (`src/alerts.ts`).
 - Suggestion: a Playground chime with two slots and `chime.play`, so the write path can be built and tested before Early Access is granted.

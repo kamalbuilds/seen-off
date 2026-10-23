@@ -11,3 +11,4 @@ data/
 .uicraft-read.json
 design-research/
 .taste-skill/
+__pycache__/

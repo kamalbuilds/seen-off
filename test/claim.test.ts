@@ -8,7 +8,7 @@ import { Ledger } from "../src/store/ledger.ts";
 import { PickupRunner } from "../src/pickup/runner.ts";
 import { createApp } from "../src/server.ts";
 import { RecordedVision, type RecordedReads } from "../src/vision/recorded.ts";
-import { checkGrounding, claimKind, draftClaim, type ClaimWriter } from "../src/pickup/claim.ts";
+import { checkGrounding, claimFacts, claimKind, draftClaim, type ClaimWriter } from "../src/pickup/claim.ts";
 import { SETTLE_MS, SIM_KEY, fixtureTracking, loadDays, playDay, replayFrameSource, root } from "../simulator/replay.ts";
 
 const days = loadDays();
@@ -67,6 +67,29 @@ test("a claim server returns only a grounded draft; a writer that keeps inventin
     assert.equal(calls, 2, "one redraft, then refuse");
     assert.equal((await draftClaim(s.packet, { model: "t", write: async () => "Subject: trace\n3 parcels left the porch." }))?.draft, "Subject: trace\n3 parcels left the porch.");
   } finally { s.close(); }
+});
+
+test("a grounded draft is written once per packet: asking again returns it without another model call", async () => {
+  let calls = 0;
+  const writer: ClaimWriter = { model: "test", write: async () => { calls++; return "Subject: trace\n3 parcels left the porch."; } };
+  const s = await served("day15", writer);
+  try {
+    const [a, b] = await Promise.all([1, 2].map(() => fetch(`${s.base}/days/day15/claim`, { method: "POST" }).then((r) => r.json() as Promise<{ draft: string }>)));
+    const c = (await (await fetch(`${s.base}/days/day15/claim`, { method: "POST" })).json()) as { draft: string };
+    assert.deepEqual([a.draft, b.draft, c.draft], Array(3).fill("Subject: trace\n3 parcels left the porch."));
+    assert.equal(calls, 1);
+  } finally { s.close(); }
+});
+
+test("a draft carries no em dash, and a Shippo test-mode number reaches the letter as a slot for the real one", async () => {
+  const s = await served("day15");
+  s.close();
+  const r = await draftClaim(s.packet, { model: "t", write: async () => "Subject: Missing Mail search \u2014 3 parcels\n3 parcels left the porch.\n\u2014 [Your name]" });
+  assert.equal(r?.draft, "Subject: Missing Mail search, 3 parcels\n3 parcels left the porch.\n[Your name]");
+  assert.ok(s.packet.labels.every((l) => l.trackingNumber.startsWith("SHIPPO_")), "the replay day uses Shippo test numbers");
+  const labels = claimFacts(s.packet).filter((f) => f.startsWith("Label:"));
+  assert.equal(labels.length, s.packet.labels.length);
+  for (const f of labels) { assert.ok(f.includes("tracking number [tracking number]"), f); assert.ok(!f.includes("SHIPPO_"), f); }
 });
 
 test("live: Qwen3-VL on Bedrock drafts a grounded carrier claim that cites the handoff time", { skip: !process.env.AWS_BEARER_TOKEN_BEDROCK }, async () => {

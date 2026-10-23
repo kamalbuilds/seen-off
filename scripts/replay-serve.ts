@@ -6,7 +6,7 @@
 //   node scripts/replay-serve.ts --demo day05,day06,day15   the three demo days: a missed day, a part-taken day, an unscanned day
 //   node scripts/replay-serve.ts --pace-ms 1500        pause between steps of a replay started from the page (800 ms minimum)
 //   node scripts/replay-serve.ts --public              public read-only demo on 0.0.0.0: plays and shows recorded days, refuses arm, delete and Ring routes
-import { mkdirSync } from "node:fs";
+import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import type { AddressInfo } from "node:net";
 import { Ledger } from "../src/store/ledger.ts";
@@ -42,6 +42,13 @@ const vision = visionFromEnv(process.env, join(root, "simulator/qwen3-vl-reads.j
 console.log(`vision: ${vision.name}/${vision.model}`);
 const runner = new PickupRunner({ ledger, vision, frames: [replayFrameSource(days)], tracking: fixtureTracking, alerter, clock: () => now, settleMs: SETTLE_MS, evidenceDir: "data/replay-evidence" });
 let playing = false;
+// Playing a day again replaces its earlier run, so the ledger and data/replay-evidence hold one copy of each day however often visitors press play.
+const fresh = (name: string) => {
+  if (!ledger.hasDay(name)) return name;
+  ledger.deleteDay(name);
+  rmSync(join("data/replay-evidence", name), { recursive: true, force: true });
+  return name;
+};
 // One seller, three scheduled parcels, three days back to back: nobody collects them, one leaves, all leave and nothing is scanned.
 // Each step carries the seller post it answers (docs/xsignals-ring/signals.md), quoted verbatim.
 const DEMO_STEPS = [
@@ -65,8 +72,7 @@ const options: Parameters<typeof createApp>[0] = {
     start(dayId) {
       if (playing) throw new Error("another pickup day is still replaying");
       const spec = days.find((x) => x.dayId === dayId)!;
-      let name = dayId, n = 1;
-      while (ledger.hasDay(name)) name = `${dayId}-replay-${++n}`;
+      const name = fresh(dayId);
       playing = true;
       void playDay(base, runner, { ...spec, dayId: name }, (ms) => { now = ms; }, { pause: pace })
         .catch((e) => console.error(`replay ${name} failed`, e))
@@ -82,8 +88,7 @@ const options: Parameters<typeof createApp>[0] = {
         void (async () => {
           for (const [i, id] of demoIds.entries()) {
             const spec = days.find((x) => x.dayId === id)!;
-            let name = DEMO_STEPS[i].name, n = 1;
-            while (ledger.hasDay(name)) name = `${DEMO_STEPS[i].name}-${++n}`;
+            const name = fresh(DEMO_STEPS[i].name);
             demo.names[i] = name; demo.current = name;
             await playDay(base, runner, { ...spec, dayId: name }, (ms) => { now = ms; }, { pause: pace });
           }

@@ -25,7 +25,7 @@ async function console_(o: { secure?: boolean; now?: () => number } = {}) {
     tracking: { statusOf: async () => "TRANSIT" }, alerter: { send: async () => {} },
   });
   let demoRunning = false;
-  const env = { RING_CLIENT_ID: "id", RING_CLIENT_SECRET: "secret", RING_WEBHOOK_SIGNING_KEY: KEY, OUTBOX_SIGN_IN_CODE: CODE, OUTBOX_PUBLIC_URL: "https://seenoff.example.com" } as NodeJS.ProcessEnv;
+  const env = { RING_CLIENT_ID: "id", RING_CLIENT_SECRET: "secret", RING_WEBHOOK_SIGNING_KEY: KEY, SEEN_OFF_SIGN_IN_CODE: CODE, SEEN_OFF_PUBLIC_URL: "https://seenoff.example.com" } as NodeJS.ProcessEnv;
   const srv = createApp({
     signingKey: KEY, ledger, runner,
     operator: createOperatorAuth({ code: CODE, secure: o.secure ?? false, now: o.now }),

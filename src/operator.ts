@@ -9,7 +9,7 @@ const sha = (s: string) => createHash("sha256").update(s).digest();
 const sameBytes = (a: Buffer, b: Buffer) => a.length === b.length && timingSafeEqual(a, b);
 
 export interface OperatorOptions {
-  /** OUTBOX_SIGN_IN_CODE: the one code that opens the seller console. Rotating it ends every session. */
+  /** SEEN_OFF_SIGN_IN_CODE: the one code that opens the seller console. Rotating it ends every session. */
   code: string;
   /** Set on every https deployment: adds Secure and the __Host- prefix to the session cookie. */
   secure: boolean;
@@ -40,7 +40,7 @@ export function createOperatorAuth(o: OperatorOptions) {
       if (failures.length >= MAX_FAILURES) return { error: "Too many wrong codes. Wait ten minutes, then try again.", locked: true };
       if (code.length === 0 || code.length > 256 || !sameBytes(sha(code), sha(o.code))) {
         failures.push(now());
-        return { error: "That code did not match. Check OUTBOX_SIGN_IN_CODE and try again.", locked: false };
+        return { error: "That code did not match. Check the sign-in code and try again.", locked: false };
       }
       failures = [];
       const exp = String(now() + SESSION_MS);

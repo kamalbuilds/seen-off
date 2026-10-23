@@ -16,16 +16,16 @@ fly volumes list -a "$APP" 2>/dev/null | grep -qw data || fly volumes create dat
 node -e '
 const { parseEnv } = require("node:util");
 const e = parseEnv(require("fs").readFileSync(".env", "utf8"));
-const skip = new Set(["WHEP_PYTHON", "OUTBOX_PUBLIC_URL", "RING_REDIRECT_URI", "PORT"]);
+const skip = new Set(["WHEP_PYTHON", "SEEN_OFF_PUBLIC_URL", "OUTBOX_PUBLIC_URL", "RING_REDIRECT_URI", "PORT"]);
 for (const k of ["AWS_BEARER_TOKEN_BEDROCK"]) if (!e[k] && process.env[k]) e[k] = process.env[k];
 for (const [k, v] of Object.entries(e)) if (v && !skip.has(k)) process.stdout.write(`${k}=${v}\n`);
-process.stdout.write(`OUTBOX_PUBLIC_URL=${process.argv[1]}\n`);
+process.stdout.write(`SEEN_OFF_PUBLIC_URL=${process.argv[1]}\n`);
 ' "$URL" | fly secrets import -a "$APP" --stage >/dev/null
 echo "secrets staged"
 
-grep -q '^OUTBOX_PUBLIC_URL=' .env \
-  && sed -i.bak "s#^OUTBOX_PUBLIC_URL=.*#OUTBOX_PUBLIC_URL=$URL#" .env && rm -f .env.bak \
-  || echo "OUTBOX_PUBLIC_URL=$URL" >> .env
+grep -q '^SEEN_OFF_PUBLIC_URL=' .env \
+  && sed -i.bak "s#^SEEN_OFF_PUBLIC_URL=.*#SEEN_OFF_PUBLIC_URL=$URL#" .env && rm -f .env.bak \
+  || echo "SEEN_OFF_PUBLIC_URL=$URL" >> .env
 
 fly deploy -a "$APP" --ha=false
 

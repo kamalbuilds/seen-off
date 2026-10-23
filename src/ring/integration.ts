@@ -8,7 +8,10 @@ import { RingDrivenLink } from "./oneway.ts";
 import { jpegSize } from "./probe.ts";
 import type { RingSession } from "./session.ts";
 
-export const SETUP_NOTE = "Connect Ring needs one setup step: add this app's Ring client ID, client secret and HMAC key as RING_CLIENT_ID, RING_CLIENT_SECRET and RING_WEBHOOK_SIGNING_KEY, plus a sign-in code as OUTBOX_SIGN_IN_CODE and this server's public https address as OUTBOX_PUBLIC_URL, in .env, then restart.";
+export const SETUP_NOTE = "Connect Ring needs one setup step: add this app's Ring client ID, client secret and HMAC key as RING_CLIENT_ID, RING_CLIENT_SECRET and RING_WEBHOOK_SIGNING_KEY, plus a sign-in code as SEEN_OFF_SIGN_IN_CODE and this server's public https address as SEEN_OFF_PUBLIC_URL, in .env, then restart.";
+/** SEEN_OFF_PUBLIC_URL or SEEN_OFF_SIGN_IN_CODE, honouring the OUTBOX_* names that servers deployed before the rename still carry. */
+export const seenOffEnv = (env: NodeJS.ProcessEnv, k: "PUBLIC_URL" | "SIGN_IN_CODE"): string | undefined => env[`SEEN_OFF_${k}`] || env[`OUTBOX_${k}`] || undefined;
+
 export const SETUP_NOTE_PARTNER = "Connect Ring signs you in on Ring's own page. One step first: add this app's Ring client ID and secret as RING_CLIENT_ID and RING_CLIENT_SECRET in .env, then restart.";
 export const RING_DRIVEN_STEPS = "Open the Ring app, go to Appstore, choose Seen Off and tap Connect. Ring brings you back here for a quick sign-in, and this panel updates when the link is done.";
 
@@ -143,12 +146,13 @@ export function createRingIntegration(o: RingIntegrationOptions): RingIntegratio
 
 /**
  * Builds the integration from env. RING_LINK_METHOD picks the link: ring-driven (default, any registered app) or partner-initiated (allowlisted apps).
- * Ring-driven needs RING_CLIENT_ID, RING_CLIENT_SECRET, RING_WEBHOOK_SIGNING_KEY (the app's HMAC key) and OUTBOX_SIGN_IN_CODE.
+ * Ring-driven needs RING_CLIENT_ID, RING_CLIENT_SECRET, RING_WEBHOOK_SIGNING_KEY (the app's HMAC key) and SEEN_OFF_SIGN_IN_CODE.
  */
 export function ringIntegrationFromEnv(env: NodeJS.ProcessEnv, deps: { session: RingSession; vision: VisionProvider; port: number; tokenFile: string; photoDir: string; fetchImpl?: typeof fetch }): RingIntegration {
   const method: LinkMethod = env.RING_LINK_METHOD === "partner-initiated" ? "partner-initiated" : "ring-driven";
   const hasApp = Boolean(env.RING_CLIENT_ID && env.RING_CLIENT_SECRET);
-  const publicUrl = env.OUTBOX_PUBLIC_URL?.replace(/\/+$/, "");
+  const publicUrl = seenOffEnv(env, "PUBLIC_URL")?.replace(/\/+$/, "");
+  const signInCode = seenOffEnv(env, "SIGN_IN_CODE");
   const link = method === "partner-initiated" && hasApp
     ? new RingLink({
       clientId: env.RING_CLIENT_ID!, clientSecret: env.RING_CLIENT_SECRET!, tokenFile: deps.tokenFile, fetchImpl: deps.fetchImpl,
@@ -156,9 +160,9 @@ export function ringIntegrationFromEnv(env: NodeJS.ProcessEnv, deps: { session: 
       authorizeUrl: env.RING_AUTHORIZE_URL, oauthBase: env.RING_OAUTH_BASE, apiBase: env.RING_API_BASE,
     })
     : undefined;
-  const driven = method === "ring-driven" && hasApp && env.RING_WEBHOOK_SIGNING_KEY && env.OUTBOX_SIGN_IN_CODE
+  const driven = method === "ring-driven" && hasApp && env.RING_WEBHOOK_SIGNING_KEY && signInCode
     ? new RingDrivenLink({
-      clientId: env.RING_CLIENT_ID!, clientSecret: env.RING_CLIENT_SECRET!, hmacKey: env.RING_WEBHOOK_SIGNING_KEY, signInCode: env.OUTBOX_SIGN_IN_CODE,
+      clientId: env.RING_CLIENT_ID!, clientSecret: env.RING_CLIENT_SECRET!, hmacKey: env.RING_WEBHOOK_SIGNING_KEY, signInCode,
       tokenFile: deps.tokenFile, fetchImpl: deps.fetchImpl, oauthBase: env.RING_OAUTH_BASE, apiBase: env.RING_API_BASE,
     })
     : undefined;

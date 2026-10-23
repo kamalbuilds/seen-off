@@ -1,9 +1,9 @@
-import { mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, renameSync } from "node:fs";
 import { fanoutAlerter, fileAlerter, webhookAlerter } from "./alerts.ts";
 import { Ledger } from "./store/ledger.ts";
 import { PickupRunner } from "./pickup/runner.ts";
 import { RingSnapshotSource } from "./ring/client.ts";
-import { ringIntegrationFromEnv } from "./ring/integration.ts";
+import { ringIntegrationFromEnv, seenOffEnv } from "./ring/integration.ts";
 import { RingSession } from "./ring/session.ts";
 import { WhepFrameSource } from "./ring/whep.ts";
 import { ShippoTracking } from "./shippo/client.ts";
@@ -25,7 +25,10 @@ const channels = [{ name: "file", alerter: fileAlerter("data/alerts.jsonl") }];
 if (process.env.ALERT_WEBHOOK_URL) channels.push({ name: "phone", alerter: webhookAlerter(process.env.ALERT_WEBHOOK_URL, "phone") });
 const alerter = fanoutAlerter(channels);
 
-const ledger = new Ledger(process.env.LEDGER_PATH ?? "data/outbox.sqlite");
+const ledgerPath = process.env.LEDGER_PATH ?? "data/seen-off.sqlite";
+// Servers deployed before the rename keep their pickup days: the old ledger file moves to the new name once.
+if (!process.env.LEDGER_PATH && !existsSync(ledgerPath) && existsSync("data/outbox.sqlite")) renameSync("data/outbox.sqlite", ledgerPath);
+const ledger = new Ledger(ledgerPath);
 const tokenFile = process.env.RING_REFRESH_TOKEN_FILE ?? "data/ring-refresh-token";
 const port = Number(process.env.PORT ?? 8787);
 // Ring credentials come from the Connect Ring link on the seller page (or RING_* env); the server starts either way.
@@ -53,9 +56,9 @@ const runner = new PickupRunner({
 
 const scheduler = new Scheduler({ ledger, runner, onError: (job, e) => console.error(`job ${job.kind} ${job.dayId} failed (attempt ${job.attempts + 1}): ${e.message}`) });
 
-const signInCode = process.env.OUTBOX_SIGN_IN_CODE;
-if (!signInCode) console.warn("OUTBOX_SIGN_IN_CODE is not set: the console is open, so the server listens on 127.0.0.1 only.");
-const operator = signInCode ? createOperatorAuth({ code: signInCode, secure: process.env.OUTBOX_PUBLIC_URL?.startsWith("https://") ?? false }) : undefined;
+const signInCode = seenOffEnv(process.env, "SIGN_IN_CODE");
+if (!signInCode) console.warn("SEEN_OFF_SIGN_IN_CODE is not set: the console is open, so the server listens on 127.0.0.1 only.");
+const operator = signInCode ? createOperatorAuth({ code: signInCode, secure: seenOffEnv(process.env, "PUBLIC_URL")?.startsWith("https://") ?? false }) : undefined;
 
 createApp({
   signingKey: need("RING_WEBHOOK_SIGNING_KEY"), ledger, runner, operator, claims: claimWriterFromEnv(),

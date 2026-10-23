@@ -18,15 +18,15 @@ export function visionFromEnv(env: NodeJS.ProcessEnv = process.env, recordedFile
   }
   if (want === "bedrock-mantle") {
     if (!env.AWS_BEARER_TOKEN_BEDROCK) throw new Error("VISION_PROVIDER=bedrock-mantle needs AWS_BEARER_TOKEN_BEDROCK");
-    return new BedrockMantleVision(env.AWS_BEARER_TOKEN_BEDROCK, env.BEDROCK_MANTLE_MODEL, env.AWS_REGION ?? "us-east-1");
+    return new BedrockMantleVision(env.AWS_BEARER_TOKEN_BEDROCK, env.BEDROCK_MANTLE_MODEL || undefined, env.AWS_REGION || "us-east-1");
   }
   if (want === "bedrock") {
     if (!env.AWS_BEARER_TOKEN_BEDROCK) throw new Error("VISION_PROVIDER=bedrock needs AWS_BEARER_TOKEN_BEDROCK");
-    return new BedrockVision(env.AWS_BEARER_TOKEN_BEDROCK, env.BEDROCK_MODEL_ID, env.AWS_REGION ?? "us-east-1");
+    return new BedrockVision(env.AWS_BEARER_TOKEN_BEDROCK, env.BEDROCK_MODEL_ID || undefined, env.AWS_REGION || "us-east-1");
   }
   if (want === "openrouter") {
     if (!env.OPENROUTER_API_KEY) throw new Error("VISION_PROVIDER=openrouter needs OPENROUTER_API_KEY");
-    return new OpenRouterVision(env.OPENROUTER_API_KEY, env.VISION_MODEL);
+    return new OpenRouterVision(env.OPENROUTER_API_KEY, env.VISION_MODEL || undefined);
   }
   throw new Error(`VISION_PROVIDER must be bedrock-mantle, bedrock, openrouter or recorded, got ${want ?? "unset"}`);
 }

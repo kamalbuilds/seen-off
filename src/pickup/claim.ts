@@ -44,23 +44,27 @@ export function claimFacts(p: Packet): string[] {
     `Parcels on the porch when the window opened (Ring doorbell frame): ${p.baselineCount ?? "unknown"}.`,
     `Parcels on the porch when the window closed (Ring doorbell frame): ${p.closeCount ?? "unknown"}.`,
   ];
-  if (p.handoffMs) facts.push(`Ring doorbell frame after the carrier's visit shows ${p.takenCount} ${p.takenCount === 1 ? "parcel" : "parcels"} gone: ${t(p.handoffMs)}.`);
+  if (p.handoffMs) facts.push(`Ring doorbell frame after motion at the door shows ${p.takenCount} ${p.takenCount === 1 ? "parcel" : "parcels"} gone: ${t(p.handoffMs)}.`);
   if (p.alert) facts.push(`Seen Off alert sent ${t(p.alert.atMs)}: "${p.alert.text}"`);
-  for (const l of p.labels) facts.push(`Label: ${l.name ? `${l.name}, ` : ""}carrier ${l.carrier}, tracking number ${l.trackingNumber}, tracking state ${l.status ?? "not read"}${l.scanned === false ? " (no carrier scan)" : ""}.`);
+  for (const l of p.labels) facts.push(`Label: ${l.name ? `${l.name}, ` : ""}carrier ${l.carrier}, tracking number ${traceable(l.trackingNumber)}, tracking state ${l.status ?? "not read"}${l.scanned === false ? " (no carrier scan)" : ""}.`);
   if (p.tracking?.length) facts.push(`Tracking read ${t(p.tracking[0].readAtMs)}, 24 h after the window closed: ${unscannedCount(p)} of ${p.labels.length} labels show no carrier scan.`);
   for (const f of p.frames) if (f.sha256) facts.push(`Evidence frame (${f.kind}) ${t(f.atMs)}, sha256 ${f.sha256}.`);
   return facts;
 }
 
+// Shippo test-mode numbers (SHIPPO_TRANSIT, SHIPPO_PRE_TRANSIT) drive the replay's tracking states; no carrier can trace one, so the letter leaves a slot.
+const traceable = (n: string) => (/^SHIPPO_[A-Z_]+$/.test(n) ? "[tracking number]" : n);
+
 export function claimPrompt(p: Packet, kind: ClaimKind): string {
   const ask = kind === "carrier-trace"
-    ? "Write a USPS Missing Mail search request (or the equivalent carrier trace request) asking the carrier to locate parcels that were handed to its driver but never scanned, and to add the acceptance scan."
+    ? "Write a USPS Missing Mail search request (or the equivalent carrier trace request) asking the carrier to locate parcels that left the seller's porch during the scheduled pickup window but carry no acceptance scan, and to add the acceptance scan."
     : "Write a message to the marketplace's seller support asking for late-shipment protection: the scheduled carrier pickup did not collect the parcels, so the late scan is the carrier's fault, not the seller's.";
   return [
     "You write dispute letters for a small online seller who ships from home and schedules carrier pickups.",
     ask,
     "Use ONLY the facts below. Copy times, tracking numbers and parcel counts exactly as written, with digits. Do not invent any time, date, tracking number, address, name or count. Where the seller must add something you do not have, write [Your name] or [Your address].",
-    "Mention that the timestamped Ring doorbell frames and their sha256 hashes are attached. Plain text, a subject line first, at most 220 words.",
+    "Say only what the frames show: the parcels were on the porch, and then they were gone. Do not say who took them, and do not say anyone collected, picked up or scanned them.",
+    "Mention that the timestamped Ring doorbell frames and their sha256 hashes are attached. Plain text, a subject line first, at most 220 words, no em dashes.",
     "Facts:",
     ...claimFacts(p).map((f) => `- ${f}`),
   ].join("\n");
@@ -106,7 +110,7 @@ export async function draftClaim(p: Packet, writer: ClaimWriter) {
   const prompt = claimPrompt(p, kind);
   let last: { draft: string; grounding: Grounding } | null = null;
   for (let attempt = 1; attempt <= 2; attempt++) {
-    const draft = (await writer.write(prompt)).replace(/^\s*word count:.*$/gim, "").trim();
+    const draft = (await writer.write(prompt)).replace(/^\s*word count:.*$/gim, "").replace(/^[ \t]*\u2014[ \t]*/gm, "").replace(/[ \t]*\u2014[ \t]*/g, ", ").trim();
     const grounding = checkGrounding(draft, p);
     last = { draft, grounding };
     if (grounding.ok) return { kind, model: writer.model, attempts: attempt, draft, grounding };
