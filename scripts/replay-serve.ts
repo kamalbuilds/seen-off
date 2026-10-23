@@ -6,6 +6,7 @@
 //   node scripts/replay-serve.ts --demo day05,day06,day15   the three demo days: a missed day, a part-taken day, an unscanned day
 //   node scripts/replay-serve.ts --pace-ms 1500        pause between steps of a replay started from the page (800 ms minimum)
 import { mkdirSync } from "node:fs";
+import { join } from "node:path";
 import type { AddressInfo } from "node:net";
 import { Ledger } from "../src/store/ledger.ts";
 import { PickupRunner, type Alerter } from "../src/pickup/runner.ts";
@@ -13,7 +14,7 @@ import { createApp } from "../src/server.ts";
 import { RingSession } from "../src/ring/session.ts";
 import { ringIntegrationFromEnv } from "../src/ring/integration.ts";
 import { visionFromEnv } from "../src/vision/index.ts";
-import { REPLAY_DEVICE, SETTLE_MS, SIM_KEY, fixtureTracking, loadDays, playDay, replayFrameSource } from "../simulator/replay.ts";
+import { REPLAY_DEVICE, SETTLE_MS, SIM_KEY, fixtureTracking, loadDays, playDay, replayFrameSource, root } from "../simulator/replay.ts";
 
 const args = process.argv.slice(2);
 const flag = (n: string, d: string) => (args.includes(n) ? args[args.indexOf(n) + 1] : d);
@@ -32,7 +33,9 @@ let now = 0;
 const alerts: string[] = [];
 const alerter: Alerter = { async send(a) { alerts.push(`${a.dayId} ${a.kind}`); console.log(`ALERT ${a.kind} ${a.dayId}: ${a.text}`); } };
 const ledger = new Ledger(":memory:");
-const vision = visionFromEnv();
+// Live Qwen3-VL on Bedrock when a key is set; otherwise the readings that model gave on these exact frames, keyed by frame sha256.
+const vision = visionFromEnv(process.env, join(root, "simulator/qwen3-vl-reads.json"));
+console.log(`vision: ${vision.name}/${vision.model}`);
 const runner = new PickupRunner({ ledger, vision, frames: [replayFrameSource(days)], tracking: fixtureTracking, alerter, clock: () => now, settleMs: SETTLE_MS, evidenceDir: "data/replay-evidence" });
 let playing = false;
 // One seller, three scheduled parcels, three days back to back: nobody collects them, one leaves, all leave and nothing is scanned.

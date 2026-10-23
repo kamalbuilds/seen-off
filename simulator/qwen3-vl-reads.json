@@ -1,0 +1,1727 @@
+{
+ "provider": "bedrock-mantle",
+ "model": "qwen.qwen3-vl-235b-a22b-instruct",
+ "recordedAt": "2026-10-23T11:16:08.687Z",
+ "reads": {
+  "380bdc5de6caf2ae1058d34db6f7f877d5bad29ce95fe05865125527eab26de6": {
+   "file": "simulator/days/day02_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "5f3b9ea2d871298d36bc9e4fbbd934658690cf22e1692d2b075941dc2897f963": {
+   "file": "simulator/days/day01_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "8f58a653da49c6f11b8050428010acea7f9a6d8387662244912f0a2138b66e75": {
+   "file": "simulator/days/day01_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "f501f18c91185b7aec31eb4b76143f02980e832aaad2f024b2330bae85662493": {
+   "file": "simulator/days/day02_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "2b4db8b81293fdc8108132747817ca0893b26e02d33ffc871a4682d96873853f": {
+   "file": "simulator/days/day03_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "a3719b38fb3e2e9ddca55ce76c52ae8f28421ec7e7b94c4fdd218ab1f65bdf9c": {
+   "file": "simulator/days/day03_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "117b32e53010508953136ca6f49e9d275e1d61d4bd872002d223b762c06615b7": {
+   "file": "simulator/days/day02_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "f9b8a038f0788a3477c498e82bb68ebd157745c37b5e53d8f0b9f2c0e6b663d0": {
+   "file": "simulator/days/day03_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "947ab8e11b14313e50e4f7220b0d33a9abda30bdafd454bca1992851ff94826b": {
+   "file": "simulator/days/day04_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "f3c2e60c18cc733bf09a77d6553b9fdf591df911f69f31e1e2d8852e19d293d1": {
+   "file": "simulator/days/day04_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "d6e8773d15749a08e225d989d386f71e4c94e021549f6d8e4b984e2817570093": {
+   "file": "simulator/days/day01_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 6,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 6\n}"
+    }
+   ]
+  },
+  "fc0774d47564ccba07d395d3dc948a2668650e65097405c6060ad7da1c267540": {
+   "file": "simulator/days/day05_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\"parcels_present\": true, \"count\": 3}"
+    }
+   ]
+  },
+  "c3ca93932abde7aa0c8a766587018fe937c32127fc7da13c6fc9adb0d036c768": {
+   "file": "simulator/days/day06_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\"parcels_present\": true, \"count\": 3}"
+    }
+   ]
+  },
+  "69b41361d76b5db7196853ebb7beb6629cb515e0ff0614c516355f8851abf39f": {
+   "file": "simulator/days/day04_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "3d8f8b575ee959413219605b246b54a7477b764e13593b19a1ef99e6427a16d1": {
+   "file": "simulator/days/day05_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\"parcels_present\": true, \"count\": 3}"
+    }
+   ]
+  },
+  "fbfa61cd98589c08b7a47c4d052ea9439d8bfef07de9a88713358dc6627e4d4a": {
+   "file": "simulator/days/day07_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "7dcc55213775b1bd6ed8cd84dca325b69dae990903cdc4b9575888671b59e90a": {
+   "file": "simulator/days/day06_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "7985aed791642c7d95e141936653190dc4f8a827e5406284d5b0fdc34a500509": {
+   "file": "simulator/days/day06_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "84cfc008245421bf1dd67992dcb24097cb918ff0a19c641100342272b07dde8f": {
+   "file": "simulator/days/day08_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "4bc4d91d9a97c22eff70a4cbcd019372d68dc1f75a2bfccfbc0631ffea3a5772": {
+   "file": "simulator/days/day07_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "4d844c002f6f8e3656a47f029ae7a88cb19d594bbedb53dcfb26cd38d9229831": {
+   "file": "simulator/days/day08_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "b0635184d7c0e3f5baef06ec44f70f06c9ac8a1ec9a5e1dab395142f980c5ccb": {
+   "file": "simulator/days/day08_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "6848733832d7780a86073f4fa6b658aabd6fda5f041de1fc0660c8d64ee50b49": {
+   "file": "simulator/days/day09_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "05fe082cad6b10ea40ef804d2a7271fd6588c888d2465c348b27a54152c74fb1": {
+   "file": "simulator/days/day09_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "4489e0827e2904d4cb5fe2892e94d27af6811731217601951e0dcf1f49923d84": {
+   "file": "simulator/days/day05_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\"parcels_present\": true, \"count\": 3}"
+    }
+   ]
+  },
+  "61557ba7ce6a72aca05b93c468827cd2f69518c112158cec63e7843b6aae355b": {
+   "file": "simulator/days/day10_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "01ae6f6117795961bd2c767d2c111e5e80782c769c8e4bbb7d194506f777117c": {
+   "file": "simulator/days/day09_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "9a628d9d68276f9653b26dd089f840ba783cb0550527e606db9a3447450cea32": {
+   "file": "simulator/days/day11_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "e5ef6e28ece6e247c2c16d6acfbe3933b8afab70316130550cf28409a1b01dad": {
+   "file": "simulator/days/day10_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "c440125c1cdfa854018821cc37f8ac67dfd111325c929a633fad43a73710b462": {
+   "file": "simulator/days/day11_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "7d00e64e53a63b9e1d72a979dd0a11933d2902cbca9940431b58c449e5a93485": {
+   "file": "simulator/days/day12_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "3112faae762ef0a7917d749ad94d907846c9f45d526cd88105bea17c08f7cd1e": {
+   "file": "simulator/days/day12_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "b9ea7692caa8335ac24f3bab146c31698f2dc382bb71f06fdc767975d8f0784d": {
+   "file": "simulator/days/day12_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "2a4256a7acb593586f61066b2ef2b11e243361fda8c9d059f59c76bf6f6c6d5a": {
+   "file": "simulator/days/day11_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "5cbad432cd2f84d803c26fd665434b6f4331d8d8537b7543270bdb7002d43749": {
+   "file": "simulator/days/day13_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "68532b0e8afa98b7e4e1cd59cb088c9b9c1669a1b5d09e165e7d1dfa891314db": {
+   "file": "simulator/days/day10_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "df0fc958db8e76f192a996ac51dcda5d4febeae2e687638faac6f70174c8f94f": {
+   "file": "simulator/days/day14_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "4241fc610bbb3d59a7d339249ecf264fe1f25473667e90d36c48d05c3e14084c": {
+   "file": "simulator/days/day13_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "20b73d4b6112814b0e86b79030c8d108032c779dd485c5bbe719bfb919d46a17": {
+   "file": "simulator/days/day15_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "3d643ef80c1a6b6748a17e76e5a44cdf1b1efac648bb6a8fbbe2f1fcb80b795d": {
+   "file": "simulator/days/day14_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "da80b3ac1f0eba63a87691fb7a3992e9e8a670d26f58c7d6321493aad7fcc467": {
+   "file": "simulator/days/day16_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "5b8c47b1d555ed05cb9e2ef79d1b3357035d9441065ea302793d570b55a075dd": {
+   "file": "simulator/days/day15_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\"parcels_present\": true, \"count\": 3}"
+    }
+   ]
+  },
+  "ea35d4282c5084f0bdd12d6a12f127e4fc72186009ea5bb0d624e3c817f941d3": {
+   "file": "simulator/days/day15_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "0fd3c0564967226a484dce93a97244578dc4f34ed5c4935ebfccb3d56c96ddbe": {
+   "file": "simulator/days/day13_open.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    },
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    },
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "0fad1472fc2f0a8fe747b4032e0410d67d16ab802cae89f2289ebe587a7e5466": {
+   "file": "simulator/days/day16_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "3e96b977398b114de90ea30109081686e7557328f3a3878ca97f60652caed877": {
+   "file": "simulator/days/day17_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "9c4268bdb76117656368a51d4cf7f3a761a383df778e7176212655fb4a27de80": {
+   "file": "simulator/days/day17_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "8e99004c58519263781404b27e01765f43a456b591144e89faae0847953d99fe": {
+   "file": "simulator/days/day16_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "9ad0cdffda21a0a544300da3e230856acd163254d74088a480c0a9014fc8323a": {
+   "file": "simulator/days/day18_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "6c273e16d3467955f24c5b999eff05b56d9a5d79aa4c637ffe2bd95439861c60": {
+   "file": "simulator/days/day17_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "6b8b564994d62444c0220a99523a103a3ab63bbfee3a2c906a211e52406c9295": {
+   "file": "simulator/days/day18_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "7e0e0d0f20e6f71355e324f0104a9290b142cc3e62a44b97d8a5b8cb28829576": {
+   "file": "simulator/days/day19_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "f36b43b2c77bf5295ef241d77f4fb0922d2107b8651248066962637a0ca7d083": {
+   "file": "simulator/days/day18_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "16c5ebb23cb96c9937e21fafba7aab4844c51bc870ac801f5184f9a178a73c4d": {
+   "file": "simulator/days/day19_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "3954c3906b105c57acced79234754aa565c1a5144c3674b932cd9b673535b32d": {
+   "file": "simulator/days/day19_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "5d007f7f3887b53c56c9b36e45f93d15a8230192c20cf83891db2495307f9514": {
+   "file": "simulator/days/day20_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "1366d3562ce852e0701b26c7d9a91e71dd76ecd665e231ba226838a53e907d29": {
+   "file": "simulator/days/day21_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "c2ce0d1e688076977e054101b53c9d668f5a2b7294ac2bd38884d578f28651e0": {
+   "file": "simulator/days/day20_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 4,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 4\n}"
+    }
+   ]
+  },
+  "3d143e900e941cb488ad0a5a47ceb510f98bff5c833ddc34a573607b00d7340e": {
+   "file": "simulator/days/day21_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "58f760b282259ac8bee613937486d724331016ee7b3665c0d7c4cc0e27d8a6ca": {
+   "file": "simulator/days/day21_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "8fcc133d96836e494e960b6ff805333ba830fc13afdcb93b43a48bd7e90a2d68": {
+   "file": "simulator/days/day20_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "25a75ca15b37223baf6fda3de06e745447f09cadc9cebc58e1d3cf259c015e9a": {
+   "file": "simulator/days/day22_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "7f9d773a9c9a4928994a3aee33a8fd7813fdd78a9258c2eca00ec817b8ad0f26": {
+   "file": "simulator/days/day22_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "df08802f8a0a481fefba1acc27e8eadaf687e2b8da94e8050a3b03559dbff1c3": {
+   "file": "simulator/days/day23_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "df31e57e8e3c4ce01746395b63a19840842c472781999a34b7c47abdbe47cea7": {
+   "file": "simulator/days/day23_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "f36beaa6fa84f73d83d15f41877407dd2bddaa875d129fac537adc9034fba185": {
+   "file": "simulator/days/day24_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "cb3ec872fb09c4198fdbce0d6e46dda8b613b75782659bbb3dae1388a6ea0c9e": {
+   "file": "simulator/days/day25_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "6efa0553d96d1ebfc0da4b650da7ad7e4a309bb10483f74bf8a43bee5fe775ba": {
+   "file": "simulator/days/day22_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "5d4493a3d2fc01b77a49d62f6d0d15a000bb328bc69f28aab127c4a38e1584d4": {
+   "file": "simulator/days/day25_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "8004714e37d6e7a4e6d34e06d7885789431e36131de208f68b467c548ee62f28": {
+   "file": "simulator/days/day26_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "5eefc54899d2375d9440570f3c2cff03a496a8bb9a3a89282f4ee56bc12b5ef2": {
+   "file": "simulator/days/day23_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "5aaec8ef7779b06657ab8686fe29fb39a1a747c5a43e005c861387a03fad3d82": {
+   "file": "simulator/days/day26_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "1a909cd73e9d4a625d9e831886be3ddcc3fc3946c0697052f36f95593e08e766": {
+   "file": "simulator/days/day25_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "d9e9589433fc2eb7ee9e45d0b4e1ecdd7b5d5c1900d49b9713fb5e2945573fbb": {
+   "file": "simulator/days/day26_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "340ccc612c4d0d0e395c5935e1eb9332f67ed3a953377e5a03f196c767422f19": {
+   "file": "simulator/days/day24_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "d41351e2a577b00ff06c48cbc445d3526c60276f824d5985db6d67cea7f7e814": {
+   "file": "simulator/days/day24_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "ada4cdfba76582915564a09370d02db8633e29ca0cf99d4abf105874f154949a": {
+   "file": "simulator/days/day28_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "a5c3b5d92e5db6c98a904442c76fb7db34d3a78cbc980364fa9aa456af58595d": {
+   "file": "simulator/days/day27_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "fd290cd7f05f5b8a1d7ea10cfe1c7bd4a98eeee3928a92f80170d50e47a8abbf": {
+   "file": "simulator/days/day28_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "d63b54458a8fce6678421118094e69baf379b31a89294f14c9c1fd63e093d538": {
+   "file": "simulator/days/day27_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "216c6242033b2977fc2812d714483f810768985d86340b8dda2da44a255ed2d2": {
+   "file": "simulator/days/day29_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "fad5ae12253b3f30ec3fd6bb2cdbe060aa449bab16a5875afe41f28ab63c1e84": {
+   "file": "simulator/days/day27_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "b1fba0534a55c8ac770ddd027ccf27b04263438c725c2f04668597534d511d3a": {
+   "file": "simulator/days/day29_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "90c769017e4108cdce4cc905341e2a0bdce9b51008813c1d873b6afab92bbf73": {
+   "file": "simulator/days/day30_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "3853ebb3ec48b9ffcebeb6c3dd15a91750fba1f2eba259c3b663704c000204c1": {
+   "file": "simulator/days/day29_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "83f0aac7b136dc69bb170861fdb43cfe671a9087c39184281ea4e282e0e0d886": {
+   "file": "simulator/holdout/day01_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "e84929804b38d004da9b9d7debcaaf27a4204c48768bbe80a5ba3f7947d6c177": {
+   "file": "simulator/days/day30_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "308cc47bbc71750dd79646535242ff8304402c3a649611624a6655c079b1a936": {
+   "file": "simulator/holdout/day02_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "16fb24a4d244b35100bf5cfa397dc3fb9e1a66e73a5a00f0834f5e673604ac27": {
+   "file": "simulator/holdout/day01_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "d633c9236887e7cd184006f198f872dbe3bc92ce903ce624742327839f0e5527": {
+   "file": "simulator/days/day30_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "93c629e222468bb0976333ae31b98c0069c427d6dc9f7a2cc8ddcc3466c547e4": {
+   "file": "simulator/holdout/day01_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "5c6e1febcea386b6d995dffa68da2213a18e9fc8696fa1ac1cffb5c8f55d5e1c": {
+   "file": "simulator/holdout/day02_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "0789c4b3c44fbb2cb6bc6694b33f64d5d898e0a91ac7fbd897b106f504fa0dfb": {
+   "file": "simulator/holdout/day03_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "2dd141e76bd8a5abeb0fc38a75abd2ada28650bcdc311f2cbca50b05255cb9a2": {
+   "file": "simulator/holdout/day04_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "c9018f3ef7ba6f1d3d465f79fe8fc9b4d412d8dab248da01b93a3e41abb45778": {
+   "file": "simulator/holdout/day04_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "4bf614493e4c4d009b3fc533e2378d3278e9b6ffafe93f9d468022067e076fa8": {
+   "file": "simulator/holdout/day04_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "1c5a878e21a4f2930ecc3b6fc3e47eeb69868434b14cfbd972999a9607c266e2": {
+   "file": "simulator/holdout/day06_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "932c95fbcd3c7a464c9fce7db278b7a225088edb28137d7f43c90e237a52ee6f": {
+   "file": "simulator/holdout/day05_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "dfaaeeee767270451a5de8b130a4af7d74b712d6803c4ff301df61df91f38058": {
+   "file": "simulator/holdout/day03_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "6c13d99203d1a1d13c8b5f861335cd759defed177c410d77612fc2174c8b297f": {
+   "file": "simulator/holdout/day05_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "b0abb2bd5a2dc40661434dd9ecc361ed76c6228dcb73a3f2d94921b118c7c7f5": {
+   "file": "simulator/holdout/day06_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "c2f6a2bf1a7634ca8955894ba2e0eb9e6ccd57315796333138bfe91831bc0bf2": {
+   "file": "simulator/holdout/day05_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "ec326345eeda9c9437b71e3645e973a647396acda721aa0396d2e9b260c2714a": {
+   "file": "simulator/holdout/day07_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "302b0a5cdcfc37dd6b014ce0c1aab64af3f4bdae103ec8ec302124230b546077": {
+   "file": "simulator/holdout/day07_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "423f039c0f24272c23bf79c3a74c02b91aeb0ea16af1694cca893a9f54b2612c": {
+   "file": "simulator/holdout/day07_open.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    },
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    },
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "b1c30c51ddc65c9be5edaccf4dce89d5c262ca9dbc85e76ae33bf64fca4347f9": {
+   "file": "simulator/holdout/day08_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "48de220e764668d1851a6529cd488d22e7ee398aae170b2fe33f8bcf97b76edf": {
+   "file": "simulator/holdout/day09_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "3dab77aa7605fd22d8eaebf7c14a7a1f8104c00645fb6d0114382b2afdf488a0": {
+   "file": "simulator/holdout/day08_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "7c72a2fbb58f883765451274a98e41d7c0f73cb616fa243a01b69b8faeadb68c": {
+   "file": "simulator/holdout/day09_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "1183859a258236b125875b6a3a83bbede35cefd9afa7d2c9c6254c1160fc1548": {
+   "file": "simulator/holdout/day11_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "e160de98e8b862cfbb9abfe3861666fc4bdf330993516aeb6588d6e4523ca2bf": {
+   "file": "simulator/holdout/day10_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "aee877d316831a83795a8ef397abf85ac7d6ff00d2f024ab42624b266b073f93": {
+   "file": "simulator/holdout/day09_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "e883c9d2722a46b86cb71bce4d15a9250819450a6221b4b5d4d175cf184f8e4d": {
+   "file": "simulator/holdout/day11_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "8b3e6c3ce503922c9bc2a908ddbf921ed6ce3d6be1b7acf3415be2116d0c66bd": {
+   "file": "simulator/holdout/day12_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "f7d7154b0955246c7742f6a80415907673719932306a04f45d274dc773fa2a9b": {
+   "file": "simulator/holdout/day12_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "c29d9687c4f86d12ae0bf846c663061fd991623305a7563040b82598b8042d7b": {
+   "file": "simulator/holdout/day08_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "58d7f676ea76c1fecdb5be814f27c6eebbfd2dcb31e57c1866ac29b0a36cc672": {
+   "file": "simulator/holdout/day13_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "e90bd7ad375994c18b468797ffb0db7fae2b654d7c9dd164f766a84bba8fee9f": {
+   "file": "simulator/holdout/day13_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "693f630e97107fefb9009accecd7a47f3464c1a5670cf5cbe36e78aa1689542e": {
+   "file": "simulator/holdout/day13_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "08fef30bbabbc96bfa97c2439de6c8d24a9c346ff0f5a9dd308520283589b7a8": {
+   "file": "simulator/holdout/day14_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "6500293c264eecc0a7dc696d1153b3d9845c250f080603c9aae9a57760be578c": {
+   "file": "simulator/holdout/day14_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "12d28fb97262a0c7b78ed9c06fcad69c10bd5dd10d936770acc1261573e4e470": {
+   "file": "simulator/holdout/day14_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "e70c4cdce3dc583bc2dbc511088ea4f0f74904de8617dd2687cb39defdc7557f": {
+   "file": "simulator/holdout/day15_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "9e190e6a813c0e6db31cd78c2560d8c1563a7091e7648ccaecd92b8299757092": {
+   "file": "simulator/holdout/day15_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "a0cae3b0ccf2a3aed45519b949b3cbf2b612a491b5224556dd28e3260894f8c6": {
+   "file": "simulator/holdout/day16_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "2507c6c7ac2459925a3e79166225f059a6c0a355345e128557494cb5a7522e11": {
+   "file": "simulator/holdout/day15_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "6571aa7fb022e0c464582bf3808034894a007bd3dacd7406ed6b622ed819b2bc": {
+   "file": "simulator/holdout/day10_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "dcbe3211eb5e5b0a73f81e644cc7805b8bba706520766526cca6f63f7f08e573": {
+   "file": "simulator/holdout/day16_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "7d96142c868dc3df8f65f4a0c7b175f148bd9d460e5f5e4be610fba79fe483ae": {
+   "file": "simulator/holdout/day17_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 4,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 4\n}"
+    }
+   ]
+  },
+  "13077a145fc77dce0002df34faae39b501450537012a08833e9152520cb80608": {
+   "file": "simulator/holdout/day18_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "99bd5418434ef9ade9be9aa939f5d3bf058ba2791e5778902e69a1d7d3f98f7e": {
+   "file": "simulator/holdout/day16_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "a05e98a3e0ce67dd6e5b2d2d3b6b8f0dd2572428e940a9b1b94d35d9da86d54c": {
+   "file": "simulator/holdout/day17_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "5e18769e83ddb0dea530e3cd269e9d7cf9bc382d573f764bb4beffd5a17f1187": {
+   "file": "simulator/holdout/day17_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "2d906de269290b9be1962d4ab4be9351cbc9fd00a83aee289dae8777eb8c07fa": {
+   "file": "simulator/holdout/day18_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "a7feb3320301eb2859b3b14afe3ecece86f1d843c31b25bb7210153d5a0c2fc5": {
+   "file": "simulator/holdout/day18_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "630ed5f4c15f1d7465c45b51daacfeb08b761a2b67193f57a9cf995a6170fd19": {
+   "file": "simulator/holdout/day19_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "71d367490c862318f3d7e2fefb3bb77ef14f2e2e1a5fdec673907048bfed2394": {
+   "file": "simulator/holdout/day19_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "d1bcc57f01b92f3379765ce6dce0055315fda6b7a87a7b671edfc64f6a3ed042": {
+   "file": "simulator/holdout/day19_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "2437894d312f8dc932502ed3fec94c6173a8655e8226ef1211baf0ac5a6baf10": {
+   "file": "simulator/holdout/day20_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "2cce504784d393b4340ee49e8eaa8d6ee4baa63ca9d91d94e41440de70bb0042": {
+   "file": "simulator/holdout/day21_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "fde8baac097c3ea833f5bc44ad8237740d9c51bd4fa165ef32fdda30bdd5eefc": {
+   "file": "simulator/holdout/day20_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "6b35667296a6831a24af61c5f94c7bdea7129bbb5ad3f742bb332033aff3effc": {
+   "file": "simulator/holdout/day21_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "cbe4c7d8391d1db102f12da6fe7fed21df4bbf92388ddca9563dab58b938caad": {
+   "file": "simulator/holdout/day22_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "2ce3ded9687ebb5caeb863a36af9a75a0e44a8868a0be90507aef5a1abfb1460": {
+   "file": "simulator/holdout/day21_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "9306957d6714d60bbd86118a7302f487db9fbdb441329ca7b2073c2303451043": {
+   "file": "simulator/holdout/day23_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\"parcels_present\": true, \"count\": 2}"
+    }
+   ]
+  },
+  "fd8a512433799d29de9ffa51a4e61b946402542c1be0f6bc35c079d33a51fa47": {
+   "file": "simulator/holdout/day22_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "9e2ae21bb0d914c8d759612e3f420daa9a1b28e9db31fe5a3d90933334e65078": {
+   "file": "simulator/holdout/day20_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "7da66ecad37da0c41e40c563a0a554d73ffabd36e1a8a42054e79b89eea88bfc": {
+   "file": "simulator/holdout/day22_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "46d0636bd45c1b13ccfa7589f05e3af962996cfed75f84917d2c3d6102216c8f": {
+   "file": "simulator/holdout/day24_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "5ab7d29f94bbf7d48708a10e6aa1f72012ecc564ec3b69f53d7285084e2fd0d3": {
+   "file": "simulator/holdout/day23_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "4a9a4688e65baa10021d1b5a450cc1996ec103ba4467f307f9de0fbb300a2e1e": {
+   "file": "simulator/holdout/day24_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\"parcels_present\": true, \"count\": 1}"
+    }
+   ]
+  },
+  "d7ad6a3f6aaac4886f1c7e81df6b6a0e4d79b298021164e93508f014f447c304": {
+   "file": "simulator/holdout/day25_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "055064e3e62b0bbd295086a1d69c952828ee73381deb458c315c2aa938ed9741": {
+   "file": "simulator/holdout/day23_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "f0267d3df91a31711331a1d1a0602508489efb820c46e6999f32a716bda10e6e": {
+   "file": "simulator/holdout/day26_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "aded3cedad1bf951bd2a9fce3f1160a600010008124007356f296c0c56e9651c": {
+   "file": "simulator/holdout/day26_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "3efa186c98f750c1ef2a2b89682d38b7c5b5011f285a7a98f65bdc6f2ec94ecf": {
+   "file": "simulator/holdout/day26_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 1,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 1\n}"
+    }
+   ]
+  },
+  "7f7b49e95c919866850b6812b2313e8b62b7af9f15e178a9f181b58b8bef8192": {
+   "file": "simulator/holdout/day27_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "1a5fb1df239b631acf8782e1b9d7dce73b8b600fd1a6c98c1ba94a4011ae2f65": {
+   "file": "simulator/holdout/day25_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "8c688f34d8fff13555df8201fb54b17700fcfbac1d4eed7c7c55420d441ce7b2": {
+   "file": "simulator/holdout/day27_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\"parcels_present\": true, \"count\": 3}"
+    }
+   ]
+  },
+  "4eaf74bb973b05e7351144396ead8e5ccec51bd257a61bc0bcce73b718ab9ed8": {
+   "file": "simulator/holdout/day28_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "a1cf3f05d554a8ad1c949841ee14acce761af10531324626df888e824e5da6cc": {
+   "file": "simulator/holdout/day28_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "1eba37e31debe14ae713b579b1f393f135cdafbff084ee59ee6d66ac9af3ee08": {
+   "file": "simulator/holdout/day28_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "fd9ed6c38279bab635e44508d65ab7074c748ac93431fcd56f6c9b3a4c8bbfd7": {
+   "file": "simulator/holdout/day25_open.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    },
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    },
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  },
+  "193ed3b5066afb14b24ce0c84910f1905784c4710d1ad2f32a7e8158e14a360b": {
+   "file": "simulator/holdout/day29_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "02ffb3dd741e2b2a727ce2bb0d43e6a4dc1705e0dfcd38ee87dd6f45d1e61fae": {
+   "file": "simulator/holdout/day30_after.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\"parcels_present\": false, \"count\": 0}"
+    }
+   ]
+  },
+  "27ed9bce7160cf8ffcc25441d94fe0c75c09bce33edb73c4312c328ae0b80002": {
+   "file": "simulator/holdout/day29_after.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 2,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 2\n}"
+    }
+   ]
+  },
+  "b1ae26c0d2bf5fcebc8c0e1c4ff7ddbd8dc6affa3672ab5139242661ae613ebc": {
+   "file": "simulator/holdout/day29_close.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "ac47079c695cbbeae321ccc6734c3b09b1ce7074d02e3d665bde2426fffeee85": {
+   "file": "simulator/holdout/day30_open.jpg",
+   "replies": [
+    {
+     "present": true,
+     "count": 3,
+     "raw": "{\n  \"parcels_present\": true,\n  \"count\": 3\n}"
+    }
+   ]
+  },
+  "5259d07bcb278b7d4fb360a6bf51485a410d9c38a8ed20df42310beebb43d1d3": {
+   "file": "simulator/holdout/day30_close.jpg",
+   "replies": [
+    {
+     "present": false,
+     "count": 0,
+     "raw": "{\n  \"parcels_present\": false,\n  \"count\": 0\n}"
+    }
+   ]
+  }
+ }
+}

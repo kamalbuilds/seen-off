@@ -35,7 +35,7 @@ const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
  * watching (window open), awaiting_tracking (window closed, verdict out), settled (24 h tracking read).
  * Every external input carries a provenance; the verdict is as live as its weakest input.
  */
-export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: Provenance) {
+export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: Provenance, vision?: { provider: string; model: string }) {
   const day = ledger.getDay(dayId);
   const obs = ledger.observations(dayId);
   const events = ledger.eventsFor(day.deviceId, day.windowStartMs, day.windowEndMs);
@@ -136,7 +136,7 @@ export function buildPacket(ledger: Ledger, dayId: string, trackingProvenance: P
       webhookRequestIds: events.map((e) => e.requestId),
       trackingReads: tracking.map((t) => ({ trackingNumber: t.trackingNumber, status: t.status, readAtMs: t.readAtMs })),
     },
-    provenance: { frames: frameProvenance, tracking: trackingProvenance, verdict: day.windowVerdict === null ? null : weakest([...(frameProvenance ? [frameProvenance] : []), ...(tracking.length ? [trackingProvenance] : [])]) },
+    provenance: { frames: frameProvenance, tracking: trackingProvenance, vision: vision ?? null, verdict: day.windowVerdict === null ? null : weakest([...(frameProvenance ? [frameProvenance] : []), ...(tracking.length ? [trackingProvenance] : [])]) },
   };
 }
 

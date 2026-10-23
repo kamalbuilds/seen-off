@@ -169,7 +169,7 @@ export class PickupRunner {
 
   /** The evidence packet as the ledger stands now: valid before the window closes, after it, and after the 24 h tracking check. */
   packetOf(dayId: string) {
-    return buildPacket(this.d.ledger, dayId, this.d.tracking.provenance ?? "simulated");
+    return buildPacket(this.d.ledger, dayId, this.d.tracking.provenance ?? "simulated", { provider: this.d.vision.name, model: this.d.vision.model });
   }
 
   /** One frame, one count. A failure is recorded as a null count, never guessed. */

@@ -12,7 +12,7 @@ real_red() { grep -Eq "^ℹ fail [1-9]" "$TMP/out.txt"; }
 fresh() { rm -rf "$TMP/w"; mkdir "$TMP/w"; (cd "$ROOT" && tar cf - --exclude=node_modules --exclude=.git --exclude=spikes --exclude=data --exclude=.venv src test simulator metric scripts package.json 2>/dev/null) | (cd "$TMP/w" && tar xf -); }
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts recorded.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN baseline $t"; else echo "BASELINE FAILS $t"; fail=1; fi
 done
 
@@ -25,6 +25,7 @@ while IFS= read -r line; do
   if cmp -s "$TMP/w/$file" "$TMP/w/$file.bak"; then echo "MUTATION DID NOT APPLY: $label"; fail=1; continue; fi
   if run_suite "$TMP/w" "$tfile"; then echo "SURVIVED (check is blind) $label"; fail=1; elif real_red; then echo "RED   $label"; else echo "CRASHED, not a test failure: $label"; fail=1; fi
 done <<'MUT'
+src/vision/recorded.ts@@s/if \(!r \|\| r.replies.length === 0\) throw new Error\(.*\);/if (!r) return { present: false, count: 0, raw: "" };/@@recorded.test.ts@@missing recorded frame read as an empty porch
 src/ring/signature.ts@@s/return timingSafeEqual\(expected, Buffer.from\(received, "hex"\)\);/return true;/@@webhook.test.ts@@signature check always accepts
 src/ring/signature.ts@@s/if \(!signingKey \|\| !header\) return false;//@@webhook.test.ts@@missing header no longer rejected
 src/ring/webhook.ts@@s/\.then\(\(\) => opts\.handle\(event\)\)\s*$/.then(() => { opts.store.markDone(event.requestId); return opts.handle(event); })/@@webhook.test.ts@@idempotency marked before handling
@@ -80,7 +81,7 @@ src/ring/oneway.ts@@s/const MAX_FAILURES = 5;/const MAX_FAILURES = 5000;/@@ring-
 MUT
 
 fresh
-for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts; do
+for t in webhook.test.ts verdict.test.ts packet.test.ts plan.test.ts scheduler.test.ts probe.test.ts replay-regressions.test.ts replay-api.test.ts token-store.test.ts ring-link.test.ts ring-driven.test.ts preflight.test.ts runner.test.ts alerts.test.ts evidence.test.ts score.test.ts stream.test.ts token-store.test.ts recorded.test.ts; do
   if run_suite "$TMP/w" "$t"; then echo "GREEN restored $t"; else echo "RESTORED FAILS $t"; fail=1; fi
 done
 exit $fail
