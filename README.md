@@ -88,7 +88,7 @@ Missed-pickup alert on Bedrock Qwen3-VL: median 1.5 s from window close, max 4.3
 
 ## Impact
 
-Sellers already use the doorbell as their receipt for outgoing parcels, by hand, and carrier tracking still disagrees with it. Three posts from X, copied from the fetched post text (`docs/xsignals-ring/signals.md`, all 117 records in it re-verified with `xsignals verify`):
+Sellers already use the doorbell as their receipt for outgoing parcels, by hand, and carrier tracking still disagrees with it. Three of the sellers saying it on X:
 
 > Everything I send out I request a pickup from USPS during the daily delivery. I put it on a table in front of my Ring doorbell, making sure the Ring can see the label. This gives me a record of the physical pickup.
 
