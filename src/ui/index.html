@@ -24,6 +24,7 @@
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s6: 24px; --s8: 32px; --s12: 48px; --s16: 64px;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { overflow-x: clip; margin: 0; }
 body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; font-variant-numeric: tabular-nums; min-height: 100dvh; }
 ::selection { background: var(--accent); color: var(--accent-ink); }
@@ -309,7 +310,7 @@ const when = (ms) => `${UTC.format(ms)} UTC`;
 const clock = (ms) => UTC_TIME.format(ms);
 const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
-const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [], demo: null };
+const state = { days: null, selected: location.hash.slice(1) || null, packet: null, devices: [], replay: [], demo: null, public: false };
 
 async function api(path, init) {
   const res = await fetch(path, { ...init, signal: AbortSignal.timeout(15000) });
@@ -428,7 +429,9 @@ async function loadRing() {
 
 /* ---------- replay a pickup day ---------- */
 async function loadReplay(first = false) {
-  try { const r = await api("/api/replay"); state.replay = r.days; state.demo = r.demo; } catch { state.replay = []; state.demo = null; }
+  try { const r = await api("/api/replay"); state.replay = r.days; state.demo = r.demo; state.public = r.public === true; } catch { state.replay = []; state.demo = null; }
+  // The public demo only plays recorded days: no arming, no doorbells, no delete.
+  for (const id of ["openForm", "newday", "ring"]) $(`#${id}`).hidden = state.public;
   $("#replay").hidden = state.replay.length === 0;
   if (first) $("#replayDay").replaceChildren(...state.replay.map((d) => h("option", { value: d.dayId }, `${d.dayId}: ${plural(d.labels, "label")}, ${when(d.startMs)}`)));
   // While the demo plays, the page follows the day that is being played.
@@ -595,7 +598,7 @@ function renderDetail() {
     tracks(p),
     h("section", { class: "section" }, h("h2", {}, "porch frames"), frames(p), facts(p)),
     h("section", { class: "section" }, h("h2", {}, "day timeline"), timeline(p)),
-    h("section", { class: "section" }, h("div", { class: "section-head" }, h("h2", {}, "evidence packet"), h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));
+    h("section", { class: "section" }, h("div", { class: "section-head" }, h("h2", {}, "evidence packet"), h("span", { class: "actions" }, h("a", { class: "btn", href: `/days/${encodeURIComponent(p.dayId)}`, download: `${p.dayId}-packet.json` }, "Download packet JSON"), state.public ? null : h("button", { type: "button", class: "btn ghost", onclick: () => removeDay(p.dayId) }, "Delete this day and its frames"))), packet(p)));
 }
 
 async function removeDay(id) {

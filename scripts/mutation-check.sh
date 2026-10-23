@@ -26,6 +26,7 @@ while IFS= read -r line; do
   if run_suite "$TMP/w" "$tfile"; then echo "SURVIVED (check is blind) $label"; fail=1; elif real_red; then echo "RED   $label"; else echo "CRASHED, not a test failure: $label"; fail=1; fi
 done <<'MUT'
 src/vision/recorded.ts@@s/if \(!r \|\| r.replies.length === 0\) throw new Error\(.*\);/if (!r) return { present: false, count: 0, raw: "" };/@@recorded.test.ts@@missing recorded frame read as an empty porch
+src/server.ts@@s/if \(o\.readOnly \&\& \(/if (false \&\& (/@@replay-api.test.ts@@public demo accepts arm, delete and Ring routes
 src/ring/signature.ts@@s/return timingSafeEqual\(expected, Buffer.from\(received, "hex"\)\);/return true;/@@webhook.test.ts@@signature check always accepts
 src/ring/signature.ts@@s/if \(!signingKey \|\| !header\) return false;//@@webhook.test.ts@@missing header no longer rejected
 src/ring/webhook.ts@@s/\.then\(\(\) => opts\.handle\(event\)\)\s*$/.then(() => { opts.store.markDone(event.requestId); return opts.handle(event); })/@@webhook.test.ts@@idempotency marked before handling

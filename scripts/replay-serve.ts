@@ -5,6 +5,7 @@
 //   node scripts/replay-serve.ts --days day01,day13    also replay these days before serving
 //   node scripts/replay-serve.ts --demo day05,day06,day15   the three demo days: a missed day, a part-taken day, an unscanned day
 //   node scripts/replay-serve.ts --pace-ms 1500        pause between steps of a replay started from the page (800 ms minimum)
+//   node scripts/replay-serve.ts --public              public read-only demo on 0.0.0.0: plays and shows recorded days, refuses arm, delete and Ring routes
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import type { AddressInfo } from "node:net";
@@ -22,6 +23,7 @@ const picked = flag("--days", "").split(",").filter(Boolean);
 const demoIds = flag("--demo", "day05,day06,day15").split(",");
 const paceMs = Number(flag("--pace-ms", "0"));
 const port = Number(flag("--port", process.env.PORT ?? "8788"));
+const isPublic = args.includes("--public");
 
 const days = loadDays();
 const unknown = picked.filter((id) => !days.some((d) => d.dayId === id));
@@ -48,9 +50,9 @@ const demo: { running: boolean; current: string | null; names: string[] } = { ru
 if (demoIds.length !== DEMO_STEPS.length) throw new Error(`--demo needs ${DEMO_STEPS.length} recorded day ids`);
 let base = "";
 const pace = () => new Promise<void>((r) => setTimeout(r, Math.max(paceMs, 800)));
-const server = createApp({
+const options: Parameters<typeof createApp>[0] = {
   signingKey: SIM_KEY, ledger, runner,
-  ring: ringIntegrationFromEnv(process.env, { session: new RingSession({ tokenFile: "data/ring-refresh-token" }), vision, port, tokenFile: "data/ring-refresh-token", photoDir: "data/ring-photos" }),
+  ring: isPublic ? undefined : ringIntegrationFromEnv(process.env, { session: new RingSession({ tokenFile: "data/ring-refresh-token" }), vision, port, tokenFile: "data/ring-refresh-token", photoDir: "data/ring-photos" }),
   devices: async () => [{ id: REPLAY_DEVICE, name: "Front door", provenance: "replay" }],
   replay: {
     days: () => days.map((d) => ({ dayId: d.dayId, labels: d.labels.length, startMs: d.windowStartMs })),
@@ -83,10 +85,19 @@ const server = createApp({
       },
     },
   },
-});
-await new Promise<void>((r) => server.listen(port, "127.0.0.1", r));
+};
+// The replay arms days and signs webhooks over HTTP. In public mode it talks to a loopback-only twin over the same ledger,
+// so the internet-facing app can refuse every write.
+const server = createApp(options);
+await new Promise<void>((r) => server.listen(isPublic ? 0 : port, "127.0.0.1", r));
 base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-console.log(`seen off replay console on ${base}`);
+if (isPublic) {
+  const open = createApp({ ...options, readOnly: true });
+  await new Promise<void>((r) => open.listen(port, "0.0.0.0", r));
+  console.log(`seen off public demo on http://0.0.0.0:${port} (read-only), pipeline on ${base}`);
+  // A visitor arriving later finds the three demo days already settled, with "Play it again" to watch them land.
+  options.replay!.demo!.start();
+} else console.log(`seen off replay console on ${base}`);
 
 const pause = paceMs > 0 ? () => new Promise<void>((r) => setTimeout(r, paceMs)) : undefined;
 for (const id of picked) {
@@ -94,4 +105,4 @@ for (const id of picked) {
   const r = await playDay(base, runner, d, (ms) => { now = ms; }, { pause });
   console.log(`${id} truth ${d.truth} -> ${r.verdict}`);
 }
-console.log(`replayed ${picked.length} days, serving on ${base}`);
+console.log(`replayed ${picked.length} days, serving on ${isPublic ? `0.0.0.0:${port}` : base}`);

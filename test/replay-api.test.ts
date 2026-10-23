@@ -59,3 +59,26 @@ test("a server without recorded days lists none and refuses a replay", async () 
     assert.equal((await fetch(`${a.base}/api/replay`, { method: "POST", body: "{}" })).status, 404);
   } finally { a.close(); }
 });
+
+test("the public demo refuses arming, deleting and every Ring route, and says it is public", async () => {
+  const ledger = new Ledger(":memory:");
+  const runner = new PickupRunner({ ledger, clock: () => 0, frames: [], vision: { name: "s", model: "s", readPorch: async () => ({ present: false, count: 0, raw: "" }) }, tracking: { statusOf: async () => "TRANSIT" }, alerter: { send: async () => {} } });
+  const replay = { days: () => [], start: () => "x", demo: { start() {}, status: () => ({ running: false, current: null, steps: [] }) } };
+  const plan = { dayId: "d1", deviceId: "dev", windowStartMs: 1_000, windowEndMs: 2_000, labels: [{ trackingNumber: "T1", carrier: "usps" }] };
+  const listen = (srv: ReturnType<typeof createApp>) => new Promise<string>((ok) => srv.listen(0, "127.0.0.1", () => ok(`http://127.0.0.1:${(srv.address() as AddressInfo).port}`)));
+  const pipe = createApp({ signingKey: "k", ledger, runner, replay });
+  const open = createApp({ signingKey: "k", ledger, runner, replay, readOnly: true });
+  const [inner, outer] = [await listen(pipe), await listen(open)];
+  try {
+    assert.equal((await fetch(`${outer}/days`, { method: "POST", body: JSON.stringify(plan) })).status, 403);
+    assert.equal((await fetch(`${inner}/days`, { method: "POST", body: JSON.stringify(plan) })).status, 201, "the loopback twin still arms");
+    assert.equal((await fetch(`${outer}/days/d1`)).status, 200, "the packet stays readable");
+    assert.equal((await fetch(`${outer}/days/d1`, { method: "DELETE" })).status, 403);
+    for (const [m, path] of [["POST", "/ring/webhook"], ["GET", "/api/ring"], ["GET", "/ring/connect"], ["POST", "/api/ring/snapshot"]]) {
+      assert.equal((await fetch(`${outer}${path}`, { method: m })).status, 403, `${m} ${path}`);
+    }
+    assert.equal(((await (await fetch(`${outer}/api/replay`)).json()) as { public?: boolean }).public, true);
+    assert.equal(((await (await fetch(`${inner}/api/replay`)).json()) as { public?: boolean }).public, undefined);
+    assert.equal((await fetch(`${inner}/days/d1`, { method: "DELETE" })).status, 200, "without readOnly the same delete succeeds");
+  } finally { pipe.close(); open.close(); }
+});

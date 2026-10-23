@@ -10,5 +10,10 @@ node_modules
 spikes
 metric
 simulator
+!simulator/days
+!simulator/days.json
+!simulator/replay.ts
+!simulator/webhook-simulator.ts
+!simulator/qwen3-vl-reads.json
 test
 docs

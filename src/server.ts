@@ -41,6 +41,11 @@ export interface AppOptions {
   ring?: RingIntegration;
   /** Operator sign-in. When set, every route except Ring's own (webhook, link, token exchange), /health and the sign-in form needs a session cookie; unset leaves the console open (local use). */
   operator?: OperatorAuth;
+  /**
+   * Public read-only demo: anyone can watch the recorded days play and open their packets, nobody can arm, delete or reach Ring.
+   * The replay itself drives a second, loopback-only app over the same ledger, so its own POSTs never pass through this one.
+   */
+  readOnly?: boolean;
   /** Recorded pickup days the seller can play through the pipeline from the page. */
   replay?: {
     days(): { dayId: string; labels: number; startMs: number }[];
@@ -76,6 +81,10 @@ export function createApp(o: AppOptions): Server {
     try {
       const url = new URL(req.url ?? "/", "http://x");
       if (req.method === "GET" && url.pathname === "/health") return send(200, { ok: true });
+      if (o.readOnly && ((req.method === "POST" && url.pathname === "/days") || (req.method === "DELETE" && /^\/days\/[^/]+$/.test(url.pathname))
+        || url.pathname.startsWith("/ring/") || url.pathname === "/api/ring" || url.pathname.startsWith("/api/ring/"))) {
+        return send(403, { error: "read-only demo", errors: ["This public demo only plays recorded pickup days."] });
+      }
       if (o.operator) {
         const op = o.operator;
         const page = (status: number, body: string) => { res.writeHead(status, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" }); res.end(body); };
@@ -192,7 +201,7 @@ export function createApp(o: AppOptions): Server {
         req.on("close", () => { clearInterval(beat); o.ledger.changes.off("change", onChange); });
         return;
       }
-      if (url.pathname === "/api/replay" && req.method === "GET") return send(200, { days: o.replay?.days() ?? [], demo: o.replay?.demo?.status() ?? null });
+      if (url.pathname === "/api/replay" && req.method === "GET") return send(200, { days: o.replay?.days() ?? [], demo: o.replay?.demo?.status() ?? null, ...(o.readOnly ? { public: true } : {}) });
       if (url.pathname === "/api/demo" && req.method === "POST") {
         if (!o.replay?.demo) return send(404, { error: "no demo on this server" });
         if (o.replay.demo.status().running) return send(409, { error: "demo busy", errors: ["the demo is already playing"] });
